@@ -1,0 +1,61 @@
+\section{Introduction}
+
+% ========== Problem ==============
+In this paper, we consider composite optimization problems of the form
+\begin{equation}\label{eq:main_problem}
+	\min_{x\in \RR^n}~f(x)+g(x)
+\end{equation}
+where $f$ is convex and differentiable, 
+%a $\mu$-strongly convex $L$-smooth function ({i.e.} differentiable with $L$-Lipschitz continous gradient) 
+and $g$ is convex and nonsmooth. 
+This type of problem appears extensively in signal processing and machine learning applications; we refer to e.g.\;\cite{candes2008enhancing}, \cite{combettes2011proximal}, \cite{bach2012optimization}, among a vast literature. Large scale applications in these fields call for first-order optimization, such as proximal gradient methods
+(see e.g.\;the recent\;\cite{teboulle2018simplified}) and coordinate descent algorithms (see e.g.\;the review\;\cite{wright2015coordinate}).  
+
+
+% =========== identification =============
+In these methods, the use of a proximity operator to handle the nonsmooth part $g$ plays a prominent role, as it typically enforces some ``sparsity'' structure on the iterates and eventually on optimal solutions, see e.g.\;\cite{vaiter-model-linear15}. For instance, the popular $\ell_1$-norm regularization ($g=\|\cdot\|_1$) promotes optimal solutions with a few nonzero elements, and its associated proximity operator (called soft-thresholding, see\;\cite{donoho1995noising}) zeroes entries along the iterations. This is an example of \emph{identification}: in general, the iterates produced by proximal algorithms eventually reach some sparsity pattern close to the one of the optimal solution. For $\ell_1$-norm regularization, this means that after a finite but unknown number of iterations the algorithm ``identifies'' the final set of non-zero variables. This active-set identification property is typical of constrained convex optimization (see e.g.\;\cite{wright1993identifiable}) and nonsmooth optimization (see e.g.\;\cite{hare2004identifying}).
+
+The study of identification dates back at least to \cite{bertsekas1976goldstein} who showed that the projected gradient method identifies a sparsity pattern when using non-negative constraints. Such identification has been extensively studied in more general settings; we refer to \cite{burke1988identification}, \cite{lewis2002active}, \cite{drusvyatskiy2013optimality} or the recent \cite{lewis2018partial}, among other references.
+Recent works on this topic include: i) extended identification for a class of functions showing strong primal-dual structure, including TV-regularization and nuclear norm \cite{fadili2018sensitivity}; ii) identification properties of various randomized algorithms, such as coordinate descent \cite{wright2012accelerated} and stochastic methods \cite{pmlr-v80-poon18a,fadili2018model,sun2019we}.
+
+The knowledge of the optimal substructure would allow to reduce the optimization problem in this substructure and solve a lower dimension problem. While identification can be guaranteed in special cases  (e.g.\;using duality\;for $\ell_1$-regularized least-squares \cite{ogawa2013safe, fercoq2015mind}), 
+%dimension reduction methods have proven to be highly profitable 
+it is usually unknown beforehand and proximal algorithms can be exploited to obtain approximations of this substructure.
+%  
+After some substructure identification, one could switch to a more sophisticated method, e.g.\,updating parameters of first-order methods (\cite{2015-Liang-InterialFB}).
+% or using restricted Newton's steps (XXX U-newton claudia, daniilidis-malick).
+Again, since the final identification moment is not known, numerically exploiting identification to accelerate the convergence of first-order methods has to be done with great care.
+
+
+% ============= contributions ===========
+
+In this paper, we propose randomized proximal algorithms leveraging on structure identification: our idea is to sample the variable space according to the structure of $g$. To do so, we first introduce a randomized descent algorithm going beyond separable nonsmoothness and associated coordinate descent methods:
+we consider ``subspace descent" extending ``coordinate descent" to generic subspaces.
+Then, we use a standard identification property of proximal methods to adapt our sampling of the subspaces with the identified structure. This results in a structure-adapted randomized method with automatic dimension reduction, which 
+performs better in terms of dimensions explored compared standard proximal methods and the non-adaptive version.
+
+Though our main concern is the handling of non-separable nonsmooth functions $g$, we mention that our identification-based adaptive approach is different from existing adaptation strategies restricted to the particular case of coordinate descent methods. Indeed, adapting coordinate selection probabilities is an important topic for coordinate descent methods as both theoretical and practical rates heavily depend on them (see e.g.\;\cite{richtarik2014iteration,necoara2014random}).
+Though the optimal theoretical probabilities, named importance sampling, often depend on unknown quantities, these \emph{fixed} probabilities can sometimes be computed and used in practice, see\;\cite{zhao2015stochastic,richtarik2016optimal}.
+The use of \emph{adaptive} probabilities is more limited; some heuristics without convergence guarantees can be found in \cite{loshchilov2011adaptive,glasmachers2013accelerated}, and greedy coordinates selection
+%with the largest norm but 
+are usually expensive to compute \cite{dhillon2011nearest,nutini2015coordinate,nutini2017let}. Bridging the gap between greedy and fixed importance sampling, \cite{perekrestenko2017faster,namkoong2017adaptive,stich2017safe} propose adaptive coordinate descent methods based on the coordinate-wise Lipschitz constants and current values of the gradient. 
+% I think we can avoid refering to :
+% One can also mention \cite{csiba2015stochastic} where the duality gap is used to adapt coordinate probabilities for the stochastic dual coordinate ascent method (SDCA).
+The methods proposed in the present paper, even when specialized in the coordinate descent case, are the first ones where the \emph{iterate structure enforced by a non-smooth regularizer} is used to adapt the selection probabilities.
+
+% ======= outline =========
+The paper is organized as follows. In Section~\ref{sec:sub_des}, we introduce the formalism for subspace descent methods. First, we formalize how to sample subspaces and introduce a first random subspace proximal gradient algorithm. Then, we show its convergence and derive its linear rate in the strongly convex case. Along the way, we make connections and comparisons with the literature on coordinate descent and sketching methods, notably in the special cases of $\ell_1$ and total variation regularization. In Section~\ref{sec:ada_sub_des}, we present our identification-based adaptive algorithm. We begin by showing the convergence of an adaptive generalization of our former algorithm; next, we show that this algorithm enjoys some identification property and give practical methods to adapt the sampling, based on generated iterates, leading to refined rates. Finally, in Section~\ref{sec:num}, we report numerical experiments on popular learning problems to illustrate the merits and reach of the proposed methods.
+
+
+
+% %skteching : je zappe ca
+% In that view, it is related to sketching methods \cite{jesaispas} sketching \cite{gower2018stochastic} although in our case the random subspaces of evaluation is not taken uniformly but along chosen structure adapted to the regularizer. -> Sec. 2.4 (top)
+
+% In the context of  $\ell_1$-regularized problems, they can be combined with screening techniques for efficiently solving high-dimensional problems, \cite{Massias_Gramfort_Salmon18}. -> 2.4.1? % pas besoin ? on cite deja les autres
+
+% 
+% adapting coordinate descent probabilities to the identified important \cite{preprint-mitya?}.  -> ???
+
+
+% more identif':
+% However, to the exception of \cite{maybe someone}, identification is only harnessed if it concerns the (coordinate) sparsity of the iterates. For a broader class of regularizers, including the total variation ($g(x) = \sum_{i=2}^n |x_{i}-x_{i-1}|$ in 1D) or weighted $\ell_1$-norm ($g(x)=\|Mx\|_1$ with $M$ an $m\times n$ matrix), the identified subspace is not coordinate-sparse but still sparse on some well-chosen subspaces. 

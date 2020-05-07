@@ -1,0 +1,102 @@
+\section{Gradient descent}\label{sec:basics_gd}
+Let us consider the following optimization problem
+\begin{equation}\label{eq:pb_simple}
+    \min_{x\in\RR^n}f(x),
+\end{equation}
+where $f$ is convex and smooth. One of the most important methods in the mathematical optimization to minimize \eqref{eq:pb_simple} is a gradient descent method. This method was initially proposed in work of Cauchy \cite[Extrait $383$]{cauchy1847methode} and becomes popular after \cite{polyak1963gradient}. Thanks to its simplicity there are many extensions of it \cite{polyak1969minimization, polyak1969conjugate, nesterov2005smooth, beck2009fast}.
+% , that are widely used in the modern machine learning applications \cite{bottou2018optimization}. 
+
+Consider the ordinary differential equation (ODE)
+$$
+\frac{d x}{d t} = -\nabla f(x),
+$$
+then the values of $f(x)$ are decreasing along the trajectories of it \cite{cauchy1847methode}. Another way to see that anti-gradient is a descent direction is the following. From the definition of the gradient we could have that
+$$
+df_x(u) = \nabla f(x)^\top u,
+$$
+for any small vector. It implies, that in this first-order approximation the best direction to select is anti-gradient, that is exactly the idea of the gradient descent.
+
+\begin{algorithm}
+    \caption{Gradient Descent (GD)}
+    \label{algo:gd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE $x^{k+1}\leftarrow x^k - \gamma^k \nabla f(x^k)$\hfill where $\gamma^k$ is a stepsize
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+Let us now present the convergence result for the gradient descent algorithm with the fixed stepsize $\gamma^k = \gamma$ (Theorems $2.1.14$ and $2.1.15$ \cite{nesterov-book}).
+\begin{theorem}[Convergence of Gradient Descent]\label{th:gd}
+Let us assume that $f$ is convex and $L$-smooth, take $\gamma\in\left(0,\frac{2}{L}\right)$, then Algorithm \ref{algo:gd} generates the sequence of poits $(x^k)_{k\geq0}$ such that 
+\begin{equation}
+    f(x^k) - f^\star \leq \frac{2(f(x^0)-f^\star)\|x^0-x^\star\|_2^2}{2\|x^0-x^\star\|_2^2 + \gamma k(2-\gamma L)(f(x^0) - f^\star)},
+\end{equation}
+where $f^\star = \min_{x\in\mathbb{R}^n}$ and $x^\star$ is an optimal solution $f(x^\star) = f^\star$.
+If moreover, $f$ is $\mu$-strongly convex with $\mu>0$, then take $\gamma\in\left(0, \frac{2}{\mu + L}\right]$, then Algorithm \ref{algo:gd} generates the sequence of points $(x^k)_{k\geq0}$ such that 
+\begin{equation}
+\|x^k-x^\star\|_2^2\leq\left(1-\frac{2\gamma\mu L}{\mu + L}\right)^k\|x^0-x^\star\|_2^2,
+\end{equation}
+where $x^\star$ is a unique minimizer of \eqref{eq:pb_simple}.
+\end{theorem}
+% {\color{blue}
+% The rate of the gradient descent for strongly convex objectives is called linear and without strong convexity it has sublinear rate.
+% \begin{definition}[Rate of convergence]
+% Algorithm is called linearly convergent on the problem $f$ is there exist such $\alpha \in(0,1)$ that for any starting point $x^0$ it holds
+% $$
+% \lim_{k\rightarrow\infty}\frac{f(x^{k+1}) - f^\star}{f(x^k) - f^{\star}}\leq 1 - \alpha.
+% $$
+% Algorithm is called sublinearly convergent on the problem $f$ is there exist such $\alpha \in(0,1)$ that for any starting point $x^0$ it holds
+% $$
+% \lim_{k\rightarrow\infty}\frac{f(x^{k+1}) - f^\star}{f(x^k) - f^{\star}}=1.
+% $$
+% \end{definition}
+% The rate of optimization algorithms is often presented in terms of amount of iterations up to some accuracy $\varepsilon$. In this terminology, GD algorithm has $O\left(\frac{L}{\varepsilon}\right)$ rate in convex case and $O\left(\kappa\log{\frac{1}{\varepsilon}}\right)$ in $\mu$-strongly convex.
+% }
+
+
+%  \cite{nesterov-book}.
+\begin{proof}[Proof of Theorem \ref{th:gd}]
+Let us start from the case when $\mu = 0$. Fix some $x^\star\in\Argmin_{x\in\mathbb{R}^n} f(x)$ and denote by $r^k = \|x^k-x^\star\|^2_2$.
+Then 
+\begin{align}\label{eq:gd_proof_1}
+r^{k+1} = \|x^k - x^\star - \gamma\nabla f(x^k)\|_2^2 = r^k - 2\gamma\langle \nabla f(x^k), x^k - x^\star\rangle &+ \gamma^2\|\nabla f(x^k)\|_2^2\nonumber\\
+&\leq r^k - \gamma\left(\frac2L - \gamma\right)\|\nabla f(x^k)\|_2^2,
+\end{align}
+where in the last inequality we use $L$-smoothness and $\nabla f(x^\star) = 0$. Now, using \eqref{eq:descent_lemma_1} we get
+$$
+f(x^{k+1})\leq f(x^k) + \langle \nabla f(x^k), x^{k+1} - x^k\rangle + \frac{L}{2}\|x^{k+1}- x^k\|_2^2 = f(x^k) - \underbrace{\gamma\left(1 - \frac{\gamma L}{2}\right)}_{\omega}\|\nabla f(x^k)\|_2^2.
+$$
+Denote by $\Delta^k = f(x^k)-f^\star$ then using the non-increasing property of $r^{k+1}\leq r^k$ \eqref{eq:gd_proof_1} we have
+$$
+\Delta^k \leq\langle\nabla f(x^k), x^k-x^\star\rangle\leq \sqrt{r^k}\|\nabla f(x^k)\|_2^2\leq \sqrt{r^0}\|\nabla f(x^k)\|_2^2.
+$$
+It implies that $\Delta^{k+1}\leq\Delta^k - \frac{\omega}{r^0}(\Delta^k)^2$ and as a result
+$$
+\frac{1}{\Delta^{k+1}}\geq \frac{1}{\Delta^k} + \frac{\omega}{r^0}\frac{\Delta^k}{\Delta^{k+1}}\geq \frac{1}{\Delta^k} + \frac{\omega}{r^0},
+$$
+where in the last inequality the non-increasing property of $\Delta^k$ is used.
+Summing up these inequalities from $k=0$ we get
+$$
+\frac{1}{\Delta^k}\geq \frac{1}{\Delta^0} + \frac{\omega}{r^0}(k+1).
+$$
+Let us now assume that $\mu> 0$ using the same notation as in the first part
+\begin{align}
+r^{k+1} = \|x^k - x^\star - \gamma \nabla f(x^k)\|_2^2 &= r^k - 2\gamma\langle \nabla f(x^k), x^k - x^\star\rangle + \gamma^2\|\nabla f(x^k)\|_2^2\nonumber\\
+&\leq \left(1-\frac{2\gamma\mu L}{\mu + L}\right) + \underbrace{\gamma\left(\gamma - \frac{2}{\mu + L}\right)}_{\leq 0}\|\nabla f(x^k)\|_2^2,
+\end{align}
+where we use Lemma \ref{lm:bubeck} and $\nabla f(x^\star) = 0$.
+\end{proof}
+As we could see from this theoretical result, the best theoretical rate for non-strongly convex fuctions is achieved when $\gamma = \argmax\left(\gamma\left(1 - \frac{\gamma L}{2}\right)\right) = \frac{1}{L}$ that leads to the following rate
+\begin{equation}\label{eq:gd_rate}
+    f(x^k) - f^\star \leq \frac{2L(f(x^0)-f^\star)\|x^0-x^\star\|_2^2}{2L\|x^0-x^\star\|_2^2 +k(f(x^0) - f^\star)}\leq \frac{2L\|x^0-x^\star\|^2_2}{k+4},
+\end{equation}
+where for the last inequality we used \eqref{eq:descent_lemma_1}.
+For the $\mu$-strongly convex objective function $f$ the optimal $\gamma= \frac{2}{\mu + L}$, that leads to the following rate
+\begin{equation}\label{eq:gd_rate_strongly}
+\|x^k-x^\star\|_2^2\leq\left(1-\frac{4\mu L}{(\mu + L)^2}\right)^k\|x^0-x^\star\|_2^2 = \left(\frac{\kappa - 1}{\kappa + 1}\right)^{2k}\|x^0-x^\star\|_2^2.
+\end{equation}
+
+{\color{blue} The convergence rate depends on $\kappa$ and it is faster if the problem is better-conditioned. For example, if the problem is $1$-conditioned, then only $1$ iteration of GD is enough to converge.}

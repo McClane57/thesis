@@ -1,0 +1,163 @@
+\section{Notations and Preliminaries}\label{sec:distributed-prelim}
+
+We place ourselves in a \emph{totally asynchronous} as per the classification of Bertsekas and Tsitsiklis \cite[Chap.\;6.1]{bertsekas1989parallel}, meaning that all workers are responsive but without bounded delays. In this section, we recall the \dave~algorithm, notations, and results from \cite{mishchenko2019distributed}. 
+
+Let us consider a distributed setup where $n$ observations are split down over $M$ machines, each machine $i$ having a private subset $\mathcal{S}_i$ of the examples.
+Learning over such scattered data leads to optimization problems with composite objective of the form
+\begin{align}\label{eq:pb}
+\tag{$\mathsf{P}$}
+\min_{x\in\mathbb{R}^d}  ~ F(x) =  \sum_{i=1}^M  \alpha_i  f_i(x)  +  r(x),
+\end{align}
+with $\alpha_i= |\mathcal{S}_i|/n$ being the proportion of observations locally stored in machine\;$i$, hence $\sum_{i=1}^M\alpha_i = 1$. $f_i(x) = \frac{1}{|\mathcal{S}_i|}  \sum_{j\in\mathcal{S}_i}l_j(x) $ is the local empirical risk at machine\;$i$ ($l_j$ standing for the smooth loss function for example $j$) and $r$ is a regularization term.
+
+\dave~can solve Problem~\eqref{eq:pb} by representing it in the form of a triplet (\emph{workers weights},\emph{workers functions},\emph{global regularization}) i.e. $((\alpha_i),(f_i),r)$ and performing Algorithm~\ref{alg:dave}.
+
+
+
+\begin{algorithm}
+\caption{\textsc{\dave} on $((\alpha_i),(f_i),r)$ with stopping criterion $\mathsf{C}$} 
+\label{alg:dave}
+
+\tcbset{width=0.48\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
+
+\begin{tcolorbox}[title=\textsc{Master} \vphantom{\texttt{Worker  i}}]
+Initialize $\bar x^0$\\
+\While{stopping criterion $\mathsf{C}$ not verified}{
+    \hspace*{0ex}\\
+     {\color{blue!70!black}Receive\,$\Delta^k$\,from\,agent\,$i^k$}\\
+     $\barx^k \leftarrow \barx^{k-1} + \alpha_i \Delta^k $\\
+     $ x^k \leftarrow \rprox(\bar x^k )$\\
+    {\color{red!80!yellow} Send $x^k$ to agent $i^k$}\\
+    $k\leftarrow k+1$
+}
+Interrupt all slaves\\
+\textbf{Output} $x^k$
+\end{tcolorbox}
+\tcbset{width=0.48\columnwidth, colframe=black!50!black, coltitle=white, colbacktitle=black}
+\begin{tcolorbox}[title=\textsc{Worker } $i$]
+Initialize $x_i = x_i^+0$\\
+\While{not interrupted by master}{
+    \hspace*{0.1ex}\\
+     {\color{red!80!yellow}Receive  $x$ from master}\\
+    $x^+_i  \leftarrow x - \gamma \nabla f_i( x)$\\[0.6ex]
+    $\Delta \leftarrow x_i^+ - x_i $ \\[0.7ex]
+    {\color{blue!70!black}Send $\Delta$ to master}\\[0.7ex]
+    $x_i \leftarrow x^+_i $%\\[0.7ex]
+}
+\vspace*{0.1cm}
+\end{tcolorbox}
+\vspace*{-0cm}
+\end{algorithm}
+
+
+An asynchronous distributed setting allows the algorithm to carry on computation without waiting for slower machines: the machine performs computations based on outdated versions of the main variable, and the master has to gather the slaves inputs into a productive update. We formalize this framework with the following notation. 
+\begin{itemize}
+    \item \emph{For a worker $i\in\{1,\ldots,M\}$.} At time $k$, let $d_i^k$ be the elapsed moment since the last time the master has communicated with worker $i$ ($d_i^k = 0$ iff the master gets updates from worker $i$ at exactly time $k$, i.e. $i^k=i$). We also consider  $D_i^k$ as the elapsed time since the second last update. This means that, at time $k$, the last two moments that the worker $i$ has communicated with the master are $k-d_i^k$ and $k-D_i^k$ (see Figure \ref{fig:delays}). 
+    %also if $i$ does not update at time $k$, then $k-d_i^k = k-1 - d_i^{k-1}$.
+    \item \emph{For the master.} We define $k$, as the number of updates that the master has received from any of the worker machines. Thus, at time $k$, the master receives some input from a worker, denoted by $i^k$, updates its global variables, $\barx^k$ and $x^k$; and sends $x^k$ back to worker $i^k$, where $\bar{x}$ is equal to the average of received updates from workers
+    \begin{equation}\label{eq:barx}
+    \barx^k = \sum_{i=1}^M\pi_i x_i^k = \sum_{i=1}^M \pi_i x^{k-d_i^k}.
+    \end{equation}
+    \end{itemize}
+To handle asynchrony, we define the sequence of stopping times $(k_m)$  iteratively as $k_0 = 0$ and
+\begin{align}
+\label{eq:km}
+k_{m+1} &= \min\left\{ k : k- D_i^k \geq k_m ~\text{for all $i$} \right\}.
+\end{align}
+
+\begin{figure}
+    \hspace{30pt}\begin{tikzpicture}[scale = 1.3]
+        %%% BASE
+       \draw[thick, ->] (0,0) -- (10,0) node [below] {global time};
+       \foreach \x in {1,...,19}
+       \draw (\x/2, 0.1) -- node[pos=0.5] (point\x) {} (\x/2.0, -0.1);
+       
+       \draw (0,1) -- (0,2) -- (11,2) -- (11,1) -- (0,1);
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] at (0.5,1.5) {$\Delta_i$};
+       \node at (2,1.5) { updates of $i$};
+       \node[draw,circle,fill=red, scale = 0.8] (B) at (8,1.5) {};
+       \node at (9.75,1.5) { viewpoint time $k$};
+    
+       %%%% Specific
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (7.5,0) {$\Delta_i$};
+       \node[draw,circle,fill=red, scale = 0.8]  at (7.5,0) {};
+       \node[scale=0.8] at (7.5,-0.75) {$k$};
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (5,0) {$\Delta_i$};
+       \node[scale=0.8] at (5,-0.75) {$k-D_i^k$};
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (2.5,0) {$\Delta_i$};
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (1.5,0) {$\Delta_i$};
+       
+     \end{tikzpicture}
+    
+    
+        \hspace{30pt}\begin{tikzpicture}[scale = 1.3]
+        %%% BASE
+       \draw[thick, ->] (0,0) -- (10,0) node [below] {global time};
+       \foreach \x in {1,...,19}
+       \draw (\x/2, 0.1) -- node[pos=0.5] (point\x) {} (\x/2.0, -0.1);
+       
+    
+       
+       %%%% Specific
+       \node[draw,circle,fill=red, scale = 0.8]  at (7.5,0) {};
+       \node[scale=0.8] at (7.5,-0.75) {$k$};
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (6.0,0) {$\Delta_i$};
+       \node[scale=0.8] at (6,-0.75) {$k-d_i^k$};
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (3.5,0) {$\Delta_i$};
+       \node[scale=0.8] at (3.5,-0.75) {$k-D_i^k$};
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (2.0,0) {$\Delta_i$};
+       \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (0.5,0) {$\Delta_i$};
+       
+     \end{tikzpicture}
+     \caption{Notations of delays at iteration $k$.}
+     \label{fig:delays}
+    \end{figure}
+    
+The stopping moment $k_{m+1}$ is the first moment of time, when $\barx^k$ directly depends only on ``new epoch'' variables. More precisely, as we could see from \eqref{eq:barx} it depends directly on the $x_i^{k-d_i^k}$ that are the result of some computation on $i$-th worker while having $x_i^{k-D_i^k}$ and $x^{k-D_i^k}$ as a parameters.
+
+As in \cite{mishchenko2019distributed}, all convergence results will involve this notion of epochs.
+
+
+\paragraph{Convergence and rate for strongly convex objectives}
+
+Let us assume that all $(f_i)$ are $\mu$-strongly convex and $L$-smooth with the same constants. This may appear limiting but actually this achieved easily by \emph{exchanging} quadratic between functions. This setup allows us to feature a single stepsize in our algorithm which simplifies the presentation to focus on the contributions.
+
+Under that assumption, we define the \emph{condition number} of the (smooth part of) Problem~\eqref{eq:pb} as 
+$$\kappa_{\eqref{eq:pb}} = \frac{\mu}{L}.$$
+
+This definition may be slightly unusual but it is convenient in the present paper as we will consider the case when $\mu=0$ in the upcoming sections. 
+
+
+\begin{theorem}[Th.~3.2~\cite{mishchenko2019distributed}] \label{th:davepg}
+Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth. Let $g$ be convex lsc. Using $\gamma \in (0, \frac{2}{\mu + L}]$, \dave~converges linearly on the epoch sequence $(k_m)$. More precisely, for all $k\in [k_m, k_{m+1})$
+\begin{align*}
+    \left\| x^k - x^\star \right\|^2 \le \left(1 - \gamma \mu  \right)^{2m} \max_i\left\|x_i^0-x_i^\star\right\|^2,
+\end{align*}
+with the shifted local solutions $x_i^\star = x^\star - \gamma_i\nabla f_i(x^\star)$. 
+
+Furthermore, using the maximal stepsize $\gamma = \frac{2}{\mu + L}$, we obtain for all $k\in [k_m, k_{m+1})$
+\begin{align*}
+    \left\| x^k - x^\star \right\|^2 \le \left( \frac{1-\kappa_{\eqref{eq:pb}}}{1+\kappa_{\eqref{eq:pb}}}  \right)^{2m} \max_i\left\|x_i^0-x_i^\star\right\|^2.
+\end{align*}
+\end{theorem}
+
+
+{\color{blue}
+\paragraph{Discussion on communication.}
+\dave~is a delay-tolerant distributed algorithm that has an automatic sparsification of master-to-worker communications for many popular regularizations. For instance, for $\ell_0$ and $\ell_1$ norms, it corresponds respectively to the hard and soft thresholding operations which set the smallest coordinates to zero, thus sparsifying the output. This kind of proximal sparsification was succesfully used in the case of synchronous distributed learning; see e.g. \cite{wang2017efficient,smith2015l1}. However worker-to-master communications do not need to be sparse that implies that the communication cost is a bottleneck of this algorithm. As we have already mentioned different techniques to solve this issue were developed for SGD: sparsification/quantization of updates \cite{horvath2019stochastic} and mini-batching/local SGD \cite{yang2013trading, khaled2019first}. In \cite{mishchenko2018,ICML18} the authors propose \daveR~Algorithm that allows making a couple of repetitions $p$ of local proximal gradient steps. However, this requires the knowledge of $\barx$ by all workers that makes communication from master to worker not sparse.
+
+In this work, we focus on another way to resolve the communication bottleneck issue - the sparsification of the updates. We aim at providing a distributed optimization algorithm reducing the size of communications by using the model structure enforced by the regularization $r$. Our adaptive communication reduction technique would then be complementary to existing compression techniques (reviewed below).
+
+We first propose an asynchronous distributed algorithm featuring a sparsification of upward communications (slave-to-master). Its sparsification mechanism consists in {\color{red}{randomly and independly}} zeroing the local update entries. This randomized technique maintains the linear convergence in the mean-squared error sense for strongly convex objectives {\color{red}{when difference in probabilities of coordinates to be selected is small enough}} and is adjustable to various levels of communication costs, machines' computational powers, and data distribution evenness. An attractive and original property of this algorithm is the possibility to use a fixed learning rate that depend neither on communication delays nor on the number of machines.
+
+But the theoretical analysis prevent us from using different probabilities in the case, when the problem is ill-conditioned. Getting around this we propose two different solutions. First, we analyze the practical interest of such algorithms and show empirically that algorithm converges often and the ``expected'' amount of communications between machines is smaller than without sparsification. The second approach is in iterative proximal reconditioning of our problem. The same idea is used in Catalyst acceleration scheme \cite{lin2015universal}, where the inner problem is well conditioned with any possible condition number.
+
+Moreover, in the case of $\ell_1$-regularized problems, we show that the generated master iterates identify some sparsity pattern in finite time with probability one, resulting in sparse downward communications (master-to-slave). Thus, all communications are eventually sparse. 
+
+Finally, we furthermore leverage on this identification to improve our sparsification technique by preferably sampling the entries in the support of the master model; 
+this approach can be seen as an automatic dimension reduction procedure, resulting in better performance in terms of quantity of information exchanged {\color{red}{that is proven to be better than non-sparsified algorithm in terms of communications with specific probability for coordinates outside the support.}}
+\paragraph{Outline.}
+This chapter is organized as follows.
+}
+
+

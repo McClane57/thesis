@@ -1,0 +1,97 @@
+% -*- Mode:TeX -*-
+%\documentclass[11pt]{mitthesis}
+\documentclass[11pt,singlespace]{mitthesis}
+
+\usepackage{lineno}
+
+%\usepackage[allfiguresdraft]{draftfigure}
+%\documentclass[11pt,twoside]{mitthesis}
+%% If you want blank pages before new chapters to be labelled ``This
+%% Page Intentionally Left Blank'', use the ``leftblank'' option
+\usepackage{microtype}% microtypography
+\usepackage{cmap}
+\usepackage[final]{pdfpages}
+%\usepackage[T1]{fontenc}
+%\pagestyle{plain}
+% Macros
+\input{header}
+%\pagestyle{headings}
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\itshape \leftmark}
+\fancyhead[RE]{\itshape \rightmark}
+\renewcommand{\headrulewidth}{0pt}
+
+\usepackage{appendix}
+\usepackage{chngcntr}
+\usepackage{etoolbox}
+
+\AtBeginEnvironment{subappendices}{%
+%\chapter*{Appendix}
+%\addcontentsline{toc}{chapter}{Appendices}
+\counterwithin{figure}{section}
+\counterwithin{table}{section}
+}
+
+\begin{document}
+% \includepdf[pages=-]{title.pdf}
+% %\include{cover}
+% \pagenumbering{roman}
+% \newpage
+% \null\vfill
+% \begin{center}
+% Copyright~\copyright~2020 by Dmitry Grishchenko\\
+% All rights reserved
+% \end{center}
+
+
+
+
+%\thispagestyle{empty}
+\newpage
+%\setcounter{savepage}{\thepage}
+%\clearpage
+
+\begingroup
+\let\cleardoublepage\clearpage
+
+% \chapter*{R\'esum\'e}
+% \input{resume}
+
+% \chapter*{Abstract}
+% \input{abstract}
+
+% \chapter*{Acknowledgements}
+% \input{acknowledgements}
+
+\endgroup
+\include{contents}
+\clearpage
+\pagenumbering{arabic}
+
+% \include{intro}
+
+\include{basics_2}
+
+
+\include{mor}
+
+% \begin{subappendices}
+%     \include{app-mor}
+% \end{subappendices}
+
+
+\include{distributed}
+
+% \begin{subappendices}
+%     \include{app-spy}
+% \end{subappendices}
+
+
+
+% \include{conclusion}
+
+\include{biblio}
+\end{document}

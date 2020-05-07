@@ -1,0 +1,146 @@
+\section{Convexity and smoothness}\label{sec:basics_conv_and_smoothness}
+In this section, we recall the basic definitions and properties that are used to analyse optimization methods for smooth and convex objective \cite{hiriart2012fundamentals}. 
+\begin{definition}[Convex function]
+A function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is called convex if $\dom f$ is a convex set and for any $x, y\in \dom f$ and $\alpha \in[0,1]$
+\begin{equation}\label{eq:conv_def}
+f(\alpha x + (1-\alpha)y)\leq \alpha f(x) + (1-\alpha)f(y),
+\end{equation}
+where the domain of function $f$ is defined as
+$$
+\dom f = \{x:|f(x)|<\infty\}.
+$$
+Moreover, function $f$ is called $\mu$-strongly convex if function $g = f - \frac{\mu}{2}\|x\|_2^2$ is convex.
+\end{definition}
+
+From this definition we could immediately get the following interpretation for smooth functions $f$ that is more practical for further analysis. 
+
+\begin{lemma}\label{lm:convex}[Theorem $2.1.2$ \cite{nesterov-book}]
+    A continuously differentiable function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex iff for any $x,y\in\mathbb{R}^n$, we have
+    \begin{equation}\label{eq:convex_1}
+        f(y) \geq f(x) + \langle \nabla f(x), y-x\rangle.
+    \end{equation}
+    Moreover, function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is $\mu$-strongly convex iff for any $x,y$ in $\mathbb{R}^n$, we have
+    \begin{equation}\label{eq:convex_2}
+        f(y) \geq f(x) + \langle \nabla f(x), y-x\rangle + \frac{\mu}{2}\|y-x\|_2^2.
+    \end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:convex}]
+If $f$ is a convex function then for any $\alpha\in[0,1]$ we have 
+$$
+f(y)\geq f(x) +\frac{1}{1-\alpha}\left(f(\alpha x + (1-\alpha)y) - f(x)\right),
+$$
+where the computation of limit for $\alpha \rightarrow 1$ will give \eqref{eq:convex_1}.
+
+Let us now prove the convexity of $f$ form \eqref{eq:convex_1}.
+Summing the following inequalities with multipliers $\alpha$ and $1-\alpha$ correspondingly
+$$
+f(\alpha x + (1-\alpha)y) \leq f(x) - \langle \nabla f(\alpha x + (1-\alpha)y), (1-\alpha)(x-y)\rangle = f(x) + (1-\alpha) \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle
+$$
+$$
+f(\alpha x + (1-\alpha)y) \leq f(y) - \langle \nabla f(\alpha x + (1-\alpha)y), \alpha(y-x)\rangle = f(x) - \alpha \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle
+$$
+we immediately get \eqref{eq:conv_def}. 
+
+The proof of \eqref{eq:convex_2} immediately follows from the definition of the strongly convexity.
+\end{proof}
+
+Convexity implies that any stationary point is a global minima of $f$. In addition, the strong convexity implies the existence and uniqueness of $x^\star = \argmin_{x\in\mathbb{R}^n} f(x)$.
+
+Now let us recall the definition of the $L$-smoothness. 
+
+\begin{definition}[$L$-smoothness]
+Differentiable function $f$ is called $L$-smooth if its gradient is $L$-Lipschitz
+\begin{equation}
+    \|\nabla f(x) - \nabla f(y)\|_2\leq L\|x-y\|_2
+\end{equation}
+for any $x,y\in\mathbb{R}^n$.
+\end{definition}
+
+If function $f$ is $L$-smooth then the following upper bound takes place.
+
+\begin{lemma}\label{lm:descent}[Theorem $2.1.5$ \cite{nesterov-book}]
+    Let us assume that $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex and $L$-smooth, then for any $x,y\in\mathbb{R}^n$
+    \begin{equation}\label{eq:descent_lemma_1}
+        f(y) - f(x) - \langle \nabla f(x), y-x\rangle\leq \frac{L}{2}\|x-y\|_2^2
+    \end{equation}
+    and
+    \begin{equation}\label{eq:descent_lemma_2}
+        \frac{1}{L}\|\nabla f(x) - \nabla f(y)\|_2^2 \leq\langle \nabla f(x) - \nabla f (y), x - y\rangle \leq L\|x-y\|_2^2.
+    \end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:descent}]
+   For any $x,y\in\mathbb{R}^n$ we have
+   \begin{align}
+        f(y) - f(x)  &= \int_0^1\langle\nabla f(x + \alpha(y-x)), y-x\rangle d\alpha\nonumber\\
+         &= \langle \nabla f(x), y-x\rangle + \int_0^1\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle d\alpha
+   \end{align}
+Now, using  convexity of $f$ and Cauchy–Schwarz inequality we have
+\begin{align}\label{eq:lipsh}
+    f(y)-f(x) - \langle \nabla f(x), y-x\rangle &= |f(y)-f(x) - \langle \nabla f(x), y-x\rangle|\nonumber\\ &= \left|\int_0^1\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle d\alpha\right|\nonumber\\
+ &\leq \int_0^1|\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle| d\alpha\nonumber\\
+&\leq\int_0^1\|\nabla f(x + \alpha(y-x)) - \nabla f(x)\|_2\|y-x\|_2 d\alpha\nonumber\\
+&\leq \int_0^1\tau L\|x-y\|_2^2 d\tau = \frac{L}{2}\|x-y\|_2^2.
+\end{align}
+
+To prove the second part let us sum \eqref{eq:lipsh} for the pairs of points $(x,y)$ and $(y,x)$ and immediately get the upper bound.
+For the lower bound, let us define function $\varphi(x)  = f(x) - \langle \nabla f(x^\prime), x\rangle$ for some fixed $x^\prime\in\mathbb{R}^n$.
+It is easy to see, that $\varphi(x)$ is $L$-smooth
+$$
+\|\nabla\varphi(x) - \nabla\varphi(y)\|_2 = \|\nabla f(x) - \nabla f(x^\prime) - \nabla f(y) + \nabla f(x^\prime)\|_2\leq L\|x-y\|_2.
+$$
+Since $x^\prime$ is a minimizer of $\varphi(x)$ we have
+\begin{equation}
+\varphi(x^\prime) \leq \varphi(x - \frac{1}{L}\nabla \varphi(x))\leq \varphi(x) - \frac{1}{2L}\|\nabla \varphi(x)\|_2^2. 
+\end{equation}
+Now setting $x^\prime = y$ we have the corresponding result.
+\end{proof}
+
+\begin{figure}[H]
+\centering
+\input{basics_2/figure}
+\caption{Graphical illustration of lower and upper bound for $L$-smooth and $\mu$-strongly convex function $f:\RR\rightarrow \RR$}
+\label{fig:functional_approximations}
+\end{figure}
+
+In Figure \ref{fig:functional_approximations} we present the graphical illustration of lower \eqref{eq:convex_2} and upper \eqref{eq:descent_lemma_1} bounds for the $L$-smooth and $\mu$-strongly convex objective function $f$. {\color{red}As we could see from this figure, the quadratic lower bound provided by \eqref{eq:convex_2} approximates the functional value much better than first-order approximation, that leads to the intuition that $\mu$-strongly convex functions are easier to analyse.} The quality of these approximations could be characterized by {\textbf{condition number}} of the problem
+$$
+\kappa =  \frac{L}{\mu}.
+$$
+When this number is close to $1$ ({\textbf{well-conditioned}}) the problem is extremely well approximated and when it is big ({\textbf{ill-conditioned}}) problems have a weak approximation. It impacts on the speed of optimization algorithms: better-conditioned problems are easier to solve.
+
+{\color{blue}
+Finally, let us present the following auxiliary lemma (Lemma $3.11$ \cite{bubeck2015convex}) that is widely used in the convergence analysis of first-order methods for $L$-smooth and $\mu$-strongly convex objectives.
+
+\begin{lemma}\label{lm:bubeck}
+Let us assume that $f$ is $L$-smooth and $\mu$-strongly convex, then for any $x,y\in\mathbb{R}^n$ holds
+\begin{equation}\label{eq:bubeck}
+\langle \nabla f(x)- \nabla f(y), x - y\rangle\geq \frac{\mu L}{\mu + L}\|x-y\|_2^2 + \frac{1}{\mu + L}\|\nabla f(x) - \nabla f(y)\|_2^2.
+\end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:bubeck}]
+Consider the case $\mu = L$ then from the $\mu$-strong convexity of $f$ we have
+$$
+f(y) + f(x) \geq f(x) + \langle \nabla f(x), y-x\rangle + \frac{\mu}{2}\|y-x\|_2^2 + f(y) - \langle \nabla f(y), y-x\rangle + \frac{\mu}{2}\|y-x\|_2^2
+$$
+that implies 
+\begin{equation}
+    \langle \nabla f(y) - \nabla f(x), y-x\rangle\geq \mu\|y-x\|_2^2.
+\end{equation}
+Now, using $L$-smoothness we have
+\begin{equation}
+    \langle \nabla f(y) - \nabla f(x), y-x\rangle\geq \frac{\mu}{2}\|y-x\|_2^2 + \frac{\mu}{2L^2}\|\nabla f(x) - \nabla f(y)\|_2^2,
+\end{equation}
+that proves the statement of the lemma.
+
+Consider the case $L>\mu$. Denote by $\varphi(x)=f(x) -\frac{\mu}{2}\|x\|_2^2$, then $\nabla \varphi(x) = \nabla f(x) - \mu x$. This function is $L-\mu$-smooth, using Cauchy–Schwarz inequality and \eqref{eq:descent_lemma_2} we have
+\begin{align}
+\langle \nabla\varphi(x) -\nabla\varphi(y), x-y\rangle\geq \frac{1}{L-\mu}\|\nabla \varphi(x) - \nabla \varphi(y)\|_2^2.
+\end{align}
+Now, substituting the expression for $\nabla \varphi$ 
+\begin{align}
+\langle \nabla f(x)- \nabla f(y), x - y\rangle - \mu\|x-y\|_2^2 &\geq \frac{1}{L-\mu}\left(\|\nabla f(x) - \nabla f(y)\|_2^2 + \mu^2\|x-y\|_2^2\right)\nonumber\\
+&- \frac{2\mu}{L-\mu} \langle \nabla f(x)- \nabla f(y), x - y\rangle,
+\end{align}
+that proves the result.
+\end{proof}
+}

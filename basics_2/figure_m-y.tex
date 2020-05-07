@@ -1,0 +1,124 @@
+\begin{tikzpicture}[
+    thick,
+    >=stealth',
+    dot/.style = {
+      draw,
+      fill = white,
+      circle,
+      inner sep = 0pt,
+      minimum size = 4pt
+    }
+  ]
+
+\draw [black, xshift=4cm] plot [smooth] coordinates {(0,5) (5,0)};
+\draw [black, xshift=4cm] plot [smooth] coordinates {(5,0) (11, 3)};
+\node[ xshift=4cm] at (2, 3) {\color{black}$\bullet$};
+\node[ xshift=4cm] at (1, 3.5) {\color{blue}$\bullet$};
+\draw [yellow!50!black, dashed, xshift = 4cm] plot [smooth] coordinates{
+( -1.0 , 1.5 )
+( -0.8 , 1.88 )
+( -0.6000000000000001 , 2.2199999999999998 )
+( -0.3999999999999999 , 2.52 )
+( -0.19999999999999996 , 2.7800000000000002 )
+( 0.0 , 3.0 )
+( 0.19999999999999996 , 3.18 )
+( 0.4 , 3.32 )
+( 0.6 , 3.42 )
+( 0.8 , 3.48 )
+( 1.0 , 3.5 )
+( 1.2 , 3.48 )
+( 1.4 , 3.42 )
+( 1.6 , 3.32 )
+( 1.8 , 3.18 )
+( 2.0 , 3.0 )
+( 2.2 , 2.7800000000000002 )
+( 2.4 , 2.52 )
+( 2.6 , 2.2199999999999998 )
+( 2.8 , 1.88 )
+};
+
+\node[ xshift=4cm] at (5, 0) {\color{black}$\bullet$};
+\draw [yellow!50!black, dashed, xshift = 4cm] plot [smooth] coordinates{
+( 3.0 , -2.0 )
+( 3.2 , -1.62 )
+( 3.4 , -1.28 )
+( 3.6 , -0.98 )
+( 3.8 , -0.72 )
+( 4.0 , -0.5 )
+( 4.2 , -0.32 )
+( 4.4 , -0.18 )
+( 4.6 , -0.08 )
+( 4.8 , -0.02 )
+( 5.0 , 0.0 )
+( 5.2 , -0.02 )
+( 5.4 , -0.08 )
+( 5.6 , -0.18 )
+( 5.8 , -0.32 )
+( 6.0 , -0.5 )
+( 6.2 , -0.72 )
+( 6.4 , -0.98 )
+( 6.6 , -1.28 )
+( 6.8 , -1.62 )
+};
+
+\node[ xshift=4cm] at (9, 2) {\color{black}$\bullet$};
+\node[ xshift=4cm] at (9.5, 2.125) {\color{blue}$\bullet$};
+\draw [yellow!50!black, dashed, xshift = 4cm] plot [smooth] coordinates{
+( 7.5 , 0.125 )
+( 7.7 , 0.5049999999999999 )
+( 7.9 , 0.845 )
+( 8.1 , 1.145 )
+( 8.3 , 1.405 )
+( 8.5 , 1.625 )
+( 8.7 , 1.805 )
+( 8.9 , 1.945 )
+( 9.1 , 2.045 )
+( 9.3 , 2.105 )
+( 9.5 , 2.125 )
+( 9.7 , 2.105 )
+( 9.9 , 2.045 )
+( 10.1 , 1.945 )
+( 10.3 , 1.805 )
+( 10.5 , 1.625 )
+( 10.7 , 1.405 )
+( 10.9 , 1.145 )
+( 11.1 , 0.845 )
+( 11.3 , 0.5049999999999999 )
+};
+
+
+\draw [red, xshift = 4cm] plot [smooth] coordinates{
+(-1, 5.5) ( 4.0 , 0.5 )};
+
+\draw [red, xshift = 4cm] plot [smooth] coordinates{
+( 4.0 , 0.5 )
+( 4.1 , 0.405 )
+( 4.2 , 0.32 )
+( 4.3 , 0.245 )
+( 4.4 , 0.18 )
+( 4.5 , 0.125 )
+( 4.6 , 0.08 )
+( 4.7 , 0.045 )
+( 4.8 , 0.02 )
+( 4.9 , 0.005 )
+( 5.0 , 0.0 )
+( 5.1 , 0.005 )
+( 5.2 , 0.02 )
+( 5.3 , 0.045 )
+( 5.4 , 0.08 )
+( 5.5 , 0.125)};
+
+\draw [red, xshift = 4cm] plot [smooth] coordinates{
+( 5.5 , 0.125)
+( 6.5 , 0.625)
+( 11.5 , 3.125)
+};
+
+\node[xshift = 4cm] at (0.7, 5) {$r(x)$};
+\node[xshift = 4cm] at (4.3, 3.2) {$\left(\prox_{r}(y), r\left(\prox_{r}(y)\right)\right)$};
+
+\node[xshift = 4cm] at (-0.4, 3.6) {\color{blue}$\left(y, M_{\lambda r}\left(y\right)\right))$};
+\node[xshift = 4cm] at (-0.3, 5.6) {\color{red}$M_{\lambda r}(x)$};
+
+\node[xshift = 4cm] at (-1, 1) {\color{yellow!50!black}$-\frac{\lambda}{2}\|x-y\|_2^2 + a_{\max}$};
+\end{tikzpicture}

@@ -1,0 +1,71 @@
+Coordinate descent methods have a big history since the idea of simplifying the gradient descent update as old as a gradient descent scheme. Let us see the interest of such methods for the problem with a least-squares objective function
+$$
+f(x) = \|Ax-b\|_2^2,
+$$
+where $A$ is a matrix of examples and $b$ is a features vector. For such objective function, the computational cost of one coordinate of the gradient is $n$ times smaller than the full gradient computation thanks to the separable structure of the function.
+
+The idea of the basic coordinate descent methods is the following: on every iteration, we compute one (or some) coordinate of gradient and make a move in that direction with some stepsize. There are different ways to select stepsize and the coordinate, based, for example on the smoothness constants of $i$-th coordinates of gradient \cite{richtarik2012efficient} or on the maximal absolute value of the gradient's coordinates correspondingly \cite{nesterov2012efficiency}. 
+
+Let us consider smooth optimization problem \eqref{eq:pb_simple}, where function $f$ has coordinate-wise Lipschitz continuous gradient
+$$
+|\nabla_{[i]} f(x+\Delta e_i) - \nabla_{[i]} f(x)|\leq M|h|,
+$$
+where subscript $[i]$ means the $i$-th coordinate, $e_i$ is a $i$-th standart basis vector, and $h\in\RR$.
+\begin{algorithm}
+    \caption{Coordinate Descent (CD) for \eqref{eq:pb_simple}}
+    \label{algo:cd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE Select coordinate $i^k=\argmax_{1\leq i^k\leq n}|\nabla_{i^k}f(x^k)|$
+            \STATE $x^{k+1}\leftarrow x^k - \frac{1}{M} \nabla_{[i^k]} f(x^k)$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+For such function it is easy to see, that
+$$
+f(x^{k}) - f(x^{k+1})\geq \frac{1}{2M}|\nabla_{i^k} f(x^k)|^2\geq \frac{1}{2nM}\|\nabla f(x^k)\|_2^2.
+$$
+It immediately implies (see the proof of Theorem \ref{th:gd}) the following rate for the non-strongly convex objective
+$$
+f(x^k) - f^\star\leq \frac{2nM}{k+4}\|x^0-x^\star\|_2^2,
+$$
+where we use the same notations as before. 
+
+As we could see from this result, the rate is $n$ times worse than the rate of gradient descent and every iteration requires the full gradient computation for coordinate selection. Moreover, it could happen that $M\gg L$ where $L$ is a smoothness constant of $f$ that makes algorithm worse even if only $1$ coordinate of the gradient is required.
+
+Together with the greedy strategy randomized and cyclic variations of this method also appear widely in the literature. Moreover, in such algorithms instead of selecting only one coordinate the block of coordinates is selected every time. Thus in practice, it is more popular to use a cyclic or randomized selection of coordinate to be updated.
+
+Now, let us consider composite optimization problem \eqref{eq:pb_composite}, where $f$ has coordinate-wise Lipschitz continuous gradient and moreover regularizer $r$ is coordinate-wise separable
+$$
+r(x) = \sum_{i=1}^nr_i(x_{[i]}).
+$$
+The best know example of coordinate-separable regularizers is $\ell_1$ regularizer with $r_i(x_{[i]}) = \lambda |x_{[i]}|$. This type of regularizers together with block-separable (for example $\ell_{1,2}$ regularization \cite{bach2012optimization}) is usual assumption for (block) coordinate descent methods, because it implies (block) separaboility of proximal operator
+$$
+\rprox(x)_{[i]} = \prox_{\gamma r_i}(x_{[i]}).
+$$
+
+The key idea of coordinate descent method for \eqref{eq:pb_composite} is to make a majorization-minimization algorithm where in \eqref{eq:step_pgd} instead of full upper bound $\hat{f}(z, x^k)$ the coordinate one used
+$$
+\hat{f}_i(z, x^k) = f(x^k) + \nabla_{[i]} f(x^k) (z-x^k)_{[i]}+\frac{1}{2\gamma}(x^k-z)_{[i]}^2.
+$$
+The simplest version of the coordinate descent for \eqref{eq:pb_composite} is presented in Algorithm \ref{algo:cd_composite} (see Theorem $1$ of \cite{richtarik2012efficient} for the proof).
+
+\begin{algorithm}
+    \caption{Coordinate Descent (CD) for \eqref{eq:pb_composite}}
+    \label{algo:cd_composite}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE Select coordinate $i^k$ i.i.d.
+            \STATE $x^{k+1}_{[i^k]}\leftarrow \prox_{\gamma r_{i^k}}\left(x^k_{[i^k]} - \gamma \nabla_{[i^k]} f(x^k)\right)$\hfill with $\gamma = \frac{1}{M}$
+            \STATE $x^{k+1}_{[j]}\leftarrow x^k_{[j]}$\hfill for all $j\neq i^k$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+Since a lot of common regularizers are not separable (for example $1$-d Total Variation \cite{bach2012optimization}) coordinate methods Algorithm \ref{algo:cd_composite} could not be widely used to solve arbitrary regularized ERM problem \eqref{eq:erm_reg}. This calls for some modern modifications that allow to use non-separable proximal term \cite{hanzely2018sega}. 
+
+{\color{red}\textbf{Part of our research consider the extension of Algorithm \ref{algo:cd_composite} with a surprising application to the non-separable regularizers.}}

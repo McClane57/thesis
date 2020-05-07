@@ -1,0 +1,4 @@
+\section{Catalyst}
+\label{sec:catalyst}
+In $2015$ it was proposed a generic framework that is able to accelerate first-order methods \cite{lin2015universal}. The core idea of it goes down to the Nesterov's acceleration \cite{nesterov-book} that improves the convergence rate of gradient descent algorithm.
+More precisely, consider convex and $L$-smooth function $f$. For such objective, gradient descent method generates the sequence of points $(\xk)_{k\geq0}$ such that $f(\xk) - \fstar\leq \varepsilon$ after $O(1/\varepsilon)$ iterations, where $\fstar$ denotes the minimum value of $f$. Moreover, if function $f$ is $\mu$-strongly convex then the complexity of algorithm becomes $O(L/\mu\log(1/\varepsilon))$.

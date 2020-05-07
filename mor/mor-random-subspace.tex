@@ -1,0 +1,419 @@
+\section{Randomized subspace descent}
+\label{sec:mor-randomized-subspace}
+
+
+The premise of randomized subspace descent consists in repeating two steps: i) randomly selecting some subspace; and ii) updating the iterate over the chosen subspace. {Such algorithms thus extend usual coordinate descent to general sampling strategies, which requires algorithmic changes and an associated mathematical analysis. }
+This section presents a subspace descent algorithm along these lines for solving \eqref{eq:main_problem}. In Section\;\ref{sec:sub}, we introduce our subspace selection procedure. We build on it to introduce, in Section\;\ref{sec:algo}, our first subspace descent algorithm, the convergence of which is analyzed in Section\;\ref{sec:conv}. Finally, we put this algorithm into perspective in Section\;\ref{sec:comparison} by connecting and comparing it to related work.
+
+% ===============================================================
+% ===============================================================
+\subsection{Subspace selection}\label{sec:sub}
+% ===============================================================
+% ===============================================================
+
+We begin by introducing the mathematical objects leading to the subspace selection used in our randomized subspace descent algorithms. Though, in practice, most algorithms rely on projection matrices, our presentation highlights intrinsic subspaces associated to these matrices; this opens the way to a finer analysis, especially in Section~\ref{sec:ada_algo} when working with adaptive subspaces. 
+
+We consider a family $\C = \{ \C_i \}_i$ of {(linear)} subspaces of $\mathbb{R}^n$. Intuitively, this set represents the directions that will be \emph{favored} by the random descent; in order to reach a global optimum, we naturally assume that the sum\footnote{In the definition and the following, we use the natural set addition (sometimes called the Minkowski sum): for any two sets $\mathcal{C},\mathcal{D}\subseteq\mathbb{R}^n$, the set  $\mathcal{C} + \mathcal{D}$ is defined as $\{x+y : x\in\mathcal{C},y\in\mathcal{D}\}\subseteq\mathbb{R}^n$.} of the subspaces in a family matches the whole space.% which we call \emph{covering}.
+
+\begin{definition}[Covering family of subspaces]\label{def:cov}
+Let $\C = \{ \C_i \}_i$ be a family of subspaces of $\mathbb{R}^n$. We say that $\C$ is \emph{covering} if it spans the whole space, i.e. if $\sum_i \C_i = \mathbb{R}^n$.
+\end{definition}
+
+\begin{example}\label{ex:axes}%[Axes are covering]
+The family of the axes $\C_i = \{x\in\mathbb{R}^n  : x_j = 0 ~~ \forall j \neq i \}$ for $i=1,..,n$ is a canonical covering family for $\RR^n$. %\remove{Another covering family is the infinite family of the spans of all points in the unit ball: $\mathrm{span}(\{b\})$ for all $b\in\mathcal{B}(0,1)$.}
+\hfill
+\end{example}
+
+{From a covering family $\C$, we call \emph{selection} the random subspace obtained by randomly choosing some subspaces in $\C$ and summing them. We call \emph{admissible} the selections that include all directions with some positive probability; or, equivalently, the selections to which no non-zero element of $\mathbb{R}^n$ is orthogonal with probability one.}
+
+% \footnote{For a family $A$, the \emph{power set} $2^A$ is the set of all subsets of $A$},  $\Sel: 2^\C \to 2^{\mathbb{R}^n}$ 
+
+{
+\begin{definition}[Admissible selection]
+Let $\C$ be a covering family of subspaces of $\mathbb{R}^n$. A selection $\Sel$ is defined from the set of all subsets of $\C$ to the set of the subspaces of $\mathbb{R}^n$ as
+ $$ \Sel(\omega) = \sum_{j = 1}^s \C_{i_j} \qquad\text{ for } \omega = \{ \C_{i_1} ,\ldots, \C_{i_s} \} .$$
+ The selection $\Sel$ is \emph{admissible} if  $\Prob[x\in \Sel^\perp]<1$ for all $x\in\mathbb{R}^n\setminus\{0\}$.
+\end{definition}
+
+{Admissibility of selections appears on spectral properties of the average projection matrix onto the selected subspaces. For a subspace $F \subseteq \mathbb{R}^n$, we denote by $P_F \in\mathbb{R}^{n\times n}$ the orthogonal projection matrix onto $F$. The following lemma shows that the average projection associated with an admissible selection is positive definite; this matrix and its extreme eigenvalues will play a major role in our developments.}
+
+\begin{lemma}[Average projection]\label{lm:eligible}
+If a selection $\Sel$ is admissible then 
+%if and only if the expectation % I failed to prove the other way around
+    \begin{equation}\label{eq:pbar}
+        \bP := \EE[P_{\Sel}]  \qquad\text{is a positive definite matrix.}
+    \end{equation}
+In this case, we denote by $\lambda_{\min}(\bP)>0$ and $\lambda_{\max}(\bP)\leq1$ its minimal and maximal eigenvalues.
+\end{lemma}
+
+\begin{proof}
+Note first that for almost all $\omega$, the orthogonal projection $P_{\Sel(\omega)}$ is positive semi-definite, and therefore so is $\bP$. Now, let us prove that if $\bP$ is not positive definite, then $\Sel$ is not admissible. 
+Take a nonzero $x$ in the kernel of $\bP$, then
+\begin{equation*}
+    x^\top\bP x = 0 \iff x^\top \EE[P_{\Sel}]x = 0 \iff   \EE[x^\top P_{\Sel} x] = 0.
+\end{equation*}
+Since $x^\top P_{\Sel(\omega)}x\geq 0$ for almost all $\omega$, the above property is further equivalent for almost all $\omega$ to 
+\begin{equation*}
+    x^\top P_{\Sel(\omega)} x = 0 \iff P_{\Sel(\omega)} x = 0 
+    \iff   x\in\Sel(\omega)^{\perp} . % ie x\notin\Sel(\omega)
+\end{equation*}
+{Since $x\neq0$, this yields that $x\in\Sel(\omega)^\perp$ for almost all $\omega$ which is in contradiction with $\Sel$ being admissible. Thus, if a selection $\Sel$ is admissible, $ \bP := \EE[P_{\Sel}]$ is positive definite (so $\lambda_{\min}(\bP)>0$). 
+
+Finally, using Jensen's inequality and the fact that $P_{\Sel}$ is a projection, we get $\| \bP x \| = \| \EE[P_{\Sel}] x \|  \leq \EE \| P_{\Sel} x \| \leq \|x\|$, which implies that $\lambda_{\max}(\bP)\leq1$.  }
+\end{proof}
+
+
+{
+Although the framework, methods, and results presented in this paper allow for infinite subspace families (as in sketching algorithms); the most direct applications of our results only call for finite families for which the notion of admissibility can be made simpler.
+}
+
+
+\begin{remark}[Finite Subspace Families]
+\label{rem:selection}
+For a covering family of subspaces $\C$ with a finite number of elements, the admissibility condition can be simplified to  $\Prob[ \C_i \subset \Sel]>0$ for all $i$.
+
+Indeed, take $x\in\mathbb{R}^n\setminus\{0\}$; then, since  $\C$ is covering and $x\neq 0$, there is a subspace $\C_i$ such that $P_{\C_i}x \neq 0$. Observe now that $\C_i \subset \Sel$ yields $P_{\Sel} x \neq 0$ (since $\Sel^\perp \subset  \C_i^\perp $, the property $P_{\Sel}x=0$ would give $P_{\C_i}x=0$ which is a contradiction with $P_{\C_i}x \neq 0$). Thus, we can write
+\begin{align*}
+    \Prob[x\in \Sel^\perp] &=  \Prob[P_{\Sel} x = 0] = 1 - \Prob[P_{\Sel} x \neq 0]  \leq 1 - \Prob[ \C_i \subset \Sel ] < 1.
+\end{align*}
+
+Building on this property, two natural ways to generate admissible selections from a finite covering family $\C=\{ \C_i \}_{i=1,\ldots,c}$ are:
+\begin{itemize}
+    \item \emph{Fixed probabilities:} Selecting each subspace $\C_i$ according to the outcome of a Bernoulli variable of parameter $p_i>0$. This gives admissible selections as $\Prob[\C_i \subseteq \Sel] = p_i >0$ for all $i$;
+    \item \emph{Fixed sample size:} Drawing $s$ subspaces in $\C$ uniformly at random. This gives admissible selections since $ \Prob[\C_i \subseteq \Sel] = s/c$ for all $i$.\hfill
+\end{itemize}
+\end{remark}
+}
+
+
+
+
+
+%\remove{With these definitions, we can properly define a randomized subspace selection plan as an i.i.d.\;sequence of admissible selections $\Sel^1,\Sel^2,\ldots,\Sel^k$, which will be used in forthcoming algorithms.} 
+
+
+
+{
+\begin{example}[Coordinate-wise projections]\label{ex:P}
+Consider the family of the axes from Example~\ref{ex:axes} and the selection generated with fixed probabilities as described in Remark~\ref{rem:selection}. The associated projections amount to zeroing entries at random and the average projection $\bP$ is the diagonal matrix with entries $(p_i)$; trivially $\lambda_{\min}(\bP)= \min_i p_i$ and $\leq \lambda_{\max}(\bP) = \max_i p_i$.
+\end{example}}
+
+% ===============================================================
+% ===============================================================
+\subsection{Random Subspace Proximal Gradient Algorithm} \label{sec:algo}
+% ===============================================================
+% ===============================================================
+
+An iteration of the proximal gradient algorithm 
+decomposes in two steps (sometimes called ``forward'' and  ``backward''):
+\begin{subequations}\label{eq:pgGradProx}
+    \begin{align}
+    \label{eq:pgGrad} z^k &= x^{k} - \gamma \nabla f(x^k)\\
+        \label{eq:pgProx} x^{k+1} &= \prox_{\gamma g}(z^k)
+\end{align}
+\end{subequations}
+where $\prox_{\gamma g}$ stands for the proximity operator defined as the mapping 
+from $\RR^n$ to $\RR^n$
+\begin{equation}
+    \prox_{\gamma g}(x) = \argmin_{y\in\RR^n}\left\{g(y) + \frac{1}{2\gamma} \|y-x\|_2^2\right\} .
+\end{equation}
+
+This operator is well-defined when $g$ is a proper, lower semi-continuous convex function \cite[Def.~12.23]{bauschke2011convex}. Furthermore, it is computationally cheap to compute in several cases, either from a closed form ({e.g.} for $\ell_1$-norm, $\ell_1/\ell_2$-norm, see among others \cite{combettes2007proximal} and references therein), or by an efficient procedure ({e.g.} for the 1D-total variation, projection on the simplex, see \cite{yuan2011efficient,condat2013direct}).
+
+
+In order to construct a ``subspace'' version of the proximal gradient \eqref{eq:pgGradProx}, one has to determine which variable will be updated along the randomly chosen subspace (which we will call a projected update). Three choices are possible: 
+\begin{itemize}
+    \item[(a)] a projected update of $x^k$,  i.e. projecting after the proximity operation;
+    \item[(b)] a projected update of $\nabla f(x^k)$,  i.e. projecting after the gradient;
+    \item[(c)] a projected update of $z^k$,  i.e. projecting after the gradient \emph{step}.
+\end{itemize}
+Choice (a) has limited interest in the general case where the proximity operator is not separable along subspaces and thus a projected update of $x^k$ still requires the computations of the full gradient. In the favorable case of coordinate projection and $g=\|\cdot\|_1$, it was studied in \cite{qu2016coordinate} using the fact that the projection and the proximity operator commute. Choice (b) is considered recently in \cite{hanzely2018sega} in the slightly different context of sketching. A further discussion on related literature is postponed to Section~\ref{sec:comparison}.
+
+In this paper, we will consider %\footnote{Options (b) and (c) will be compared theoretically and practically.} 
+Choice (c), inspired by recent works highlighting that combining iterates usually works well in practice (see \cite{mishchenko2018distributed} and references therein). However, taking gradient steps along random subspaces introduce bias and thus such a direct extension fails in practice. In order to retrieve convergence to the optimal solution of \eqref{eq:main_problem}, we slightly modify the proximal gradient iterations by including a correction featuring the inverse square root of the expected projection denoted by $ \bQ= \bP^{-1/2}$ (note that as soon as the selection is admissible, $ \bQ$ is well defined from Lemma~\ref{lm:eligible}).
+
+
+Formally, our Random Proximal Subspace Descent algorithm \algo, displayed as Algorithm~\ref{alg:strata_nondis}, replaces \eqref{eq:pgGrad} by 
+\begin{equation}\label{eq:grad_step}
+    y^k = \bQ\left(x^k - \gamma\nabla f\left(x^k\right)\right)\qquad\text{and}\qquad
+    z^{k} = P_{\Sel^k} \left(y^k\right) + (I- P_{\Sel^k} ) \left(z^{k-1}\right).
+\end{equation}
+That is, we propose to first perform a gradient step followed by a change of basis {(by multiplication with the positive definite matrix $\bQ$), giving variable $y^k$}; then, variable $z^k$ is updated only in the random subspace $\Sel^k$: to  $P_{\Sel^k} \left(y^k\right)$ in $\Sel^k$, and keeping the same value outside. Note that $y^k$ does not actually have to be computed and only the ``$P_{\Sel^k}\bQ$-sketch'' of the gradient (i.e.\;$ P_{\Sel^k}\bQ\nabla f\left(x^k\right)$) is needed. Finally, the final proximal operation \eqref{eq:pgProx} is performed {after getting back to the original space (by multiplication with $\bQ^{-1}$)}:
+\begin{align}\label{eq:prox_step}
+   x^{k+1} = \prox_{\gamma g} \left(\bQ^{-1}\left(z^{k}\right)\right).
+\end{align}
+Contrary to existing coordinate descent methods, our randomized subspace proximal gradient algorithm does not assume that the proximity operator $\prox_{\gamma g} $ is separable with respect to the projection subspaces. Apart from the algorithm of \cite{hanzely2018sega} in a different setting, this is an uncommon but highly desirable feature to tackle general composite optimization problems.  
+
+\begin{algorithm} % enter the algorithm environment
+\caption{Randomized Proximal Subspace Descent - \algo}
+\label{alg:strata_nondis} % and a label for \ref{} commands later in the document
+\begin{algorithmic}[1] % enter the algorithmic environment
+    \STATE Input:  $\bQ = \bP^{-\frac12}$
+    \STATE Initialize $z^0$, $x^1 = \prox_{\gamma g}(\bQ^{-1}(z^0))$
+    \FOR{$k=1,\ldots$}
+           % \STATE Randomly select a subspace $\Sel^k $
+            \STATE $y^k = \bQ\left(x^k - \gamma\nabla f\left(x^k\right)\right)$
+            \STATE $z^{k} = P_{\Sel^k} \left(y^k\right) + (I- P_{\Sel^k} ) \left(z^{k-1}\right)$
+            \STATE$x^{k+1} = \prox_{\gamma g} \left(\bQ^{-1}\left(z^{k}\right)\right)$
+    \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+Let us provide a first example, before moving to the analysis of the algorithm in the next section. 
+
+\begin{example}[Interpretation for smooth problems]
+In the case where $g\equiv0$, our algorithm has two interpretations. 
+First, using\;$\prox_{\gamma g} = I$, the iterations simplify to 
+\begin{align*}
+     z^{k+1} &= z^k - \gamma P_{\Sel^k}\bQ\left(\nabla f\left(\bQ^{-1}\left(z^k\right)\right)\right) = z^k - \gamma  P_{\Sel^k}\bQ^2 \underbrace{\bQ^{-1}  \left(\nabla f\left(\bQ^{-1}\left(z^k\right)\right)\right) }_{\nabla f\circ \bQ^{-1} (z^k)}.
+\end{align*}
+As $\mathbb{E}[P_{\Sel^k}\bQ^2] = I $, this corresponds to a random subspace descent on {$ f\circ \left(\bQ^{-1}\right)$} with unbiased gradients. Second, we can write it with the change of variable $u^k =\bQ^{-1} z^k $ as
+\begin{align*}
+  u^{k+1} &= u^k - \gamma  \bQ^{-1}  P_{\Sel^k} \bQ\left(\nabla f\left(u^k\right)\right).
+\end{align*}
+As $\mathbb{E} [\bQ^{-1}  P_{\Sel^k}\bQ] = \bP $, this corresponds to random subspace descent on $ f $ but with biased gradient. We note that the recent work \cite{frongillo2015convergence} considers a similar set-up and algorithm; however, the provided convergence result does not lead to the convergence to the optimal solution (due to the use of the special semi-norm).\hfill
+\end{example}
+
+
+
+% ===============================================================
+% ===============================================================
+\subsection{Analysis and convergence rate}\label{sec:conv}
+% ===============================================================
+% ===============================================================
+
+In this section, we provide a theoretical analysis for \algo, showing linear convergence for strongly convex objectives. Tackling the non-strongly convex case requires extra-technicalities; we thus choose to postpone the corresponding convergence result to the appendix for clarity. 
+
+
+
+\begin{assumption}[On the optimization problem]\label{hyp:f}
+The function $f$ is $L$-smooth and $\mu$-strongly convex and the function $g$ is convex, proper, and lower-semicontinuous.
+\end{assumption}
+
+
+Note that this assumption implies that Problem~\eqref{eq:main_problem} has a unique solution that we denote $x^\star$ in the following.
+
+
+\begin{assumption}[On the randomness of the algorithm]\label{hyp:main}
+Given a covering family $\C=\{ \C_i \}$ of subspaces, we consider a sequence $\Sel^1,\Sel^2,..,\Sel^k$ of admissible selections, which is i.i.d.
+\end{assumption}
+
+In the following theorem, we show that the proposed algorithm converges linearly at a rate that only depends on the function properties and on the smallest eigenvalue of $\bP$.
+%\remove{, but neither on the number nor on the type of projections in $\PP$}. 
+We also emphasize that the step size $\gamma$ can be taken in the usual range for the proximal gradient descent.  
+
+
+\begin{theorem}[\algo~convergence rate]\label{th:conv_nondis}
+Let Assumptions \ref{hyp:f} and  \ref{hyp:main} hold. Then, for any $\gamma\in(0,2/(\mu+L)]$, the sequence $(x^k)$ of the iterates of \algo converges almost surely to the minimizer  $x^\star$  of \eqref{eq:main_problem} with rate
+$$
+\EE\left[\|x^{k+1} - x^\star\|_2^2\right] \leq \left(1 - \lambda_{\min}(\bP) \frac{2\gamma\mu L}{\mu + L} \right)^k C,
+$$
+where $C = \lambda_{\max}(\bP)\|z^0 - \bQ(x^\star - \gamma\nabla f(x^\star))\|_2^2$.
+\end{theorem}
+
+To prove this result, we first demonstrate two intermediate lemmas respectively expressing the distance of $z^k$ towards its fixed points (conditionally to the filtration of the past random subspaces $\FF^k = \sigma( \{\Sel_\ell\}_{\ell\leq k} )$), and bounding the increment (with respect to $\| x \|_{\bP}^2 = \langle x , \bP x \rangle $ the norm associated to $\bP$).
+
+
+\begin{lemma}[Expression of the decrease as a martingale]\label{lm:removing_exp}
+From the minimizer  $x^\star$  of \eqref{eq:main_problem}, define the fixed points $z^\star = y^\star = \bQ\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)$ of the sequences $(y^k)$ and $(z^k)$.  If Assumption \ref{hyp:main}~holds, then 
+    $$
+    \EE\left[\|z^{k} - z^\star\|_2^2\,|\,\FF^{k-1}\right] = \|z^{k-1}-z^\star\|_2^2 + \|y^{k}-y^\star\|_{\bP}^2 -  \|z^{k-1}-z^\star\|_{\bP}^2.
+    $$
+\end{lemma}
+
+\begin{proof}
+By taking the expectation on $\Sel^k$ (conditionally to the past), we get 
+\begin{align*}
+\EE\left[\|z^{k} - z^\star\|_2^2|\,\FF^{k-1}\right]  &= \EE \left[\|z^{k-1} - z^\star + P_{\Sel^k}(y^k-z^{k-1}) \|_2^2 |\,\FF^{k-1}\right]\\
+&= \|z^{k-1}-z^\star\|_2^2 + 2 \EE \left[  \langle z^{k-1}-z^\star, P_{\Sel^k}(y^k - z^{k-1} ) \rangle |\,\FF^{k-1}\right] + \EE \left[ \left\| P_{\Sel^k}(y^k-z^{k-1}) \right\|^2 |\,\FF^{k-1}\right] \\
+&=\|z^{k-1}-z^\star\|_2^2 + 2\langle z^{k-1}-z^\star, \bP(y^k - z^{k-1} ) \rangle + \EE \left[\langle  P_{\Sel^k}(y^k-z^{k-1}), P_{\Sel^k} (y^k-z^{k-1})\rangle |\,\FF^{k-1}\right]\\
+&=\|z^{k-1}-z^\star\|_2^2 + 2\langle z^{k-1}-z^\star, \bP(y^k - z^{k-1} ) \rangle + \EE \left[ \langle y^k-z^{k-1}, P_{\Sel^k} (y^k-z^{k-1})\rangle |\,\FF^{k-1}\right] \\
+&= \|z^{k-1}-z^\star\|_2^2 + \langle z^{k-1} + y^k - 2 z^\star , \bP(y^k - z^{k-1} ) \rangle,
+\end{align*}
+where we used the fact that $z^{k-1}$ and $y^k$ are $\FF^{k-1}$-measurable and that $P_{\Sel^k}$ is a projection matrix so $P_{\Sel^k} = P_{\Sel^k}^\top = P_{\Sel^k}^2 $.
+
+Then, using the fact $y^\star = z^\star$, the scalar product above can be simplified as follows
+\begin{align*}
+\nonumber\langle z^{k-1} &+ y^k - 2z^\star , \bP(y^k - z^{k-1}) \rangle = \langle z^{k-1} + y^k - z^\star - y^\star, \bP(y^k - z^{k-1} + y^\star -  z^\star ) \rangle \\
+ \nonumber
+ &=  - \langle z^{k-1}  - z^\star, \bP(z^{k-1} - z^\star) \rangle + \langle z^{k-1} - z^\star, \bP(y^k - y^\star) \rangle\\
+ \nonumber
+&\hspace*{0.2cm} + \langle y^k  - y^\star, \bP(y^k - y^\star) \rangle - \langle y^k - y^\star, \bP(z^{k-1} - z^\star) \rangle\\
+&=  \langle y^k  - y^\star, \bP(y^k - y^\star) \rangle - \langle z^{k-1}  - z^\star, \bP(z^{k-1} - z^\star) \rangle
+\end{align*}
+where we used in the last equality that $\bP$ is symmetric.
+\hfill
+\end{proof}
+
+
+
+\begin{lemma}[Contraction property in $\bP$-weighted norm]\label{lm:bub}
+From the minimizer  $x^\star$  of \eqref{eq:main_problem}, define the fixed points $z^\star = y^\star = \bQ\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)$ of the sequences $(y^k)$ and $(z^k)$. 
+If Assumptions \ref{hyp:f} and \ref{hyp:main} hold, then
+    \begin{equation*}
+\|y^{k}-y^\star\|_{\bP}^2 -  \|z^{k-1}-z^\star\|_{\bP}^2 \leq - \lambda_{\min}(\bP) \frac{2\gamma\mu L}{\mu + L}\|z^{k-1} - z^\star\|_2^2.
+\end{equation*}
+\end{lemma}
+
+
+\begin{proof}
+First, using the definition of $y^k$ and $y^\star$,
+\begin{align*}
+  \|y^{k}-y^\star\|_{\bP}^2
+   &=
+   \langle \bQ(x^k - \gamma\nabla f(x^k) - x^\star + \gamma\nabla f(x^\star)), 
+   \bP\bQ(x^k - \gamma\nabla f(x^k) - x^\star + \gamma\nabla f(x^\star)) \rangle\\
+   &=
+   \langle x^k - \gamma\nabla f(x^k) - x^\star + \gamma\nabla f(x^\star), \bQ^\top\bP\bQ (x^k - \gamma\nabla f(x^k) - x^\star + \gamma\nabla f(x^\star)) \rangle\\
+   &= \left\| x^k - \gamma\nabla f(x^k) - ( x^\star - \gamma\nabla f(x^\star) ) \right\|_2^2.
+\end{align*}
+Using the standard stepsize range $\gamma\in(0,2/(\mu+L)]$, one has (see e.g. \cite[Lemma~3.11]{bubeck2015convex}) 
+$$
+ \|y^{k}-y^\star\|_{\bP}^2 = \left\| x^k - \gamma\nabla f(x^k) - ( x^\star - \gamma\nabla f(x^\star) ) \right\|_2^2 \leq \left(1 - \frac{2\gamma\mu L}{\mu + L}\right)\|x^k - x^\star\|_2^2.
+$$
+Using the non-expansivity of the proximity operator of convex l.s.c. function $g$ \cite[Prop. ~12.27]{bauschke2011convex} along with the fact that as $x^\star$ is a minimizer of \eqref{eq:main_problem} so $x^\star = \prox_{\gamma g}(x^\star - \gamma \nabla f(x^\star)) = \prox_{\gamma g}(\bQ^{-1}z^\star)$ \cite[Th. ~26.2]{bauschke2011convex}, we get
+\begin{align*}
+\|x^k - x^\star\|_2^2 &= \|\prox_{\gamma g}(\bQ^{-1}(z^{k-1})) - \prox_{\gamma g}(\bQ^{-1}(z^\star))\|_2^2\\
+&\leq
+\|\bQ^{-1}(z^{k-1} - z^\star)\|_2^2 = \langle \bQ^{-1}(z^{k-1} - z^\star),\bQ^{-1}(z^{k-1} - z^\star)\rangle \\
+&= \langle z^{k-1} - z^\star,\bP(z^{k-1} - z^\star)\rangle =  \|z^{k-1}-z^\star\|_{\bP}^2
+\end{align*}
+where we used that $\bQ^{-\top}\bQ^{-1} = \bQ^{-2} = \bP$. Combining the previous equations, we get 
+\begin{align*}
+    \|y^{k}-y^\star\|_{\bP}^2 -  \|z^{k-1}-z^\star\|_{\bP}^2 \leq- \frac{2\gamma\mu L}{\mu + L} \|z^{k-1} - z^\star\|_{\bP}^2.
+\end{align*}
+Finally, the fact that $\|x\|_{\bP}^2 \geq \lambda_{\min}(\bP)\|x\|_2^2$ for positive definite matrix $\bP$ enables to get the claimed result.
+\end{proof}
+
+
+Relying on these two lemmas, we are now able to prove Theorem~\ref{th:conv_nondis}.
+by showing that the distance of $z^k$ towards the minimizers is a contracting super-martingale. % which leads to the result.
+
+% ==========
+\begin{proof}[Proof of Theorem~\ref{th:conv_nondis}.]
+Combining Lemmas~\ref{lm:removing_exp} and \ref{lm:bub}, we get
+\begin{align*}
+    \EE\left[\|z^{k} - z^\star\|_2^2\,|\,\FF^{k-1}\right] \leq \left(1 - \lambda_{\min}(\bP)\frac{2\gamma\mu L}{\mu + L}\right)\|z^{k-1}-z^\star\|_2^2
+\end{align*}
+and thus by taking the full expectation and using nested filtrations $(\FF^k)$, we obtain
+\begin{equation*}%\label{eq:zconv}
+    \EE\left[\|z^{k} - z^\star\|_2^2\right] \leq \left(1 - \lambda_{\min}(\bP)\frac{2\gamma\mu L}{\mu + L}\right)^k\|z^0-z^\star\|_2^2 = \left(1 - \lambda_{\min}(\bP)\frac{2\gamma\mu L}{\mu + L}\right)^k\|z^0-\bQ(x^\star - \gamma\nabla f(x^\star))\|_2^2.
+\end{equation*}
+Using the same arguments as in the proof of Lemma~\ref{lm:bub}, one has
+\begin{align*}
+  \|x^{k+1}-x^\star\|_2^2 \leq  \|z^k-z^\star\|_{\bP}^2 \leq \lambda_{\max}(\bP)\|z^k-z^\star\|_2^2
+\end{align*}
+which enables to conclude 
+\begin{equation*}
+    \EE\left[\|x^{k+1}-x^\star\|_2^2\right] \leq \left(1 - \lambda_{\min}(\bP)\frac{2\gamma\mu L}{\mu + L}\right)^k \lambda_{\max}(\bP) \|z^0-\bQ(x^\star - \gamma\nabla f(x^\star))\|_2^2.
+\end{equation*}
+Finally, this linear convergences implies the almost sure convergence of $(x^k)$ to $x^\star$ as 
+\begin{equation*}
+    \EE\left[ \sum_{k=1}^{+\infty}  \|x^{k+1} - x^\star \|^2 \right]\leq C \sum_{k=1}^{+\infty}\left(1-\lambda_{\min}(\bP)\frac{2\gamma\mu L}{\mu + L}\right)^k < +\infty
+\end{equation*}
+implies that $ \sum_{k=1}^{+\infty}  \|x^{k+1} - x^\star \|^2$ is finite with probability one. Thus we get
+\[
+1 = \mathbb{P}\left[ \sum_{k=1}^{+\infty}  \|x^{k+1} - x^\star \|^2 < +\infty \right] \leq \mathbb{P}\left[ \|x^k - x^\star \|^2 \to 0 \right]
+\]
+which in turn implies that $(x^k)$ converges almost surely to $x^\star$.
+\end{proof}
+
+% ==============================================================================
+\subsection{Examples and Connections with the existing work}\label{sec:comparison}
+% ==============================================================================
+ 
+In this section, we derive specific cases and discuss the relation between our algorithm and the related literature.
+ 
+
+% ================================================
+\subsubsection{Projections onto coordinates} \label{sec:coordproj}
+
+A simple instantiation of our setting can be obtained by considering projections onto uniformly chosen coordinates (Example\;\ref{ex:P}); with 
+%resulting in coordinate descent algorithms. With our notation, it corresponds to 
+the family 
+$$ \C = \{\C_1,..,\C_n\} \quad\text{ with } \C_i = \{x\in\mathbb{R}^n  : x_j = 0 ~~ \forall j \neq i \} $$ 
+and the selection $\Sel$ consisting {of} taking $\C_i$ according to the output of a Bernoulli experiment of parameter $p_i$. Then, the matrices $\bP = \diag( [p_1,..,p_n])$, $P_{\Sel^k}$ and $\bQ$ commute, {and, by a change of variables $\tilde{z}^k = \mathsf{Q}^{-1} z^k$ and $\tilde{y}^k  = \mathsf{Q}^{-1} y^k$, } Algorithm \ref{alg:strata_nondis} boils down to
+%  \begin{align*}
+%  y^k &= x^k - \gamma\nabla f\left(x^k\right)\\
+%  z^{k} &=  P_{\Sel^k}\left(y^k\right) + (I- P_{\Sel^k})\left(z^{k-1}\right)\\
+%  x^{k+1} & = \prox_{\gamma g} \left(z^{k}\right)
+%  \end{align*}
+{
+\[
+\tilde{y}^k = x^k - \gamma\nabla f\left(x^k\right)\qquad
+\tilde{z}^{k} =  P_{\Sel^k}\left(\tilde{y}^k\right) + (I- P_{\Sel^k})\left(\tilde{z}^{k-1}\right),\qquad
+x^{k+1}  = \prox_{\gamma g} \left(\tilde{z}^{k}\right)
+ \]}
+i.e. no change of basis is needed anymore, even if $g$ is non-separable. Furthermore, the convergence rates simplifies to $(1- 2 \min_i p_i  \gamma \mu L/(\mu + L))$ which translates to $(1- 4 \min_i p_i\mu L/(\mu + L)^2)$ for the optimal $\gamma = 2/(\mu+L)$.
+
+In the special case where $g$ is separable (i.e. $g(x) = \sum_{i=1}^n g_i(x_i)$), we can further simplify the iteration. In this case, projection and proximal steps commute, so that the iteration can be written
+\begin{align*}
+ x^{k+1} &=  P_{\Sel^k}\prox_{\gamma g} \left( x^k - \gamma\nabla f(x^k)\right)  + (I -  P_{\Sel^k}) x^k\\
+\text{i.e. } x_i^{k+1} &= \left\{  \begin{array}{ll}
+   \prox_{\gamma g_i} \left( x_i^k - \gamma\nabla_i f(x^k)\right) = \displaystyle\arg\min_w g_i(w) + \langle w , \nabla_i f(x^k) \rangle  + \frac{1}{2\gamma}\|w - x_i^k\|_2^2 & \text{ if } i \in \Sel^k  \\
+   x_i^k  & \text{ elsewhere}
+\end{array}  \right. 
+\end{align*}
+which boils down to the usual (proximal) coordinate descent algorithm, that recently knew a rebirth in the context of huge-scale optimization, see\;\cite{tseng2001convergence}, \cite{nesterov2012efficiency}, \cite{richtarik2014iteration} or \cite{wright2015coordinate}.
+In this special case, the theoretical convergence rate of \algo is close to the existing rates in the literature. 
+For clarity, %as rates are not central in the present paper, 
+we compare with the uniform randomized coordinate descent of \cite{richtarik2014iteration} 
+(more precisely Th.\;6 with $L_i =L$, $B_i=1$, $\mu L\leq 2$) which can be written as $\left(1 - \mu L/4n\right)$ in $\ell_2$-norm.
+%(since the $\mu$-strongly convexity with respect to $\|\cdot\|_L$ is the same as $\mu L$-strongly convexity with respect to $\|\cdot\|_2$). 
+The rate of \algo in the same uniform setting (Example~\ref{ex:P} with $p_i = p=1/n$) is $\left(1 - \frac{4\mu L}{n(\mu+ L)^2}\right)$ with the optimal step-size.
+
+% ================================================
+\subsubsection{Projections onto vectors of fixed variations}
+\label{sec:var}
+
+The vast majority of randomized subspace methods consider the coordinate-wise projections treated in \ref{sec:coordproj}. This success is notably due to the fact that most problems onto which they are applied have naturally a coordinate-wise structure; for instance, due to the structure of $g$ ($\ell_1$-norm, group lasso, etc). However, many problems in signal processing and machine learning feature a very different structure. A typical example is when $g$ is the $1$D-Total Variation 
+\begin{equation}\label{eq:TV}
+    g(x) = \sum_{i=2}^n |x_{i}-x_{i-1}|
+\end{equation}
+featured for instance in the fused lasso problem \cite{tibshirani2005sparsity}. In order to project onto subspaces of vectors of fixed variation (i.e. vectors for which $x_j = x_{j+1}$ except for a prescribed set of indices), one can define the following covering family 
+{
+$$ \C = \{\C_1,..,\C_{n-1}\} \quad\text{ with } \C_i = \left\{x\in\mathbb{R}^n  : x_{j} = x_{j+1} \text{ for all } j\in \{1,..,n-1\}\setminus\{i\}  \right\} $$ }
+and an admissible selection $\Sel$ consisting in selecting uniformly $s$ elements in $\C$. {
+Then, if $\Sel$ selects $\C_{n_1},...,\C_{n_s}$, the update will live in the sum of these subspaces, i.e. the subspace of the vectors having jumps at coordinates $n_1,n_2,..,n_s$. Thus, the associated projection in the algorithm writes\\[2ex]
+{\footnotesize 
+\begin{equation}\label{eq:proj_tv}
+P_{\Sel} =
+\begin{matrix}
+\begin{pmatrix}
+\overmat{$n_1$}{\frac{1}{n_1}& \hdots & \frac{1}{n_1}}& 0 &\hdots & \overmat{$n-n_s$}{\hdots &\hdots & \hspace*{4pt}0\hspace*{4pt}} \\
+\vdots& \ddots & \vdots & \vdots & \ddots & \ddots &\ddots & \vdots\\
+\frac{1}{n_1}& \hdots & \frac{1}{n_1}& 0 &\ddots & \ddots &\ddots & \vdots\\
+0 & \hdots & 0  &\ddots & \ddots & \ddots & \ddots & \vdots\\
+\vdots & \ddots & \ddots & \ddots  &\ddots & 0  & \hdots & 0\\
+\vdots &\ddots & \ddots &\ddots & 0 & \frac{1}{n-n_s}& \hdots & \frac{1}{n-n_s}\\
+\vdots & \ddots & \ddots &\ddots & \vdots & \vdots& \ddots & \vdots\\
+0 &\hdots & \hdots &\hdots & 0 & \frac{1}{n-n_s}& \hdots & \frac{1}{n-n_s}
+\end{pmatrix}
+\hspace*{-5pt}
+\begin{aligned}
+  &\left.\begin{matrix}
+  \\[36pt]
+  \end{matrix} \right\} %
+  n_1\\[40pt]
+  &\left.\begin{matrix}
+  \\[36pt]
+  \end{matrix} \right\} %
+  n-n_s
+\end{aligned}
+\end{matrix}
+\end{equation}}}
+Note also that $P_{\Sel}x$ has the same value for coordinates $[n_i,n_{i+1})$, equal to the average of these values.
+
+As mentioned above, the similarity between the structure of the optimization problem and the one of the subspace descent is fundamental for performance in practice. In Section\;\ref{sec:adapt}, we exploit the identification properties of the proximity operator in order to automatically adapt the subspace selection, which leads to a tremendous gain in performance.
+
+% ============================================================ 
+\subsubsection{Comparison with sketching}
+
+In sharp contrast with the existing literature, our subspace descent algorithm handles non-separable regularizers $g$. A notable exception is the algorithm called \sega \cite{hanzely2018sega}, a random sketch-and-project proximal algorithm, that can also deal with non-separable regularizers. While the algorithm shares similar components with ours, the main differences between the two algorithms are 
+\begin{itemize}
+    \item {biasedness of the gradient}: \sega deals with unbiased gradients while they are biased for \algo;
+\item {projection type}: \sega projects the gradient while we project after a gradient step (option (b) vs.\,option (c) in the discussion starting Section\;\ref{sec:algo}).
+\end{itemize} 
+These differences are fundamental and create a large gap in terms of target, analysis and performance between the two algorithms. The practical comparison is illustrated in Section\;\ref{sec:num:sega}.
+
+%Nevertheless, one can compare the obtained rates in the simple context of coordinate-wise projections considered in \ref{sec:coordproj}. In this setup, \sega enjoys a $\left(1 - \frac{\mu}{4nL}\right)$ rate which is slightly worse than the  $(1- 4 \mu L/(n(\mu + L)^2))$ of the proposed algorithm. Further comparison with \sega is beyond the scope of this work.

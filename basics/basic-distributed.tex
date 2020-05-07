@@ -1,0 +1,192 @@
+\section{Distributed ...}\label{sec:basic-distributed}
+In this section, we present some preliminaries in asynchronous algorithms to be used in Chapter \ref{ch:spy}.
+
+
+
+{\color{red}
+\subsection{completely wackadoodle}
+\subsubsection{Centralized set-up}\label{sec:basic:distributed-centralized}
+
+Let us start with the discussion on distributed learning.
+% : what is it, why it is interesting, and which bottlenecks usually appear in such setup.
+
+Given the tremendous production of data and the ever-growing size of collections, there is a surge of interest in both Machine Learning and Optimization communities for the development of efficient and scalable distributed learning strategies. In such context, training observations are generally split over different computing nodes and learning is performed simultaneously where each node, also referred to as a \textit{worker}, has its memory and processing unit.  Note that this is different from shared-memory parallel computing, where each worker machine can potentially have access to all available memory \cite{Leslie91, Kumar02}. 
+
+All distributed algorithms could be segregated according to the network structure. Some of them use networks with $1$ central node called master that has a LAN connection with all the other nodes called workers. In such setups usually, all the data is split between worker machines and worker machines update their parameters simultaneously on a local sub-part of data and send their updated parameters to a master machine. The master integrates all received parameters and broadcasts them back to each computing node for a new local update of their parameters. This setup is called a centralized or master-worker setup. It could be a different amount of layers: master communicates only with some of the other nodes that are the local masters and so on. Graphs of such networks are trees with the root being the master node, leaves being the workers and all the others being the local masters. It is easy to see, that from the theoretical point of view such setup is quite the same as the first one.
+
+There is another setup called decentralized, when all the nodes are the same and could communicate with neighbor nodes with respect to the network graph \cite{nedic2009distributed, boyd2011distributed, duchi2011dual, shi2015extra}. In this setup, the approach usually builds on the seminal work of Tsitsikas \cite{tsitsiklis1984problems} (see also \cite{bertsekas1997parallel} and \cite{tsitsiklis1986distributed}) who proposed a framework to analyze the distributed computation models. Another important part is in computing exact averages of values that are initially stored on the nodes \cite{boyd2011distributed, olshevsky2006convergence,olshevsky2009convergence}. 
+
+In this work we focus on centralized setup. Taking into account, that key idea of our work is ``sparsification via identification'' we were motivated to consider proximal gradient descent method for asynchronous distributed centralized setup without shared memory \cite{mishchenko2018} to use identification property of proximal methods \cite{fadili2018sensitivity}.
+
+\subsubsection{Asynchronicity}\label{sec:basic:distributed-asynchronous}
+Let us focus on centralized setup when all the data $\data$ is separated between $M$ workers and all local subsets $\data_i$ are stored on each machine without any shared memory. Let us also consider the case, when there is only one layer and all worker machines are connected with the central node of the system - master node. 
+
+For such setup, there are two approaches that have different assumptions on the communication rounds. In the synchronous approach every communication round mobilizes all worker machines \cite{BoydPCPE11,Chen2016,Tsianos12}. Such algorithms performs well, when it takes approximately the same time for all machines to perform their update. Otherwise, the slower worker machines may slow down the whole process as the faster ones have to wait all updates in order to terminate their computation and exchange information.
+
+Recently, many studies have focused on asynchronous distributed frameworks, where worker machines update their parameters simultaneously on a local sub-part of data and send their updated parameters to a master machine. The master integrates then all received parameters and broadcasts them back to each computing node for a new local update of their parameters \cite{konevcny2016federated,ICML18}.
+}
+
+\subsection{DAve-PG algorithm}
+Let us introduce an algorithm, that formed the basis of our algorithms that we present in Chapter \ref{ch:spy}. 
+
+\subsubsection{Useful notations}
+{\color{yellow}I think that in this section notation would be well-placed}
+
+We consider the following distributed setup where there are $M$ worker machines, $i\in\{1,\ldots,M\}$, each of which contains a subset $\data_i\subset \data$ of the training set (i.e. $\data=\sqcup_{i=1}^M \data_i$). Learning over such scattered data leads to optimization problems with composite objective of the form:
+\begin{align}\label{eq:pb}
+\min_{x\in\mathbb{R}^n}  ~\underbrace{\sum_{i=1}^M  \pi_i  f_i(x)}_{ F(x)}  +  r(x),
+\end{align}
+where $x\in\mathbb{R}^n$ are the parameters shared over all computing machines, $m=|\data|$ is the size of the training set, $\pi_i= |\data_i|/m$ is the proportion of observations locally stored in worker machine\;$i$, $f_i(s) = \frac{1}{|\data_i|}  \sum_{j\in\data_i}\ell_j(s) $ is the local empirical risk estimated on the subset $\data_i$ for machine $i$; $\ell_j$ is a smooth loss function for the training example $j\in\data_i$, and $r$ is a convex, non-smooth, and lower-semicontinuous regularization term (for example $\|\cdot\|_1$).
+%, and $r:\mathbb{R}^n\rightarrow \mathbb{R}_+$ is a regularization function.  We consider $r(x) = \lambda_1\|x\|_1$ later in this work.
+
+
+In this setting, our algorithm carries out computations without waiting for slower machines to finish their computations. Each worker machine performs computations based on outdated versions of the main variable that it has. The master machine gathers the workers inputs, updates the parameters at each communication and sends back the updated versions to the current worker with which it is in interaction. We formalize this framework as~: 
+\begin{itemize}
+\item \emph{For a worker $i\in\{1,\ldots,M\}$.} At time $k$, let $d_i^k$ be the elapsed moment since the last time the master has communicated with worker $i$ ($d_i^k = 0$ iff the master gets updates from worker $i$ at exactly time $k$, i.e. $i^k=i$). We also consider  $D_i^k$ as the elapsed time since the second last update. This means that, at time $k$, the last two moments that the worker $i$ has communicated with the master are $k-d_i^k$ and $k-D_i^k$ (see Figure \ref{fig:delays}). 
+%also if $i$ does not update at time $k$, then $k-d_i^k = k-1 - d_i^{k-1}$.
+\item \emph{For the master.} We define $k$, as the number of updates that the master has received from any of the worker machines. Thus, at time $k$, the master receives some input from a worker, denoted by $i^k$, updates its global variables, $\barx^k$ and $x^k$; and sends $x^k$ back to worker $i^k$, where $\bar{x}$ is equal to the average of received updates from workers
+\begin{equation}\label{eq:barx}
+\barx^k = \sum_{i=1}^M\pi_i x_i^k = \sum_{i=1}^M \pi_i x^{k-d_i^k}.
+\end{equation}
+\end{itemize}
+
+In addition, let us introduce the notion of ``epochs''. Let us define the sequence of stopping times $(k_m)$ defined iteratively as $k_0 = 0$ and
+\begin{align}
+\label{eq:km1}
+k_{m+1} &= \min\left\{ k : k- D_i^k \geq k_m ~\textnormal{for all $i$} \right\}. 
+\end{align}
+\begin{figure}
+\hspace{30pt}\begin{tikzpicture}[scale = 1.3]
+    %%% BASE
+   \draw[thick, ->] (0,0) -- (10,0) node [below] {global time};
+   \foreach \x in {1,...,19}
+   \draw (\x/2, 0.1) -- node[pos=0.5] (point\x) {} (\x/2.0, -0.1);
+   
+   \draw (0,1.8) -- (0,3.2) -- (11,3.2) -- (11,1.8) -- (0,1.8);
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] at (0.5,2.5) {$\Delta_i$};
+   \node at (2,2.5) { updates of $i$};
+   \node[draw,circle,fill=red, scale = 0.8] (B) at (8,2.5) {};
+   \node at (9.75,2.5) { viewpoint time $k$};
+
+   %%%% Specific
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (7.5,0) {$\Delta_i$};
+   \node[draw,circle,fill=red, scale = 0.8]  at (7.5,0) {};
+   \node[scale=0.8] at (7.5,-0.95) {$k$};
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (5,0) {$\Delta_i$};
+   \node[scale=0.8] at (5,-0.95) {$k-D_i^k$};
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (2.5,0) {$\Delta_i$};
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (1.5,0) {$\Delta_i$};
+   
+ \end{tikzpicture}
+
+
+    \hspace{30pt}\begin{tikzpicture}[scale = 1.3]
+    %%% BASE
+   \draw[thick, ->] (0,0) -- (10,0) node [below] {global time};
+   \foreach \x in {1,...,19}
+   \draw (\x/2, 0.1) -- node[pos=0.5] (point\x) {} (\x/2.0, -0.1);
+   
+
+   
+   %%%% Specific
+   \node[draw,circle,fill=red, scale = 0.8]  at (7.5,0) {};
+   \node[scale=0.8] at (7.5,-0.95) {$k$};
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (6.0,0) {$\Delta_i$};
+   \node[scale=0.8] at (6,-0.95) {$k-d_i^k$};
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (3.5,0) {$\Delta_i$};
+   \node[scale=0.8] at (3.5,-0.95) {$k-D_i^k$};
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (2.0,0) {$\Delta_i$};
+   \node[draw,diamond,aspect=0.5,fill=gray, scale = 0.4] (B) at (0.5,0) {$\Delta_i$};
+   
+ \end{tikzpicture}
+ \caption{delays}
+ \label{fig:delays}
+\end{figure}
+It is easy to see, that $k_{m+1}$ is the first moment of time, when $\barx^k$ directly depends only on ``new epoch'' variables. More precisely, as we could see from \eqref{eq:barx} it depends directly on the $x_i^{k-d_i^k}$ that are the result of some computation on $i$-th worker while having $x_i^{k-D_i^k}$ and $x^{k-D_i^k}$ as a parameters.
+
+\subsubsection{Algorithm}
+Let us now present \daveR~algorithm from \cite{mishchenko2018}. In this work, authors propose a novel asynchronous distributed proximal gradient algorithm to solve \eqref{eq:pb}. 
+
+For the composite optimization problems it is common to use proximal point algorithms ({\color{red} some reference to the section in introduction}). In this algorithm, authors propose to use proximal gradient descent based algorithm. 
+
+\begin{algorithm}[t!]
+    \caption{\daveR}
+    \label{alg:dave-rpg}
+    \tcbset{width=0.41\textwidth,before=,after=\hfill, colframe=black, colback=white, fonttitle=\bfseries, coltitle=black, colbacktitle=gray!20, boxrule=0.2mm,arc=1mm, left = 2pt}
+    
+    \begin{tcolorbox}[title=\textsc{Master }]
+    \begin{algorithmic}
+    \STATE \textbf{initialize} $\barx = \barx^0$, $k=0$\\
+    \WHILE{not converge}{
+        \STATE\textbf{when} a worker finishes:
+        \STATE {\color{blue!70!black} Receive  $\Delta$ from it}
+        \STATE $\barx \leftarrow \barx + \Delta$
+        \STATE {\color{red!80!yellow} Send $\barx$ back}
+        \STATE $k\leftarrow k+1$
+    }\ENDWHILE
+    \STATE Interrupt all workers
+    \STATE\textbf{output} $\rprox(\barx)$
+    
+    \end{algorithmic}
+    \end{tcolorbox}
+    \tcbset{width=0.41\textwidth,before=,after=\hfill, colframe=black, colback=white, fonttitle=\bfseries, coltitle=black, colbacktitle=gray!20, boxrule=0.2mm,arc=1mm, left = 2pt}
+    \hfill\begin{tcolorbox}[title=\textsc{Worker} $i$
+    \vphantom{\texttt{Worker $i$}}]
+    \begin{algorithmic}
+    \STATE \textbf{initialize} $x_i = x = \barx^0$
+    %Send $\overline x$ to each machine\\
+    \WHILE{not converged}{
+         \STATE {\color{red!80!yellow}Receive the most recent $\barx$}
+         \STATE Select the number of repetitions $p$
+         \STATE $\Delta \leftarrow 0$
+         \FOR{$q=1$ to $p$}{
+             \STATE $z\leftarrow\rprox(\barx+\Delta)$
+             \STATE $x^+ \leftarrow z - \gamma_i\nabla f_i(z)$
+             \STATE $\Delta \leftarrow \Delta + \pi_i(x-x^+)$
+             \STATE $x \leftarrow x^+$
+         }
+         \ENDFOR
+        \STATE {\color{blue!70!black} Send adjustment $\Delta$ to master}
+        %$k\leftarrow k+1$
+    }
+    \ENDWHILE
+    \end{algorithmic}
+    \end{tcolorbox}
+    \end{algorithm}
+
+
+As an additional feature, this algorithm allows to make a couple of repetitions $p$ of local proximal gradient steps to figure out the main bottleneck of distributed methods for high dimensional problems - the size of communication. In contrast with the usual technique of sparsification updates ($\Delta$) before sending to master, authors use local loops to decrease the amount of communication rounds. 
+
+\subsubsection{Theoretical result}
+Let us present the {\color{red}simplified} theoretical result from \cite{mishchenko2018} under the following assumption.
+
+\begin{assumption}[On problem]\label{hyp:basic:problem}
+    Suppose all functions $\{f_i\}_{i=1,..,M}$ are $\mu$-strongly convex and $L$-smooth (i.e. differentiable with Lipschitz continuous gradient).
+\end{assumption}
+
+The strong convexity assumption implies that there is indeed a unique optimal solution $x^\star$ of problem \eqref{eq:pb}. Note that, the assumption that the objective functions $f_i$ share the same strong convexity constant is convenient for the analysis, but it does not restrict generality, as we can include a $\ell_2$ regularization term in order to enhance the strong convexity constant of those having a lower one. In addition, it allows to use $\gamma_i = \gamma$ as far as it depends only on $\mu$ and $L$.
+
+Before presenting the main result of that paper, let us define the local shifted optimal points as following.
+
+\begin{definition}[Local shifted optimal points]\label{def:basics:localoptim}
+For any worker $i$ let us define the local shifted optimal point $x_i^\star$ as
+\begin{equation}
+x_i^\star = x^\star - \gamma\nabla f_i(x^\star).
+\end{equation}
+\end{definition}
+
+As we could see from the definition, if all $x_i = x_i^\star$, then 
+$$
+\barx^\star = \sum_{i=1}^M\pi_ix_i^\star = x^\star - \gamma\sum_{i=1}^M\pi_i\nabla f_i(x^\star) = x^\star - \gamma\nabla F(x^\star)
+$$
+that satisfies the optimality condition for the problem \eqref{eq:pb}
+$$
+x^\star = \rprox(x^\star - \gamma\nabla F(x^\star)) = \rprox(\barx^\star).
+$$
+
+
+
+
+\subsubsection{Why \dave}
+{\color{yellow} May be this discussion should be moved to the Chapter with \spy}
+Let us explain, why we use \dave~algorithm as a basis for our algorithm. As we mentioned, our goal is to propose a two-way sparse algorithm to solve \eqref{eq:pb}. Consider the identification property of the proximal operator we could guarantee the sparsity of $\rprox(\barx^k)$ after some moment of time {\color{red}XXX}. But, there is no reason for $\barx^k$ to become sparse. Thus, while sending $\barx^k$ from master to worker we will have a completely dense data to 

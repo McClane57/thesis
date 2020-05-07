@@ -1,0 +1,55 @@
+This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
+Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+The top-level auxiliary file: main.aux
+A level-1 auxiliary file: contents.aux
+A level-1 auxiliary file: basics_2.aux
+A level-1 auxiliary file: mor.aux
+A level-1 auxiliary file: distributed.aux
+A level-1 auxiliary file: biblio.aux
+The style file: alpha.bst
+Database file #1: references.bib
+Warning--I didn't find a database entry for "bertsekas1989parallel"
+Warning--empty journal in moreau1962fonctions
+Warning--empty journal in stout1974almost
+You've used 143 entries,
+            2543 wiz_defined-function locations,
+            1284 strings with 28340 characters,
+and the built_in function-call counts, 63532 in all, are:
+= -- 6483
+> -- 3072
+< -- 77
++ -- 1087
+- -- 1070
+* -- 4565
+:= -- 10187
+add.period$ -- 442
+call.type$ -- 143
+change.case$ -- 941
+chr.to.int$ -- 140
+cite$ -- 145
+duplicate$ -- 2533
+empty$ -- 4536
+format.name$ -- 1230
+if$ -- 13115
+int.to.chr$ -- 4
+int.to.str$ -- 0
+missing$ -- 148
+newline$ -- 719
+num.names$ -- 429
+pop$ -- 877
+preamble$ -- 1
+purify$ -- 1089
+quote$ -- 0
+skip$ -- 2222
+stack$ -- 0
+substring$ -- 3865
+swap$ -- 560
+text.length$ -- 77
+text.prefix$ -- 33
+top$ -- 0
+type$ -- 1120
+warning$ -- 2
+while$ -- 635
+width$ -- 149
+write$ -- 1836
+(There were 3 warnings)

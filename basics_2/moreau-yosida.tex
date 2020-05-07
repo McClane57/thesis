@@ -1,0 +1,47 @@
+\subsection{Moreau-Yosida regularization}\label{sec:basics_moreau-yosida}
+Let us define a Moreau envelope, that is also called Moreau-Yosida regularization \cite{moreau1962fonctions, yosida2012functional}.
+
+\begin{definition}
+Given $\lambda>0$, the Moreau envelope $M_{\lambda r}$ of the function $r$ with parameter $\lambda$ is defined as 
+\begin{equation}\label{eq:M-Y}
+M_{\lambda r}(y) = \inf_x\left(r(x) + \frac{1}{2\lambda}\|x-y\|_2^2\right).
+\end{equation}
+\end{definition}
+
+Moreau-Yosida regularization of function $r$ is continuously differentiable, even if $r$ is not \cite[Fact $17.17$]{yamada2011minimizing} and its gradient is given by
+\begin{equation}\label{eq:M-Y_grad}
+\nabla M_{\lambda r} = \frac{1}{\lambda}(x-\prox_{\lambda r}(x)).
+\end{equation}
+Moreover, the sets of minimums of $r$ and $M_f$ are the same. Let us rewrite proximal operator as
+$$
+\prox_{\lambda r}(x) = x - \lambda\nabla M_{\lambda r}(x),
+$$
+which shows that proximal operator could be viewed as a gradient step and Algorithm \ref{algo:pm} is a gradient descent algorithm with stepsize $\lambda$ for minimizing $M_{\lambda r}$ \cite{rockafellar1976monotone}. Taking into account that Moreau envelope has the same minimizers as $r$ we have the convergence of proximal point method. In Figure \ref{fig:M-Y} we present a geometrical interpretation of Moreau envelope for the non-smooth objective function $r$.
+
+\begin{figure}[H]
+    \centering
+    \input{basics_2/figure_m-y}
+    \caption{Geometrical interpretation of Moreau envelope for $r = \max\left\{-x, 0.5x\right\}$ from $\RR$ to $\RR$.}
+    \label{fig:M-Y}
+\end{figure}
+
+Let us talk a little bit about the properties of Moreau-Yosida regularization. Since we mentioned that the proximal point method is a gradient descent method on Moreau envelope of the function, let us present smoothness and strong convexity properties of this envelope. From \eqref{eq:M-Y_grad} we have that 
+\begin{equation}\label{eq:M-Y_smoothness}
+L_{M_{\lambda r}} = \lambda^{-1}
+\end{equation}
+independent on the smoothness parameter of $r$. However, Moreau-Yosida regularization is strongly convex if the objective function $r$ is strongly convex, moreover, their strongly convexity constants relates as
+\begin{equation}\label{eq:M-Y_strongly}
+\mu_{M_{\lambda r}} = \frac{\mu\lambda^{-1}}{\mu + \lambda^{-1}},
+\end{equation}
+where $\mu$ is the strongly convexity constant of $r$ (see Theorem 2.2 of \cite{lemarechal1997practical} for the proof). Thus, the condition number of this Moreau-Yosida regularization of $\mu$-strongly convex function $r$ is 
+\begin{equation}\label{eq:M-Y_condition}
+\kappa_{M_{\lambda r}} = \frac{L_{M_{\lambda r}}}{\mu_{M_{\lambda r}}} = \frac{\mu + \lambda^{-1}}{\mu}.
+\end{equation}
+
+As a result, this problem becomes extremely well-conditioned when $\lambda$ is selected big.
+
+
+
+
+
+

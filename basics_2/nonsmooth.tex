@@ -1,0 +1,163 @@
+\section{Non-smooth optimization}\label{sec:basics_nonsmooth}
+Let us now consider the following optimization problem
+\begin{equation}\label{eq:pb_r}
+\min_{x\in\RR^n} r(x),
+\end{equation}
+where $r$ is convex but non-smooth. {\color{blue}These functions are often assumed to be smooth almost everywhere on their domain since one of the common approaches in different applications is a model of max-type functions
+$$
+r(x) = \max_{1\leq i \leq p} f_i(x),
+$$
+where $f_i$ as=re convex and differentiable.
+}
+
+Since $r$ is non-smooth we could not calculate the gradient of it at any arbitrary point that leads to the other type of optimization methods for such methods. {\color{blue}Let us start with the definition of the object that could replace gradients for non-smooth functions.}
+
+\begin{definition}[Subgradient]
+Consinder convex function $r$. Vector $g$ is called subgradient of $r$ at point $y\in\dom r$ if for any $x\in\dom r$ holds
+\begin{equation}\label{eq:subgrad}
+r(x)\geq r(y) + \langle g, x-y\rangle.
+\end{equation}
+The set of all subgradients at $y$ is called subdifferential of $r$ at point $x$ and denoted by $\partial r(y)$.
+\end{definition}
+
+Now we are ready to present one of the basic algorithm \cite[Chapter $3$]{nesterov-book} to solve \eqref{eq:pb_r}.
+
+\begin{algorithm}
+    \caption{Subgradient Descent}
+    \label{algo:sd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \STATE Select the sequence of stepsizes $\gamma^k$ such that
+        $
+            \gamma^k>0,~\gamma^k\rightarrow 0,~\sum_0^\infty \gamma^k = \infty
+        $
+        \FOR{$k\geq 0$}{
+            \STATE Compute any subgradient $g^k\in\partial r(x^k)$
+            \STATE $x^{k+1}\leftarrow x^k - \gamma^k \frac{g^k}{\|g^k\|}$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+As we could see from the definition, the norm of subgradient could be different, that is why in the algorithm used the normalized version. It is clear, that this method is worse than the gradient descent, as far as the direction of $-g^k$ has no reason to be the descent direction see Figure \ref{fig:nonsmooth_approx}. This explains the usage of decreasing stepsizes to converge to the minimizer and stay in its neighborhood after the next step.
+
+
+\begin{figure}[H]
+    \centering
+    \input{basics_2/figure_subdiff}
+    \caption{Linear approximations of non-smooth function $r = \max\left\{-2x, (0.2x+1)^2 - 1\right\}$ from $\RR$ to $\RR$
+    at point $y = 0$ with different subgradients. As we could see, $y=0$ is a minimizer of $r$, however its subdifferential in this point is $\partial_0 r = [-2, 0.4]\ni0$. Depending on the subgradient $g$ (we plot for $g=-1, -0.5, 0.4$) different linear approximations of function $r$ in $0$ appears and, as a result, the ``descent'' step is the descent step for these approximations but not for $r$.}
+    \label{fig:nonsmooth_approx}
+\end{figure}
+
+
+\subsubsection{Proximal methods}
+The subgradient descent method is not the only method to solve non-smooth problems. Let us present the class of methods called proximal methods and, first, let us recall the definition of a proximal operator.
+
+\begin{definition}[Proximal operator]\label{def:proximal_operator}
+Given a convex function $r:\RR^n\rightarrow \RR$, the proximal operator of $r$ is the function
+\begin{equation}
+\prox_r(x) = \argmin_{y\in\RR^n}\left\{r(y) + \frac{1}{2}\|x-y\|_2^2\right\}.
+\end{equation}
+\end{definition}
+Since $r$ is convex, the objective of $\argmin$ is strongly convex that means the proximal operator of any point is well defined and unique.
+
+In machine learning applications many regularizers are relatively simple that makes the computation of proximal operator cheap. More precisely, a proximal operator for such problems usually has a closed-form solution ($\ell_1$, Group-Lasso) or could be computed iteratively (TV). Moreover, if $r$ is the indicator function of a convex set, the proximal operator is an orthogonal projection onto this set. 
+
+{\color{blue} Before presenting proximal algorithms let us recall some important properties of the proximal operator that will be useful.
+First, let us present the lemma about the optimal solution of \eqref{eq:pb_r} that shows the interest of the proximal operator \cite[Section $2.3$]{parikh2014proximal}.
+
+\begin{lemma}\label{lm:stationary_point}
+Point $x^\star$ is a solution of \eqref{eq:pb_r} if and only if $x^\star = \prox_r(x^\star)$.  
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:stationary_point}]
+Let $x^\star$ be a minimizer of $r$ then
+$$
+r(x) + \frac{1}{2}\|x-x^\star\|_2^2\geq r(x) \geq r(x^\star) = r(x^\star) + \frac{1}{2}\|x^\star - x^\star\|_2^2,
+$$
+that implies $x^\star = \prox_r(x^\star)$.
+
+Let $x^\star = \prox_r(x^\star)$, using optimality condition we have 
+$$
+0\in \partial r(y) + (y-x)
+$$
+for any $x\in\RR^n$ and $y=\prox_r(x)$.
+Taking $x=y = x^\star$ we have $0\in\partial r(x^\star)$.
+\end{proof}
+
+Now, we present the important property of the proximal operator that is widely used in the analysis of proximal methods \cite[Prop. ~12.27]{bauschke2011convex}.
+\begin{lemma}[Firm nonexpansiveness of proximal operator]\label{lm:firm}
+Consider convex function $r:\RR^n\rightarrow \RR$ then for any $x, y\in \RR^n$ holds
+\begin{equation}\label{eq:firm}
+\|\prox_r(x)-\prox_r(y)\|_2^2\leq\langle x-y, \prox_r(x)-\prox_r(y)\rangle.
+\end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:firm}]
+Let $x^\prime = \prox_r(x)$ and $y^\prime = \prox_r(y)$, then 
+$$
+x - x^\prime\in\partial r(x^\prime)~~~~~\textnormal{and}~~~~~y - y^\prime \in\partial r(y^\prime).
+$$
+Thus, by the definition of subdifferential we have 
+$$
+r(y^\prime)\geq r(x^\prime) + \langle x - x^\prime, y^\prime- x^\prime\rangle~~~~~\textnormal{and}~~~~~r(x^\prime)\geq r(y^\prime) + \langle y - y^\prime, x^\prime- y^\prime\rangle.
+$$
+Summing up these inequalities we get the statement of the lemma.
+\end{proof}
+
+Finally, let us introduce the connection between proximal operator and subdifferential of function $r$ \cite{parikh2014proximal}.
+
+\begin{lemma}[Resolvent]\label{lm:resolvent}
+    The proximal operator $\rprox$ and the subdifferential $\partial r$ are related as follows:
+    \begin{equation}\label{eq:resolvent}
+        \rprox = (I+\gamma\partial r)^{-1}, 
+    \end{equation}
+    where $I$ is identity matrix.
+    The mapping $(I+\gamma\partial r)^{-1}$ is called the resolvent of operator $\partial r$ with parameter $\gamma>0$.
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:resolvent}]
+By the definition if $y\in (I+\gamma\partial r)^{-1}(x)$, Then
+$$
+x\in (I+\gamma\partial r)(y) = y + \partial r(y).
+$$
+It could be rewritten as
+$$
+0\in \partial r(y) + \frac{1}{\gamma}(y-x) = \partial_y \left(r(y) + \frac{1}{2\gamma}\|x-y\|_2^2\right).
+$$
+This is the necessary and sufficient condition for 
+$$
+y = \argmin_z\left\{r(z) + \frac{1}{2\gamma}\|z-x\|_2^2\right\},
+$$
+that proves the result.
+\end{proof}
+}
+\begin{figure}[H]
+    \centering
+\input{basics_2/prox_l1}
+    \caption{Geometrical interpretation of soft-thresholding operator}
+    \label{fig:prox_l1}
+\end{figure}
+
+In Figure \ref{fig:prox_l1} we present a geometrical example: proximal operator for the function $r = \lambda\|\cdot\|_1$ that is also known as a soft-thresholding operator \cite{donoho1995noising}. It is easy to see that the following problems are equivalent 
+$$
+\max_{a - \frac{1}{2\lambda}\|x-y\|_2^2\leq\|y\|_1} a ~~~\Leftrightarrow~~~\min_{y\in\RR^n}\left\{\lambda_1\|y\|_1 + \frac{1}{2}\|x-y\|_2^2\right\}.
+$$
+It implies that the proximal operator could be interpreted as a point where lines $r(x)$ and $-\frac{1}{2}\|x-y\|_2^2-a_{\max}$ touch each other. Moreover, from this figure we could see the sequence of points 
+$$
+x^{k+1} = \prox_{\lambda\|\cdot\|_1}(x^k)
+$$
+is decreasing (in terms of $\|\cdot\|_1$, that motivates the following proximal algorithm \cite{rockafellar1976monotone}.
+
+\begin{algorithm}
+    \caption{Proximal Minimization}
+    \label{algo:pm}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE $x^{k+1}\leftarrow \rprox(x^k)$,\hfill where $\gamma$ is a stepsize
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+This algorithm converges to the minimizer if this minimizier exists (see for example Theorem $23.41$ \cite{bauschke2011convex}).
+% The result above shows that in particular, the resolvent of subdifferential is a single-valued.

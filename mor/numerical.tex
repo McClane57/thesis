@@ -1,0 +1,183 @@
+\section{Numerical illustrations}\label{sec:mor-numerical}
+We report preliminary numerical experiments illustrating the behavior of our randomized proximal algorithms on standard problems involving $\ell_1$/TV regularizations. We provide an empirical comparison of our algorithms
+%\algo, \adaalgo, 
+with the standard proximal (full and coordinate) gradient algorithms %\cite{teboulle2018simplified,wright2015coordinate} 
+%(\pgd) 
+and a recent proximal sketching algorithm.
+%\sega.
+%\cite{hanzely2018sega}.
+
+
+% ==========================================================================
+\subsection{Experimental setup}
+% ==========================================================================
+
+
+% ==========================================================================
+%\paragraph{Problems.}
+%\textbf{Problems.}
+We consider the standard regularized logistic regression with three different regularization terms,
+%"epsilon" from LibSVM data set with 100,000 observations and 2,000 features. 
+% estimated over a training set $\mathcal S=\{(z_j,y_j), j\in\{1,\ldots,n\}\}$
+%\begin{align*}%\label{eq:reg-loss}
+which can be written for given $(a_i,b_i)\in\RR^{n+1}$ ($i=1,\ldots,m$) and parameters $\lambda_1,\lambda_2>0$
+\begin{subequations}
+\begin{align}
+ &+ ~\lambda_1\!\left\|x\right\|_1\label{eq:logl1}\\
+ \min_{x\in \RR^n}~~~\frac{1}{m}\sum\limits_{i=1}^m \log\left(1 + \exp\left(-b_ia_i^\top x\right)\right) + \frac{\lambda_2}{2}\|x\|_2^2 &+ ~  \lambda_1\!\left\|x\right\|_{1,2}\label{eq:logl12}\\
+ &+~\lambda_1\!\mathbf{TV}(x)\label{eq:logtv}
+\end{align}
+\end{subequations}
+%\end{align*}
+We use two standard data-sets from the LibSVM repository: the 
+\emph{a1a} data-set ($m=1,605$ $n=123$) for the $\mathbf{TV}$ regularizer
+%with hyperparameters $\lambda_2$ and $\lambda_1$, chosen to reach 80\% sparsity;
+the \emph{rcv1\_train} data-set ($m=20,242$ $n=47,236$) for the $\ell_1$ and $\ell_{1,2}$ regularizers. We fix the parameters $\lambda_2=1/m$ and $\lambda_1$ to reach a final sparsity of roughly 90\%. 
+%$\lambda_2$ and $\lambda_1$ are chosen to reach a sparsity  80\% (for \eqref{eq:logl1}), 90\% (for \eqref{eq:logl12}) and 96\% (for \eqref{eq:logtv}) respectively.
+
+The subspace collections are taken naturally adapted to the regularizers: by coordinate for \eqref{eq:logl1} and \eqref{eq:logl12}, and by variation for \eqref{eq:logtv}. {The adaptation strategies are the ones described in Section~\ref{sec:ex_ada}.}
+
+% For the coordinate-wise problems \eqref{eq:logl1} and \eqref{eq:logl12}, adaptation is performed at each iteration following Example~\ref{ex:adapt_coord}; for the variation~\eqref{eq:logtv} where the adaptation is both more costly to compute and more challenging theoretically, we adopt the strategy of Example~\ref{ex:adapt_fixed}, leading to seldom but efficient adaptations (see forthcoming Figure\;\ref{fig:a11}).
+
+% We also examine a synthetic least squares problems
+%  \begin{align*}
+%  &~~\lambda_1\!\left\|x\right\|_1\\
+%  \min_{x\in \RR^n}~~\| Ax - b\|^2 &+ ~  \lambda_1\!\left\|x\right\|_{1,2}\\
+%  &~~\lambda_1\!\mathbf{TV}(x)
+% \end{align*}
+% with $m= 10,000$ examples and $n = 100$ features.  $A$ is $m\times n$ matrix generated from the standard normal distribution, $b = Ax_0 +e$ where $x_0$ is a 90\% sparse vector and $e\in\mathbb{R}^m$ is taken from the normal distribution with standard deviation $0.01$.  
+% %\end{align*}
+% We take $\lambda_1$ to reach the sparsity of 90\%.
+
+
+% It measures the amount of coordinates that are updated during all the iterations. Especially this measure is interesting for the problems when the computational time of iteration $k$ depends on $\rank(P^k)$ (for example in LASSO problems with coordinate-wise projections).
+
+% % ==========================================================================
+% \paragraph{Projections.} 
+% More precisely, for $\ell_{1,2}$ and $\ell_1$ in nonadaptive case the set of projections is associated with all elements of $\C_\ell$ with dimension $d$, where $d$ is a parameter of the algorithm. In adaptive case we select the set of projections $\PP(x)$ associated with all linear subspaces $\{C_i\}_i$ of $\C_\ell$ such that $T(x)\subset C_i$ and $\dim(C_i) = \dim(T(x)) + d$, where $d$ is a parameter of the algorithm.
+
+% For $\bP$ associated with some subcollection of $\C^\mathbf{TV}$ there is no closed formula and the only way to compute it just to calculate the weighted sum of all projections matrices. According to this exponentially big number of projections in $\PP$ as in $\ell_1$ case above is permitted. Because of this, we select in nonadaptive case the set of projections associated with all elements of $C_l\in\C^\mathbf{TV}$ with jumps set $\jumps(C_l) = \{l, l+1,\dots, l+d-1\}$, where $d$ is a parameter of the algorithm. 
+% To describe the selection on adaptive case, let us define 
+% \begin{equation}
+%     \overline{\jumps}(x) = \{i\in[2,n]\colon i\notin\jumps(x)\}.
+% \end{equation}
+% In adaptive case we select the set of projections $\PP(x)$ associated with all linear subspaces $C_l\in\C^\mathbf{TV}$ such that 
+% \begin{equation}
+%     \jumps(C_l) = \jumps(x) + \{\overline{\jumps}(x)_l, \overline{\jumps}(x)_{l+1},\dots,\overline{\jumps}(x)_{l+d-1}\},
+% \end{equation}
+% where $d$ is a parameter of the algorithm. Remark \ref{rm:el} guarantees the eligibility of both of these sets.
+
+
+% \subsubsection{$\mathbf{TV}$ case}
+% This case is different from all the others as far as there is no closed formula for expected projection $\bP$ and for its square root of the inverse $\bQ$. It means, that for computation of $\bQ$ we need to take into account all projections from the set $\PP$. To make it feasible we assume that against of selecting $s$ jump positions in random we select only the first one and all the other are consecutive free places just after the first one. According to the Lemma \ref{lm:eligible} this set is eligible so it is fair to use it.
+
+
+% ==========================================================================
+%\paragraph{Algorithms.}
+%textbf{Algorithms.} 
+We consider five algorithms:\\[0.2cm]
+\resizebox{\linewidth}{!}{
+\begin{tabular}{|c|c|c|c|}
+\hline
+    Name & Reference & Description & Randomness  \\
+    \hline
+   \pgd  &  &  vanilla proximal gradient descent  & None \\
+   x\footnotemark \, \rpcd & \cite{nesterov2012efficiency} & standard proximal coordinate descent &  x coordinates selected for each update \\
+   x  \sega & \cite{hanzely2018sega} & Algorithm \sega~with coordinate sketches &  $\rank(S^k) = \text{x}$ \\
+   x  \algo &  Algorithm \ref{alg:strata_nondis} & (non-adaptive) random subspace descent & Option 2 of Table~\ref{tab:comp} with $s =  \text{x}$ \\
+   x  \adaalgo & Algorithm \ref{alg:ada_strata_nondis} & adaptive random subspace descent &  Option 2 of  Table~\ref{tab:comp} with $s =  \text{x}$\\
+ \hline
+\end{tabular}}
+\footnotetext{In the following, x is often given in percentage of the possible subspaces, i.e. x\% of $|\mathcal{C}|$, that is x\% of $n$ for coordinate projections and x\% of $n-1$ for variation projections.}
+
+\vspace*{0.5cm}
+
+
+For the produced iterates, we measure the sparsity of a point $x$ by $\|\S(x_k)\|_1$, which correspond to the size of the supports for the $\ell_1$ case and the number of jumps for the TV case. We also consider the quantity: 
+\[
+\text{Number of subspaces explored at time $k$} \displaystyle ~=~ \sum^k_{t=1} \|\S(x^t)\|_1.
+\]
+We then compare the performance of the algorithms on three criteria:
+\begin{itemize}
+    \item functional suboptimality vs iterations (standard comparison);
+    \item size of the sparsity pattern vs iterations (showing the identification properties);
+    \item functional suboptimality vs number of subspaces explored (showing the gain of adaptivity).
+\end{itemize}
+
+% ==========================================================================
+\subsection{Illustrations for coordinate-structured problems}
+% ==========================================================================
+
+
+% ==========================================================================
+\subsubsection{Comparison with standard methods}
+% ==========================================================================
+
+{We consider first $\ell_1$-regularized logistic regression \eqref{eq:logl1}; in this setup, the non-adaptive \algo~boils down to the usual randomized proximal gradient descent (see Section\;\ref{sec:coordproj}). We compare the proximal gradient to its adaptive and non-adaptive randomized counterparts.
+
+First, we observe that the iterates of \pgd~and \adaalgo~coincide. This is due to the fact that the sparsity of iterates only decreases ($\S(x_k)\leq \S(x_{k+1})$) along the convergence, and according to Option 2 all the non-zero coordinates are selected at each iteration and thus set to the same value as with \pgd. However, a single iteration of $10\%$-\adaalgo costs less in terms of number of subspaces explored, leading the speed-up of the right-most plot.  Contrary to the adaptive \adaalgo, the structure-blind \algo~identifies much later then \pgd~and shows poor convergence.}
+
+
+\begin{figure}[H]
+\begin{center}
+\scalebox{.85}{\input{mor/figs/rcv1_sparsity_vs_iteration_l1__algorithms_comparison.tex}}
+\scalebox{.85}{\input{mor/figs/rcv1_suboptimality_vs_iteration_l1_different_amount_of_coordinates.tex}}
+\scalebox{.85}{\input{mor/figs/rcv1_suboptimality_vs_sparsity_l1_different_amount_of_coordinates.tex}}
+\end{center}
+\caption{$\ell_1$-regularized logistic regression \eqref{eq:logl1}
+}
+\label{fig:rcv1}
+\end{figure}
+
+% ==========================================================================
+\subsubsection{Comparison with \sega}\label{sec:num:sega}
+
+
+In Figure~\ref{fig:rcv1_l12}, we compare \adaalgo~algorithm with \sega~algorithm featuring coordinate sketches\;\cite{hanzely2018sega}. While the focus of \sega~is not to produce an efficient coordinate descent method but rather to use sketched gradients, \sega~and \algo~are similar algorithmically and reach similar rates (see Section \ref{sec:comparison}). As mentioned in \cite[Apx.\;G2]{hanzely2018sega}, \sega~is slightly slower than plain randomized proximal coordinate descent (10\% \algo) but still competitive, which corresponds to our experiments. Thanks to the use of identification, \adaalgo~shows a clear improvement over other methods in terms of efficiency with respect to the number of subspaces explored.
+
+\begin{figure}[H]
+\begin{center}
+\scalebox{.85}{\input{mor/figs/sega_sparsity_vs_iteration_tv__algorithms_comparison.tex}}
+\scalebox{.85}{\input{mor/figs/sega_suboptimality_vs_iteration_tv_algorithms_comparison.tex}}
+\scalebox{.85}{\input{mor/figs/sega_suboptimality_vs_sparsity_tv__algorithms_comparison.tex}}
+\end{center}
+\caption{$\ell_{1,2}$ regularized logistic regression \eqref{eq:logl12}
+}
+\label{fig:rcv1_l12}
+\end{figure}
+
+% ==========================================================================
+\subsection{Illustrations for total variation regularization}
+
+We focus here on the case of total variation \eqref{eq:logtv} which is a typical usecase for our adaptive algorithm and subspace descent in general. Figure~\ref{fig:a11} displays a comparison between the vanilla proximal gradient and various versions of our subspace descent methods.
+
+We observe first that  \algo, not exploiting the problem structure, fails to reach satisfying performances as it identifies lately and converges slowly. In contrast, the adaptive versions \adaalgo~perform similarly to the vanilla proximal gradient in terms of sparsification and suboptimality with respect to iterations. As a consequence, in terms of number of subspaces explored, \adaalgo~becomes much faster once a near-optimal structure is identified. More precisely, all adaptive algorithms (except 1 \adaalgo, see the next paragraph) identify a subspace of size $\approx 8\%$ (10 jumps in the entries of the iterates) after having explored around $10^5$ subspaces. Subsequently, each iteration involves a subspace of size 22,32,62 (out of a total dimension of 123) for 10\%,20\%,50\% \adaalgo~respectively, resulting in the different slopes in the red plots on the rightmost figure.
+
+\begin{figure}[H]
+\begin{center}
+\scalebox{.85}{\input{mor/figs/a1a_sparsity_vs_iteration_tv_different_amount_of_coordinates.tex}}
+\scalebox{.85}{\input{mor/figs/a1a_suboptimality_vs_iteration_tv_different_amount_of_coordinates.tex}}
+\scalebox{.85}{\input{mor/figs/a1a_suboptimality_vs_sparsity_tv_different_amount_of_coordinates.tex}}
+\end{center}
+\caption{1D-TV-regularized logistic regression \eqref{eq:logtv}}
+\label{fig:a11}
+\end{figure}
+
+% ========================================================================
+% ========================================================================
+%\section{Additional experiments on adaptive selection}
+% ========================================================================
+% ========================================================================
+
+Finally, Figure~\ref{fig:tvcomp} displays 20 runs of 1 and 20\% \adaalgo~as well as the median of the runs in bold. We notice that more than 50\% of the time, a low-dimensional structure is quickly identified (after the third adaptation) resulting in a dramatic speed increase in terms of subspaces explored. However, this adaptation to the lower-dimensional subspace might take some more time (either because of poor identification in the first iterates or because a first heavy adaptation was made early and a pessimistic bound on the rate prevents a new adaptation in theory). Yet, one can notice that these adaptations are more stable for the 20\% than for the 1 \adaalgo, illustrating the ``speed versus stability'' tradeoff in the selection. 
+
+
+\begin{figure}[H]
+\begin{center}
+\scalebox{.9}{\input{mor/figs/a1a_expectation_1_tv_different_amount_of_coordinates.tex}}
+\scalebox{.9}{\input{mor/figs/a1a_expectation_20_tv_different_amount_of_coordinates.tex}}
+\end{center}
+\caption{20 runs of \adaalgo~and their median (in bold) on 1D-TV-regularized logistic regression \eqref{eq:logtv}
+}
+\label{fig:tvcomp}
+\end{figure}

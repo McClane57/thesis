@@ -1,0 +1,573 @@
+\section{Optimization in ML}
+
+\subsection{Introduction}
+Mathematical optimization is one of the important tools in the Machine Learning since its foundation. It is often happend, that the empirical risk minimization (ERM) is used to find the best approximator for the risk. But in practice, the easiest approximator sometimes is preferrable than the best one, for example in the variable selection problems it is important to have only few entries of estimator be non-zero. On the other hand, the solution of ERM problem has the arbitrary structure, thus require for some changes in optimization problem to solve. On of the popular ways to enforce the specific structure to the final solution is to add a regularization term to the problem or to consider the constraint optimization problem, when the solution is forced to belong some specific set. Let us focus on the regularized problems that are know in mathematical optimization as composite problems.
+
+\subsection{Smooth optimization}
+
+Let us consider general empirical risk minimization problem without regularization
+\begin{equation}\label{eq:pb_simple}
+\min_{x\in\mathbb{R}}~f(x),
+\end{equation}
+where $f(x)= \frac{1}{|\data|}  \sum_{j\in\data}\ell(x) $ is the empirical risk estimated on the set $\data$.
+
+We will focus on the case, when empirical risk is a convex and smooth function that covers the classical linear or logistic regression models.
+
+
+\begin{definition}[Convex set]
+Set $S$ is called convex if for any $x,y\in S$ and any $\alpha\in[0,1]$ holds
+$$
+\alpha x + (1-\alpha)y \in S.
+$$
+\end{definition}
+
+Let us recall that the domain of function $f$ is defined as
+$$
+\dom f = \{x:|f(x)|<\infty\}.
+$$
+
+\begin{definition}[Convex function]
+Function $f$ is called convex if $\dom f$ is a convex set and for any $x, y\in \dom f$ and $\alpha \in[0,1]$
+\begin{equation}\label{eq:conv_def}
+f(\alpha x + (1-\alpha)y)\leq \alpha f(x) + (1-\alpha)f(y).
+\end{equation}
+Moreover, function $f$ is called $\mu$-strongly convex if function $g = f - \frac{\mu}{2}\|x\|_2^2$ is convex.
+\end{definition}
+
+From this definition we could immediately get the following interpretation for smooth functions $f$.
+
+\begin{lemma}\label{lm:convex}
+    A continuously differentiable function $f$ is convex iff for any $x,y\in\mathbb{R}^n$, we have
+    \begin{equation}\label{eq:convex_1}
+        f(y) \geq f(x) + \langle \nabla f(x), y-x\rangle.
+    \end{equation}
+    Moreover, function $f$ is $\mu$-strongly convex iff for any $x,y$ in $\mathbb{R}^n$, we have
+    \begin{equation}\label{eq:convex_2}
+        f(y) \geq f(x) + \langle \nabla f(x), y-x\rangle + \frac{\mu}{2}\|y-x\|_2^2.
+    \end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:convex}]
+If $f$ is a convex function then for any $\alpha\in[0,1]$ we have 
+$$
+f(y)\geq f(x) +\frac{1}{1-\alpha}\left(f(\alpha x + (1-\alpha)y) - f(x)\right),
+$$
+where the computation of limit for $\alpha \rightarrow 1$ will give \eqref{eq:convex_1}.
+
+Let us now prove the convexity form \eqref{eq:convex_1}.
+Summing the following inequalities with multipliers $\alpha$ and $1-\alpha$ correspondingly
+$$
+f(\alpha x + (1-\alpha)y) \leq f(x) - \langle \nabla f(\alpha x + (1-\alpha)y), (1-\alpha)(x-y)\rangle = f(x) + (1-\alpha) \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle
+$$
+$$
+f(\alpha x + (1-\alpha)y) \leq f(y) - \langle \nabla f(\alpha x + (1-\alpha)y), \alpha(y-x)\rangle = f(x) - \alpha \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle
+$$
+we immediately get \eqref{eq:conv_def}. 
+
+The proof of \eqref{eq:convex_2} immediately follows from the definition of the strongly convexity.
+
+
+\end{proof}
+
+Convexity implies that any stationary point is a global minima of $f$. In addition, the strong convexity implies the existance and uniqness of $x^\star = \argmin_{x\in\mathbb{R}^n} f(x)$.
+
+\begin{definition}[$L$-smoothness]
+Differentiable function $f$ is called $L$-smooth if its gradient is $L$-Lipschitz
+\begin{equation}
+    \|\nabla f(x) - \nabla f(y)\|_2\leq L\|x-y\|_2
+\end{equation}
+for any $x,y\in\mathbb{R}^n$.
+\end{definition}
+
+It is easy to see, that if function $f$ is $L$-smooth then the following upperbound takes place.
+\begin{lemma}\label{lm:descent}
+    Let us assume that $f$ is convex and $L$-smooth, then for any $x,y\in\mathbb{R}^n$
+    \begin{equation}\label{eq:descent_lemma_1}
+        f(y) - f(x) - \langle \nabla f(x), y-x\rangle\leq \frac{L}{2}\|x-y\|_2^2
+    \end{equation}
+    and
+    \begin{equation}\label{eq:descent_lemma_2}
+        \frac{1}{L}\|\nabla f(x) - \nabla f(y)\|_2^2 \leq\langle \nabla f(x) - \nabla f (y), x - y\rangle \leq L\|x-y\|_2^2.
+    \end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:descent}]
+   For any $x,y\in\mathbb{R}^n$ we have
+   \begin{align}
+        f(y) - f(x)  &= \int_0^1\langle\nabla f(x + \alpha(y-x)), y-x\rangle d\alpha\nonumber\\
+         &= \langle \nabla f(x), y-x\rangle + \int_0^1\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle d\alpha
+   \end{align}
+Now, using  convexity of $f$ and Cauchy–Schwarz inequality we have
+\begin{align}\label{eq:lipsh}
+    f(y)-f(x) - \langle \nabla f(x), y-x\rangle &= |f(y)-f(x) - \langle \nabla f(x), y-x\rangle|\nonumber\\ &= \left|\int_0^1\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle d\alpha\right|\nonumber\\
+ &\leq \int_0^1|\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle| d\alpha\nonumber\\
+&\leq\int_0^1\|\nabla f(x + \alpha(y-x)) - \nabla f(x)\|_2\|y-x\|_2 d\alpha\nonumber\\
+&\leq \int_0^1\tau L\|x-y\|_2^2 d\tau = \frac{L}{2}\|x-y\|_2^2.
+\end{align}
+
+To prove the second part let us sum \eqref{eq:lipsh} for the pairs of points $(x,y)$ and $(y,x)$ and immediately get the upperbound.
+For the lowerbound, let us define function $\varphi(x)  = f(x) - \langle \nabla f(x^\prime), x\rangle$ for some fixed $x^\prime\in\mathbb{R}^n$.
+It is easy to see, that $\varphi(x)$ is $L$-smooth
+$$
+\|\nabla\varphi(x) - \nabla\varphi(y)\|_2 = \|\nabla f(x) - \nabla f(x^\prime) - \nabla f(y) + \nabla f(x^\prime)\|_2\leq L\|x-y\|_2.
+$$
+It is easy to see, that $x^\prime$ is a minimizer of $\varphi(x)$ that mean
+\begin{equation}
+\varphi(x^\prime) \leq \varphi(x - \frac{1}{L}\nabla \varphi(x))\leq \varphi(x) - \frac{1}{2L}\|\nabla \varphi(x)\|_2^2. 
+\end{equation}
+Now setting $x^\prime = y$ we have the corresponding result.
+\end{proof}
+
+
+
+
+As it could be seen from the equations above, $\mu$ and $L$ provides quadratic lower and upper bound for the function, and the quality of these approximations could be characterized by {\textbf{condition number}} of the problem
+$$
+\kappa =  \frac{L}{\mu}.
+$$
+When this number is close to $1$ ({\textbf{well-conditioned}}) the problem is extremely well approximated and when it is big ({\textbf{ill-conditioned}}) problems have a weak approximation. It impacts on the speed of optimization algorithms: better conditioned problems are easier to solve.
+
+
+
+
+
+\subsubsection{Gradient descent.} One of the most important methods in the mathematical optimization is a gradient descent method. Thanks to its simplicity there are many extensions of it, that are widely used in the modern machine learning applications. 
+
+Going back to the definition of the gradient we could have that
+$$
+df_x(u) = \nabla f(x)^\top u,
+$$
+for any small vector. It implies, that in this first-order approximation the best direction to select is anti-gradient, that is exactly the idea of the gradient descent.
+
+\begin{algorithm}
+    \caption{Gradient Descent (GD)}
+    \label{algo:gd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE $x^{k+1}\leftarrow x^k - \gamma^k \nabla f(x^k)$\hfill where $\gamma^k$ is a stepsize
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+Let us now present the convergence result for the gradient descent algorithm with the fixed stepsize $\gamma^k = \gamma$.
+\begin{theorem}[Convergence of Gradient Descent]\label{th:gd}
+Let us assume that $f$ is convex and $L$-smooth, take $\gamma\in\left(0,\frac{2}{L}\right)$, then Algorithm \ref{algo:gd} generates the sequence of poits $(x^k)_{k\geq0}$ such that 
+\begin{equation}
+    f(x^k) - f^\star \leq \frac{2(f(x^0)-f^\star)\|x^0-x^\star\|_2^2}{2\|x^0-x^\star\|_2^2 + \gamma k(2-\gamma L)(f(x^0) - f^\star)},
+\end{equation}
+where $f^\star = \min_{x\in\mathbb{R}^n}$ and $f(x^\star) = f^\star$.\footnote{$x^\star\in\Argmin_{x\in\mathbb{R}^n}f(x)$}
+If moreover, $f$ is $\mu$-strongly convex with $\mu>0$, then take $\gamma\in\left(0, \frac{2}{\mu + L}\right]$, then Algorithm \ref{algo:gd} generates the sequence of poits $(x^k)_{k\geq0}$ such that 
+\begin{equation}
+\|x^k-x^\star\|_2^2\leq\left(1-\frac{2\gamma\mu L}{\mu + L}\right)^k\|x^0-x^\star\|_2^2,
+\end{equation}
+where $x^\star$ is a unique minimizer of \eqref{eq:pb_simple}.
+\end{theorem}
+Before going to the proof, let us present the following auxillary lemma.
+
+\begin{lemma}\label{lm:bubeck}
+Let us assume that $f$ is $L$-smooth and $\mu$-strongly convex, then for any $x,y\in\mathbb{R}^n$ holds
+\begin{equation}\label{eq:bubeck}
+\langle \nabla f(x)- \nabla f(y), x - y\rangle\geq \frac{\mu L}{\mu + L}\|x-y\|_2^2 + \frac{1}{\mu + L}\|\nabla f(x) - \nabla f(y)\|_2^2.
+\end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:bubeck}]
+Consider the case $\mu = L$ then from the $\mu$-strong convexity of $f$ we have
+$$
+f(y) + f(x) \geq f(x) + \langle \nabla f(x), y-x\rangle + \frac{\mu}{2}\|y-x\|_2^2 + f(y) + f(x) - \langle \nabla f(y), y-x\rangle + \frac{\mu}{2}\|y-x\|_2^2
+$$
+that implies 
+\begin{equation}
+    \langle \nabla f(y) - \nabla f(x), y-x\rangle\geq \mu\|y-x\|_2^2.
+\end{equation}
+Now, using $L$-smoothness we have
+\begin{equation}
+    \langle \nabla f(y) - \nabla f(x), y-x\rangle\geq \frac{\mu}{2}\|y-x\|_2^2 + \frac{\mu}{2L^2}\|\nabla f(x) - \nabla f(y)\|_2^2,
+\end{equation}
+that proves the statement of the lemma.
+
+Consider the case $L>\mu$. Denote by $\varphi(x)=f(x) -\frac{\mu}{2}\|x\|_2^2$, then $\nabla \varphi(x) = \nabla f(x) - \mu x$. This function is $L-\mu$-smooth, using Cauchy–Schwarz inequality and \eqref{eq:descent_lemma_2} we have
+\begin{align}
+\langle \nabla\varphi(x) -\nabla\varphi(y), x-y\rangle\geq \frac{1}{L-\mu}\|\nabla \varphi(x) - \nabla \varphi(y)\|_2^2.
+\end{align}
+Now, substituting the expression for $\nabla \varphi$ 
+\begin{align}
+\langle \nabla f(x)- \nabla f(y), x - y\rangle - \mu\|x-y\|_2^2 &\geq \frac{1}{L-\mu}\left(\|\nabla f(x) - \nabla f(y)\|_2^2 + \mu^2\|x-y\|_2^2\right)\nonumber\\
+&- \frac{2\mu}{L-\mu} \langle \nabla f(x)- \nabla f(y), x - y\rangle,
+\end{align}
+that proofs the result.
+\end{proof}
+
+
+Now we are ready to prove the convergence rate of gradient descent method.
+\begin{proof}[Proof of Theorem \ref{th:gd}]
+Let us start from the case when $\mu = 0$. Fix some $x^\star\in\Argmin_{x\in\mathbb{R}^n} f(x)$ and denpte by $r^k = \|x^k-x^\star\|^2_2$.
+Then 
+\begin{align}\label{eq:gd_proof_1}
+r^{k+1} = \|x^k - x^\star - \gamma\nabla f(x^k)\|_2^2 = r^k - 2\gamma\langle \nabla f(x^k), x^k - x^\star\rangle &+ \gamma^2\|\nabla f(x^k)\|_2^2\nonumber\\
+&\leq r^k - \gamma\left(\frac2L - \gamma\right)\|\nabla f(x^k)\|_2^2,
+\end{align}
+where in the last inequality we use $L$-smoothness and $\nabla f(x^\star) = 0$. Now, using \eqref{eq:descent_lemma_1} we get
+$$
+f(x^{k+1})\leq f(x^k) + \langle \nabla f(x^k), x^{k+1} - x^k\rangle + \frac{L}{2}\|x^{k+1}- x^k\|_2^2 = f(x^k) - \underbrace{\gamma\left(1 - \frac{\gamma L}{2}\right)}_{\omega}\|\nabla f(x^k)\|_2^2.
+$$
+Denote by $\Delta^k = f(x^k)-f^\star$ then using the nonincreasing propery of $r^{k+1}\leq r^k$ \eqref{eq:gd_proof_1} we have
+$$
+\Delta^k \leq\langle\nabla f(x^k), x^k-x^\star\rangle\leq \sqrt{r^k}\|\nabla f(x^k)\|_2^2\leq \sqrt{r^0}\|\nabla f(x^k)\|_2^2.
+$$
+It implies that $\Delta^{k+1}\leq\Delta^k - \frac{\omega}{r^0}(\Delta^k)^2$ and as a result
+$$
+\frac{1}{\Delta^{k+1}}\geq \frac{1}{\Delta^k} + \frac{\omega}{r^0}\frac{\Delta^k}{\Delta^{k+1}}\geq \frac{1}{\Delta^k} + \frac{\omega}{r^0},
+$$
+where in the last inequality the nonincreasing property of $\Delta^k$ is used.
+Summing up these inequalities from $k=0$ we get
+$$
+\frac{1}{\Delta^k}\geq \frac{1}{\Delta^0} + \frac{\omega}{r^0}(k+1).
+$$
+Let us now assume that $\mu\geq 0$ using the same notation as in the first part
+\begin{align}
+r^{k+1} = \|x^k - x^\star - \gamma \nabla f(x^k)\|_2^2 &= r^k - 2\gamma\langle \nabla f(x^k), x^k - x^\star\rangle + \gamma^2\|\nabla f(x^k)\|_2^2\nonumber\\
+&\leq \left(1-\frac{2\gamma\mu L}{\mu + L}\right) + \underbrace{\gamma\left(\gamma - \frac{2}{\mu + L}\right)}_{\leq 0}\|\nabla f(x^k)\|_2^2,
+\end{align}
+where we use Lemma \ref{lm:bubeck} and $\nabla f(x^\star) = 0$.
+\end{proof}
+As we could see from this theoretical result, the best theoretical rate for non-strongly convex fuctions is achieved when $\gamma = \argmax\left(\gamma(1 - \frac{\gamma L}{2}\right) = \frac{1}{L}$ that leads to the following rate
+\begin{equation}\label{eq:gd_rate}
+    f(x^k) - f^\star \leq \frac{2L(f(x^0)-f^\star)\|x^0-x^\star\|_2^2}{2L\|x^0-x^\star\|_2^2 +k(f(x^0) - f^\star)}\leq \frac{2L\|x^0-x^\star\|^2_2}{k+4},
+\end{equation}
+where for the last inequality we used \eqref{eq:descent_lemma_1}.
+For the $\mu$-strongly convex objective function $f$ the optimal $\gamma= \frac{2}{\mu + L}$, that leads to the following rate
+\begin{equation}\label{eq:gd_rate_strongly}
+\|x^k-x^\star\|_2^2\leq\left(1-\frac{4\mu L}{(\mu + L)^2}\right)^k\|x^0-x^\star\|_2^2 = \left(\frac{\kappa - 1}{\kappa + 1}\right)^{2k}\|x^0-x^\star\|_2^2.
+\end{equation}
+
+
+
+
+
+
+\subsubsection{Finite sums applications.}
+
+As we mentioned before, in machine learning applications objective function $f$ often comes from empirical risk minimization problems when the objective is a finite sum of loss functions associated with different examples 
+\begin{equation}
+\min_{x\in\RR^n}~f(x) = \sum_{i=1}^m l_i(x),
+\end{equation}
+where $l_i$ is a smooth and convex loss that corresponds to the $i$-th example. In this case, when the size of the training dataset or the dimension of the problem are extremely big, the computation of the full gradient becomes expensive that makes gradient descent algorithm very unpracticable. It motivates to invent methods that could make a cheaper update. In this section, we want to consider two main classes of such algorithms: coordinate descent and stochastic gradient descent.
+
+
+\subsubsection{Coordinate descent.}
+Let us start from the coordinate descent methods. These methods has a big history since the idea of simplifying the gradient descent update as old as a gradient descent scheme. One of the motivating examples for such methods is the problem with least squares objective function
+$$
+f(x) = \|Ax-b\|_2^2,
+$$
+where $A$ is a matrix of examples and $b$ is a features vector. For such objective function the computational cost of one coordinate of the gradient is $m$ times smaller than the full gradient computation thanks to the separable structure of the function.
+
+The idea of the basic coordinate descent methods is the following: on every iteration, we compute one (or some) coordinate of gradient and make a move in that direction with some stepsize. There are different way to select stepsize and the coordinate, based, for example on the smoothness constants of $i$-th coordinates of gradient or on the maximal absolute value of the gradient's coordinates correspondingly. 
+
+Let us consider function $f$ with coordinate-wise Lipschitz continuous gradient
+$$
+|\nabla_i f(x+\Delta e_i) - \nabla_i f(x)|\leq M|h|,
+$$
+where subscript $i$ means the $i$-th coordinate, $e_i$ is a $i$-th standart basis vector, and $h\in\RR$.
+\begin{algorithm}
+    \caption{Coordinate Descent (CD)}
+    \label{algo:cd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE Select coordinate $i^k=\argmax_{1\leq i^k\leq n}|\nabla_{i^k}f(x^k)|$
+            \STATE $x^{k+1}\leftarrow x^k - \frac{1}{M} \nabla_{i^k} f(x^k)$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+For such function it is easy to see, that
+$$
+f(x^{k}) - f(x^{k+1})\geq \frac{1}{2M}|\nabla_{i^k} f(x^k)|^2\geq \frac{1}{2nM}\|\nabla f(x^k)\|_2^2.
+$$
+It immediately implies (see the proof of Theorem \ref{th:gd}) the following rate for the non-strongly convex objective
+$$
+f(x^k) - f^\star\leq \frac{2nM}{k+4}\|x^0-x^\star\|_2^2,
+$$
+where we use the same notations as before. 
+
+As we could see from this result, the rate is $n$ times worse than the rate of gradient descent and every iteration requires the full gradient computation for coordinate selection. Moreover, it could happen that $M\gg L$ where $L$ is a smoothness constant of $f$ that makes algorithm worse even if only $1$ coordinate of gradient is required.
+
+As far as greedy strategy is not very efficient, randomized or cyclic variations of this method also appear widely in the literature. Moreover, in such algorithms instead of selecting only one coordinate the block of coordinates is selected every time.
+
+\subsubsection{Stochastic gradient descent.}
+Let us now present another approach that allows to make a step without computing full gradient. The key idea in computing of unbiased estimator of gradient of $f$ when the computation of gradient is impossible or extremely costly. For example, the full gradient computation is impossible in the problems that appear in statistical learning applications, when the objective function is the infinite sum
+$$
+f(x) = \EE_{\eta\sim\mathcal{D}}f_{\eta}(x),
+$$
+where distribution $\mathcal{D}$ is not known but samples $\eta\sim\mathcal{D}$ are available. It means that $\nabla f(x)$ is impossible to compute but every $\nabla f_{\eta}(x)$ are computable and moreover, $\nabla f_{\eta}(x)$ is an unbiased estimator of the gradient of $f$
+$$
+\EE_{\eta\sim\mathcal{D}}\nabla f_{\eta}(x) = \nabla f(x).
+$$
+In case of finite sum
+$$
+f(x) = \sum_{i=1}^m f_i(x)
+$$
+if $i$ is selected uniformly at random from $[m] = [1,\dots,m]$ then $\nabla f_i(x)$ is also an undiased estimator of gradient of $f$, but its computation is about $n$ times faster than computation of $\nabla f(x)$
+
+Let us present the general scheme of stochastic gradient descent.
+\begin{algorithm}
+    \caption{Stochastic Gradient Descent (SGD)}
+    \label{algo:sgd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE Compute an unbiased estimator $g^k$\hfill $\EE\left[g^k|x^k\right] = \nabla f(x^k)$
+            \STATE $x^{k+1}\leftarrow x^k - \gamma g^k$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+Let us present a couple of important tools that is widely used for stochastic algorithms.
+
+\begin{lemma}[Tower property]\label{lm:tower_exp}
+For any random variables $X$ and $Y$, we have $\EE[X] = \EE\left[\EE[X|Y]\right]$.
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:tower_exp}]
+    Let us provide the proof for discrete random variables only.
+\begin{align}
+\EE[X] &= \sum_x x P(X=x) = \sum_x x\sum_yP(X=x)\&P(Y=y) = \sum_x\sum_y x P(X=x)\&P(Y=y)\nonumber\\
+&= \sum_x\sum_y P(Y=y)x\frac{P(X=x\&Y=y)}{P(Y = y)}  = \sum_y P(Y=y) \sum_x xP(X=x\&Y=y)\nonumber\\
+& = \sum_y P(Y=y) \EE[X|Y=y] = \EE\left[\EE[X|Y]\right],
+\end{align}
+which finishes the proof.
+\end{proof}
+
+
+
+
+
+
+
+
+
+\subsection{Non-smooth optimization}
+Let us now consider the following optimization problem
+\begin{equation}\label{eq:pb_r}
+\min_{x\in\RR^n} r(x),
+\end{equation}
+where $r$ is convex but non-smooth. Since $r$ is non-smooth we could not calculate the gradient of it at any arbitrary point that leads to the other type of optimization methods for such methods.
+
+Let us start from the definition.
+
+\begin{definition}[Subgradient]
+Consinder convex function $r$. Vector $g$ is called subgradient of $f$ at point $y\in\dom r$ if for any $x\in\dom r$ holds
+\begin{equation}\label{eq:subgrad}
+f(x)\geq f(y) + \langle g, x-y\rangle.
+\end{equation}
+The set of all subgradients at $y$ is called subdifferential of $r$ at point $x$ and denoted by $\partial r(y)$.
+\end{definition}
+
+Now we are ready to present one of the basic algorithms to solve \eqref{eq:pb_r}.
+
+\begin{algorithm}
+    \caption{Subgradient Descent}
+    \label{algo:sd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \STATE Select the sequence of stepsizes $\gamma^k$ such that
+        $
+            \gamma^k>0,~\gamma^k\rightarrow 0,~\sum_0^\infty \gamma^k = \infty
+        $
+        \FOR{$k\geq 0$}{
+            \STATE Compute any subgradient $g^k\in\partial r(x^k)$
+            \STATE $x^{k+1}\leftarrow x^k - \gamma^k \frac{g^k}{\|g^k\|}$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+As we could see from the definition, the norm of subgradient could be different, that is why in the algorithm used the normalized version. It is clear, that this method is worse than the gradient descent, as far as the direction of $-g^k$ has no reason to be the descent direction.
+
+Moreover, as we could see algorithm requires the sequence of stepsizes to be decreasing that leads to the slower rate than in gradient descent algorithm even if $g^k$ are computed in points where $r$ is differentiable.
+
+
+
+
+
+
+
+
+Let us now introduce the notion of proximal operator.
+
+\begin{definition}[Proximal operator]\label{def:proximal_operator}
+Given a convex function $r:\RR^n\rightarrow \RR$, the proxial oerator of $r$ is the function
+\begin{equation}
+\prox_r(x) = \argmin_{y\in\RR^n}\left\{r(y) + \frac{1}{2}\|x-y\|_2^2\right\}.
+\end{equation}
+\end{definition}
+Since $r$ is convex, the objective of $\argmin$ is strongly convex that means the proximal operator of any point is well defined and unique. 
+
+In machine learning applications regularizers are relatively simple that makes the computation of proximal operator cheap. More precisely, proximal operator for such problems usually has a closed form solution ($\ell_1$, Group-Lasso) or could be computed iteratively (TV). Moreover, if $r$ is the indicator function of convex set, the proximal operator is an orthogonal projection onto this set. 
+
+
+The proximal operator allows to extend gradient descent and other methods to solve composite optimization problem
+\begin{equation}\label{eq:pb_composite}
+\min_{x\in\RR^n} f(x) + r(x),
+\end{equation}
+where $f$ is smooth and convex and $r$ is convex, non-smooth.
+
+Let us present proximal gradient descent method with constant stepsize that performs alternatively the gradient step and the proximal one. This class of method is also known as iterative shrinkage-thresholding algorithms and as forward-backward splitting method.
+
+\begin{algorithm}
+    \caption{Proximal Gradient Descent (ISTA)}
+    \label{algo:pgd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE $x^{k+1}\leftarrow \rprox(x^k - \gamma \nabla f(x^k))$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+At every iterate of this methed, additionally to the step of gradient descent algorithm performs an additional proximal step on top of it that could be reformulated as
+\begin{equation}\label{eq:step_pgd}
+x^{k+1} = \argmin_{z\in\RR^n}\left\{\underbrace{f(x^k) + \langle\nabla f(x^k), z-x^k\rangle+\frac{1}{2\gamma}\|x^k-z\|_2^2}_{\hat{f}(z, x^k)} + r(z)\right\}.
+\end{equation}
+If $\gamma\leq \frac{1}{L}$, where $L$ is a smoothness parameter of $f$ then $\hat{f}(z, x^k)$ is a convex upperbound to $f$ that is tight at $x^k$. This allows to interpret proximal methods as a majorization-minimization algorithm.
+
+
+{\color{yellow}
+From this form it is easy to see that the stationary point of this algorithm is a minimizer of \eqref{eq:pb_composite}. Since objective in \eqref{eq:step_pgd} is strongly-convex we could write the optimality condition for fixed point
+\begin{align*}
+x^\star &= \argmin_{z\in\RR^n}\left\{\langle\nabla f(x^\star), z-x^\star\rangle+\frac{1}{2\gamma}\|x^\star-z\|_2^2 + r(z)\right\}\\
+&\Updownarrow\\
+0&\in \partial r(x^\star) + \nabla f(x^\star),
+\end{align*}
+that is an optimality condition for \eqref{eq:pb_composite}.}
+
+In case, when $r$ is the indicator function of convex set, the proximal operator projects the gradient step onto the constrained set that yields to the generalization of the projected gradient method. 
+
+
+Let us finally present an important property of the proximal operator that is widely used in the analysis of proximal methods. Moreover, it gives an intuition why the additional proximal sted does not change the convergence rate comparing to the case when $r=0$.
+
+\begin{lemma}[Firm nonexpansiveness of proximal operator]\label{lm:firm}
+Consider convex function $r:\RR^n\rightarrow \RR$ then for any $x, y\in \RR^n$ holds
+\begin{equation}\label{eq:firm}
+\|\prox_r(x)-\prox_r(y)\|_2^2\leq\langle x-y, \prox_r(x)-\prox_r(y)\rangle.
+\end{equation}
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:firm}]
+Let $x^\prime = \prox_r(x)$ and $y^\prime = \prox_r(y)$, then 
+$$
+x - x^\prime\in\partial r(x^\prime)~~~~~\textnormal{and}~~~~~y - y^\prime \in\partial r(y^\prime).
+$$
+Thus, by the definition of subdifferential we have 
+$$
+r(y^\prime)\geq r(x^\prime) + \langle x - x^\prime, y^\prime- x^\prime\rangle~~~~~\textnormal{and}~~~~~r(x^\prime)\geq r(y^\prime) + \langle y - y^\prime, x^\prime- y^\prime\rangle.
+$$
+Summing up these inequalities we get the statement of the lemma.
+\end{proof}
+
+
+{\color{blue}\subsection{Proximal methods}
+Let us present another technique to solve \eqref{eq:pb_r} using proximal operator. First, let us prove a simple lemma about the optimal solution of \eqref{eq:pb_r}.
+
+\begin{lemma}\label{lm:stationary_point}
+Point $x^\star$ is a solution of \eqref{eq:pb_r} if and only if $x^\star = \prox_r(x^\star)$.  
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:stationary_point}]
+Let $x^\star$ be a minimizer of $r$ then
+$$
+f(x) + \frac{1}{2}\|x-x^\star\|_2^2\geq f(x) \geq f(x^\star) = f(x^\star) + \frac{1}{2}\|x^\star - x^\star\|_2^2,
+$$
+that implies $x^\star = \prox_r(x^\star)$.
+
+Let $x^\star = \prox_r(x^\star)$, using optimality condition we have 
+$$
+0\in \partial r(y) + (y-x)
+$$
+for any $x\in\RR^n$ and $y=\prox_r(x)$.
+Taking $x=y = x^\star$ we have $0\in\partial f(x^\star)$.
+\end{proof}
+Now we are ready to present the simplest proxiaml algorithm that is called proximal minimization or proximal point algorithm.
+
+\begin{algorithm}
+    \caption{Proximal Minimization}
+    \label{algo:pm}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE $x^{k+1}\leftarrow \rprox(x^k)$,\hfill where $\gamma$ is a stepsize
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+This algorithm converges to the minimizer if this minimizier exists {\color{red}(see explanation in Moreau-Yosida part).} 
+
+Finally, let us introduce the connection between proximal operator and subdifferential of function $r$
+
+\begin{lemma}[Resolvent]\label{lm:resolvent}
+    The proximal operator $\rprox$ and the subdifferential $\partial f$ are related as follows:
+    \begin{equation}\label{eq:resolvent}
+        \rprox = (I+\gamma\partial f)^{-1}, 
+    \end{equation}
+    where $I$ is identity matrix.
+    The mapping $(I+\gamma\partial f)^{-1}$ is called the resolvent of operator $\partial f$ with parameter $\gamma>0$.
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:resolvent}]
+By the definition if $y\in (I+\gamma\partial f)^{-1}(x)$, Then
+$$
+x\in (I+\gamma\partial f)(y) = y + \partial f(y).
+$$
+It could be rewritten as
+$$
+0\in \partial f(y) + \frac{1}{\gamma}(y-x) = \partial_y \left(f(y) + \frac{1}{2\gamma}\|x-y\|_2^2\right).
+$$
+This is the necessary and sufficient condition for 
+$$
+y = \argmin_z\left\{f(z) + \frac{1}{2\gamma}\|z-x\|_2^2\right\},
+$$
+that proves the result.
+\end{proof}
+The result above shows that in particular, the resolvent of subdifferewntial is a single-valued.
+
+\subsection{Moreau-Yosida regularization}
+Let us define a Moreau envelope, that is also called Moreau-Yosida regularization.
+
+\begin{definition}
+Given $\lambda>0$, the Moreau envelope $M_{\lambda f}$ of the function $f$ with parameter $\lambda$ is defined as 
+\begin{equation}\label{eq:M-Y}
+M_{\lambda f}(y) = \inf_x\left(f(x) + \frac{1}{2\lambda}\|x-y\|_2^2\right).
+\end{equation}
+\end{definition}
+
+Moreau-Yosida regularization of function $f$ is continuously differentiable, even if $f$ is not and its gradient is given by
+\begin{equation}\label{eq:M-Y_grad}
+\nabla M_{\lambda f} = \frac{1}{\lambda}(x-\prox_{\lambda f}(x)).
+\end{equation}
+Moreover, the sets of minimums of $f$ and $M_f$ are the same. Let us rewrite proximal operator as
+$$
+\prox_{\lambda f}(x) = x - \lambda\nabla M_{\lambda f}(x),
+$$
+which shows that proximal operator could be viewed as a gradient step and Algorithm \ref{algo:pm} is a gradient descent algorithm with stepsize $\lambda$ for minimizing $M_{\lambda f}$. Taking into account that Moreau envelope has the same minimizers as $f$ we have the convergence of proximal point method.
+
+
+Let us talk a little bit about the properties of Moreau-Yosida regularization. Since we mentioned that the proximal point method is a gradient descent method on Moreau envelope of the function, let us present smoothness and strong convexity properties of this envelope. From \eqref{eq:M-Y_grad} it is trivial that 
+\begin{equation}\label{eq:M-Y_smoothness}
+L_{M_{\lambda f}} = \lambda^{-1}
+\end{equation}
+independent on the smoothness parameter of $f$. However, Moreau-Yosida regularization is strongly convex if the objective function $f$ is strongly convex, moreover, their strongly convexity constants relates as
+\begin{equation}\label{eq:M-Y_strongly}
+\mu_{M_{\lambda f}} = \frac{\mu\lambda^{-1}}{\mu + \lambda^{-1}},
+\end{equation}
+where $\mu$ is the strongly convexity constant of $f$ (see Theorem 2.2 of \cite{lemarechal1997practical} for the proof). Thus, the condition number of this Moreau-Yosida regularization of $\mu$-strongly convex function $f$ is 
+\begin{equation}\label{eq:M-Y_condition}
+\kappa_{M_{\lambda f}} = \frac{L_{M_{\lambda f}}}{\mu_{M_{\lambda f}}} = \frac{\mu + \lambda^{-1}}{\mu}.
+\end{equation}
+
+As a result, this problem becomes extremely well-conditioned while $\lambda$ is selected big.
+
+
+
+
+
+
+}

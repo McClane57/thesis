@@ -1,0 +1,656 @@
+\section{Adaptive subspace descent}
+\label{sec:mor-adaptive-subspace}
+
+{This section presents an extension of our randomized subspace descent algorithm where the projections are iterate-dependent. % and adapted to the structure identified by the algorithm.
+Our aim is to automatically adapt to the structure identified by the iterates along the run of the algorithm.
+
+The methods proposed here are, up to our knowledge, the first ones where the iterate structure enforced by a nonsmooth regularizer is used to adapt the selection probabilities in a randomized first-order method. As discussed in the introduction, even for the special case of coordinate descent, our approach is different from existing techniques that use fixed arbitrary probabilities \cite{richtarik2014iteration,necoara2014random}, greedy selection \cite{dhillon2011nearest,nutini2015coordinate,nutini2017let}, or adaptive selection 
+based on the coordinate-wise Lipschitz constant and coordinates \cite{perekrestenko2017faster,namkoong2017adaptive,stich2017safe}. 
+
+% Adapting the selection probabilities to the problem at hand is an important topic for coordinate descent methods as both the theoretical and practical rates heavily depend on them. Indeed, recent works on coordinate descent allow for fixed arbitrary probabilities \cite{richtarik2014iteration,necoara2014random}; however, the optimal theoretical probabilities, named importance sampling, often depend on unknown quantities (such as local properties at the optimum). Nevertheless, in certain special cases, these \emph{fixed} probabilities can be computed and used in practice \cite{zhao2015stochastic,richtarik2016optimal}.
+
+
+% In contrast, the use of \emph{adaptive} probabilities is much more limited. Some heuristics without convergence guarantees can be found in \cite{loshchilov2011adaptive,glasmachers2013accelerated}. In another directions, greedy methods select coordinates with the largest norm but are usually rather expansive to compute \cite{dhillon2011nearest,nutini2015coordinate,nutini2017let}. Bridging the gap between greedy and fixed importance sampling, \cite{perekrestenko2017faster,namkoong2017adaptive,stich2017safe} propose adaptive coordinate descent methods based on the coordinate-wise Lipschitz constant and current values of the gradient. 
+% % I think we can avoid refering to :
+% % One can also mention \cite{csiba2015stochastic} where the duality gap is used to adapt coordinate probabilities for the stochastic dual coordinate ascent method (SDCA).
+
+
+% Thus, the methods proposed in this section are, up to our knowledge, the first ones where the \emph{iterate structure enforced by a non-smooth regularizer} is used to adapt the selection probabilities in a proximal gradient subspace descent method. 
+
+
+We present our adaptive subspace descent algorithm in two steps. First, we introduce in Section~\ref{sec:ada_algo} a generic algorithm with varying selections and establish its convergence. %\remove{, which is the main technical point of this paper}. 
+Second, in Section~\ref{sec:identif}, we provide a simple general identification result. We then combine these two results to provide an efficient adaptive method in Section~\ref{sec:adapt}}. % which we will discuss on two simple examples in Section~\ref{sec:ex_ada}.} %This algorithm is then put in perspectives with the examples Section \ref{sec:ex_ada}.
+%and with the practical considerations of section~\ref{sec:practical}
+
+
+%  An optimal choice of subspace for proximal subspace descent in this case would be $X^\star$. Unfortunately this subspace is usually unknown, but its {structure} is known and depends only on $g$. For instance, when $g = \lambda_1\|\cdot\|_1$ the optimal solution of \eqref{eq:main_problem} will have coordinate sparsity \cite{bach2012optimization}.
+
+% All known results (including also \cite{lee2012manifold}) use moreover a strong non-degeneracy assumption to establish identification result. The only exception is \cite{fadili2017sensitivity} that present extended identification results without non-degeneracy for a large class of nonsmooth regularizers. Identification results for our distributed algorithm in the $\ell_1$ regularization will be based on general identification results of \cite{fadili2017sensitivity}.
+
+% Finally note that, though identification has been used to accelerate algorithms (by a better tuning of parameters, lower computation complexity of iterations, or high-order accelerations), it is the first time in this paper that it is used as an automatic dimension reduction and sparsification technique.
+
+
+
+% ==============================================================================
+\subsection{Random Subspace Descent with Time-Varying Selection}
+\label{sec:ada_algo}
+
+{For any randomized algorithm,  
+using iterate-dependent sampling would  automatically break down the usual i.i.d. assumption.} %{since the sampling probabilities depend on the current point}. 
+In our case, adapting to the current iterate structure means that the associated random variable depends on the past. We thus need further analysis and notation.
+
+In the following, we use the subscript $\ell$ to denote the $\ell$-th change in the selection. We denote by $\Up$ the set of time indices at which an adaptation is made, themselves denoted by $k_\ell  = \min \{ k> k_{\ell-1} : k\in\Up\}$. 
+
+In practice, at each time $k$, there are two decisions to make (see Section\;\ref{sec:adapt}): (i) \emph{if} an adaptation should be performed; and (ii) \emph{how} to update the selection. Thus, we replace the i.i.d. assumption of Assumption\;\ref{hyp:main} with the following one.
+
+\begin{assumption}[On the randomness of the adaptive algorithm]\label{hyp:main_identif}
+For all $k>0$, $\Sel^k$ is $\FF^k$-measurable and admissible. Furthermore, if $k\notin\Up$,  $(\Sel^k)$ is independent and identically distributed on $[{k}_{\ell},k]$. The decision to adapt or not at time $k$ is $\FF^k$-measurable, i.e. $(k_\ell)_\ell$ is a sequence of $\FF^k$-stopping times. 
+\end{assumption}
+
+Under this assumption, we can prove the convergence of the varying-selection random subspace descent, Algorithm \ref{alg:ada_strata_nondis}. A generic result  is given in Theorem\;\ref{th:conv_nondis_arbitrary} and a simple specification in the following example. The rationale of the proof is that the stability of the algorithm is maintained when adaptation is performed sparingly. 
+
+
+\begin{algorithm}[H] % enter the algorithm environment
+\caption{Adaptive Randomized Proximal Subspace Descent - \adaalgo}
+\label{alg:ada_strata_nondis}
+\begin{algorithmic}[1] % enter the algorithmic environment
+    \STATE Initialize $z^0$, $x^1 = \prox_{\gamma g}(\bQ_0^{-1}(z^0))$, $\ell=0$, $\Up=\{0\}$.
+    \FOR{$k=1,\ldots$}
+            \STATE $y^k = \bQ_{\ell}\left(x^k - \gamma\nabla f\left(x^k\right)\right)$
+            \STATE $z^{k} = P_{\Sel^k} \left(y^k\right) + (I- P_{\Sel^k} ) \left(z^{k-1}\right)$
+            \STATE$x^{k+1} = \prox_{\gamma g} \left(\bQ_\ell^{-1}\left(z^{k}\right)\right)$
+            \IF{an adaptation is decided }
+            \STATE $\Up \leftarrow \Up \cup \{k+1\}$, $\ell\leftarrow \ell +1$
+            \STATE Generate a new admissible selection
+            \STATE Compute $\bQ_\ell = \bP_\ell^{-\frac12}$ and $\bQ_\ell^{-1}$
+            \STATE Rescale $z^k \leftarrow \bQ_\ell   \bQ_{\ell-1}^{-1} z^k$ \label{line:rescale}
+            \ENDIF
+    \ENDFOR
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{theorem}[\adaalgo~convergence]\label{th:conv_nondis_arbitrary}
+Let Assumptions \ref{hyp:f} and  \ref{hyp:main_identif} hold.  For any $\gamma\in(0,2/(\mu+L)]$, let the user choose its adaptation strategy so that:
+\begin{itemize}
+    \item  the \emph{adaptation cost} is upper bounded by a deterministic sequence:  $ \|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 \leq \mathbf{a}_\ell $;
+    \item the \emph{inter-adaptation time} is lower bounded by a deterministic sequence: $k_{\ell}-k_{\ell-1}\geq \mathbf{c}_\ell$;
+    \item the \emph{selection uniformity} is lower bounded by a deterministic sequence: $\lambda_{ \min}(\bP_{\ell-1}) \geq \lambda_{\ell-1} $;
+\end{itemize}
+then, from the \emph{previous instantaneous rate} $1-\alpha_{\ell-1}  := 1 -  2\gamma \mu L \lambda_{\ell-1}/(\mu + L)  $, the \emph{corrected rate} for cycle $\ell$ writes  
+\begin{equation}\label{eq:corr-rate}
+(1-\beta_\ell) := (1-\alpha_{\ell-1})\mathbf{a}_\ell^{1/\mathbf{c}_\ell}. 
+\end{equation}
+Then, we have for any $k\in [k_\ell,k_{\ell+1})$
+\begin{align*}
+    \EE\left[\|x^{k+1}-x^\star\|_2^2\right] &\leq (1-\alpha_\ell)^{k-k_\ell} \prod_{m=1}^\ell (1-\beta_m)^{\mathbf{c}_m}  \|z^{0}-\bQ_0\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)\|_2^2. %\\
+  %  &\leq (1-\alpha_\ell)^{k-k_\ell} (1-\beta)^{\sum_{m=0}^\ell \mathbf{c}_m}   \|z^{0}-\bQ_0\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)\|_2^2.
+\end{align*}
+\end{theorem}
+
+{This theorem means that by balancing the magnitude of the adaptation (i.e.\;$\mathbf{a}_m$) with the time before adaptation (i.e.\;$\mathbf{c}_m$) from the knowledge of the current rate $(1-\alpha_{m-1})$, one can retrieve the exponential convergence with a controlled degraded rate $(1-\beta_m)$. 
+This result is quite generic, but it can be easily adapted to specific situations.
+For instance, we provide a simple example with a global rate on the iterates in the forthcoming Example\;\ref{ex:adapt_fixed}.
+
+For now, let us turn to the proof of the theorem. To ease its reading, the main notations and measurability relations are depicted in Figure\;\ref{fig:proof}.
+
+\input{mor/figs/filtration-fig.tex}}
+
+\begin{proof}[Proof of Theorem \ref{th:conv_nondis_arbitrary}]
+We start by noticing that, for a solution $x^\star$ of \eqref{eq:main_problem}, the proof of Theorem~\ref{th:conv_nondis} introduces the companion variable $z^\star =  \bQ\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)$ which directly depends on $\bQ$, preventing us from a straightforward use of the results of Section\;\ref{sec:conv}. However, defining $z^{\star}_{\ell} =  \bQ_\ell\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)$, Lemmas~\ref{lm:removing_exp} and \ref{lm:bub} can be directly extended and combined to show for any $k\in [k_\ell,k_{\ell+1})$ 
+\begin{equation}\label{eq:iterate_flexible_lambda}
+    \EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\,|\,\FF^{k-1}\right] \leq \underbrace{  \left(1 -  \frac{2\gamma \mu L \lambda_{ \min}(\bP_\ell)}{\mu + L} \right) }_{\leq 1- \alpha_\ell} \|z^{k-1}-z^{\star}_{\ell}\|_2^2 .
+\end{equation} 
+%that for any $\gamma\in(0,2/(\mu+L)]$ and
+Since the distribution of the selection has not changed since ${k}_{\ell}$, iterating \eqref{eq:iterate_flexible_lambda} leads to 
+\begin{align}\label{eq:iterate_flexible_lambda2}
+    \EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell}-1}\right] &\leq (1- \alpha_\ell)^{k-k_\ell} \|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2 .
+\end{align}
+We focus now on the term $\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2$ corresponding to what happens at the last adaptation step. From the definition of variables in the algorithm and using the deterministic bound on $\|  \bQ_\ell   \bQ_{\ell-1}^{-1}\|$, we write
+\begin{align}
+  \nonumber  \EE\left[\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell}-2}\right] &\leq   \EE\left[ \|  \bQ_\ell   \bQ_{\ell-1}^{-1}(z^{k_{\ell}-2} + P_{k_{\ell}-1}(y^{k_{\ell}-1}-z^{k_{\ell}-2}) - \bQ_\ell   \bQ_{\ell-1}^{-1}z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell}-2}\right] \\[1.5ex]
+        &\leq  \EE\left[ \|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2   \|  z^{k_{\ell}-2} + P_{k_{\ell}-1}(y^{k_{\ell}-1}-z^{k_{\ell}-2}) - z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell}-2}\right] \label{eq:Jadd} \\[1.5ex]
+   \nonumber &\leq   \mathbf{a}_\ell  (1-\alpha_{\ell-1}) \|z^{k_\ell-2}-z^{\star}_{\ell-1}\|_2^2. \label{eq:adapt}
+\end{align} 
+Repeating this inequality backward to the previous adaptation step $z^{k_{\ell-1}}$, we get 
+\begin{align}
+  \nonumber  \EE\left[\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell-1}}\right] &\leq  \mathbf{a}_\ell  (1-\alpha_{\ell-1})^{k_{\ell}-k_{\ell-1}} \|z^{k_{\ell-1}}-z^{\star}_{\ell-1}\|_2^2 \\
+   &\leq  \mathbf{a}_\ell  (1-\alpha_{\ell-1})^{\mathbf{c}_\ell} \|z^{k_{\ell-1}}-z^{\star}_{\ell-1}\|_2^2,
+\end{align} 
+using the assumption of bounded inter-adaptation times.
+Combining this inequality and \eqref{eq:iterate_flexible_lambda2}, we obtain that for any $k\in[k_\ell,k_{\ell+1})$, 
+\begin{align*}
+    \EE\left[\|z^{k}-z^{\star}_{\ell}\|_2^2\right] &\leq (1-\alpha_\ell)^{k-k_\ell}
+    \prod_{m=1}^\ell  \mathbf{a}_m (1-\alpha_{m-1})^{\mathbf{c}_m} \|z^{0}-z^{\star}_{0}\|_2^2.
+    \end{align*}
+Using now \eqref{eq:corr-rate}, we get    
+\[
+\EE\left[\|z^{k}-z^{\star}_{\ell}\|_2^2\right] ~\leq~ (1-\alpha_\ell)^{k-k_\ell}
+    \prod_{m=1}^\ell  (1-\beta_{m})^{\mathbf{c}_m} \|z^{0}-z^{\star}_{0}\|_2^2
+    %~\leq~ (1-\alpha_\ell)^{k-k_\ell} (1-\beta)^{\sum_{m=1}^\ell \mathbf{c}_m}  \|z^{0}-z^{\star}_{0}\|_2^2.
+\]
+% \begin{align*}  
+%   \EE\left[\|z^{k}-z^{\star}_{\ell}\|_2^2\right] &\leq (1-\alpha_\ell)^{k-k_\ell}
+%     \prod_{m=1}^\ell  (1-\beta_{m})^{\mathbf{c}_m} \|z^{0}-z^{\star}_{0}\|_2^2\\
+%     &\leq (1-\alpha_\ell)^{k-k_\ell} (1-\beta)^{\sum_{m=1}^\ell \mathbf{c}_m}  \|z^{0}-z^{\star}_{0}\|_2^2.
+% \end{align*}
+Finally, the non-expansiveness of the prox-operator propagates this inequality to $x_k$, since we have 
+% $k\in(k_\ell,k_{\ell+1}]$ we have
+\begin{align*}
+\|x^k &- x^\star\|_2^2 = \|\prox_{\gamma g}(\bQ_\ell^{-1}(z^{k-1})) - \prox_{\gamma g}(\bQ_\ell^{-1}(z_\ell^\star))\|_2^2\\
+&\leq
+\|\bQ_\ell^{-1}(z^{k-1} - z_\ell^\star)\|_2^2 \leq \lambda_{\max}(\bQ_\ell^{-1})^2  \|z^{k-1}-z^\star_\ell\|_2^2 =  %\lambda_{\min}(\bP_\ell)  \|z^{k-1}-z^\star\|_2^2
+\lambda_{\max}(\bP_\ell)  \|z^{k-1}-z^\star_\ell\|_2^2 \leq \|z^{k-1}-z^\star_\ell\|_2^2.
+\end{align*}
+This concludes the proof.
+\end{proof}
+
+
+\begin{example}[Explicit convergence rate] \label{ex:adapt_fixed}
+Let us specify Theorem \eqref{th:conv_nondis_arbitrary} with the following simple adaptation strategy. We take a fixed upper bound on the adaptation cost and a fixed lower bound on uniformity:
+\begin{equation}\label{eq:explicit}
+\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 \leq \mathbf{a} \qquad
+\lambda_{ \min}(\bP_{\ell}) \geq \lambda.
+\end{equation}
+Then from the rate $1-\alpha = 1- 2\gamma\mu L\lambda/(\mu+L)$, we can perform an adaptation every 
+\begin{align}
+    \label{eq:min_adapt}
+\mathbf{c} = \lceil \log(\mathbf{a})/\log\big((2-\alpha)/(2-2\alpha)\big)\rceil
+\end{align}
+ iterations, so that $\mathbf{a}(1-\alpha)^\mathbf{c} = (1-\alpha/2)^\mathbf{c}$ and $k_\ell = \ell \mathbf{c}$. A direct application of Theorem \eqref{th:conv_nondis_arbitrary} gives that, for any $k$,
+ \begin{align*}
+    \EE\left[\|x^{k+1}-x^{\star}_{\ell}\|_2^2\right] &\leq  \left(1-\frac{\gamma\mu L\lambda}{\mu+L}\right)^{k}  C
+\end{align*}
+where $C = \|z^0 - \bQ_0(x^\star - \gamma\nabla f(x^\star))\|_2^2$. That is the same convergence mode as in the non-adaptive case (Theorem\;\ref{th:conv_nondis}) with a modified rate. Note the modified rate provided here (of the form $(1-\alpha/2)$ to be compared with the $1-\alpha$ of Theorem\;\ref{th:conv_nondis}) was chosen for clarity; any rate strictly slower than $1-\alpha$ can bring the same result by adapting $\mathbf{c}$ accordingly.
+\end{example}
+
+
+% \begin{example}[Simpler result for coordinate projections] \label{ex:adapt_coord}
+% The special case of subspace descent along coordinates (i.e.\;coordinate descent methods) leads to a simpler result. As discussed in Section~\ref{sec:coordproj}, the scaling matrices $(\bQ_\ell)$ commute with the proximity operator, so they can be removed from the algorithm. {Since no rescaling is needed in that case (line~\ref{line:rescale}, see Sec.~\ref{sec:coordproj}), there is no adaptation cost, $\mathbf{a}_{\ell} = 1$ for all $\ell$, and thus no inter-adaptation time, $\mathbf{c}_\ell = 1$ for all $\ell$, i.e. the sampling probabilites can be changed at every iteration. Then, under Assumptions \ref{hyp:f} and  \ref{hyp:main_identif}, the proof of the theorem simplifies and gives that for any $\gamma\in(0,2/(\mu+L)]$, we have for any $k\in [k_\ell,k_{\ell+1})$
+% \begin{align*}
+%     \EE\left[\|x^{k+1}-x^\star\|_2^2\right] &\leq C \left(1 -  \lambda_{\min}(\bP_{\ell})  \frac{2\gamma \mu L}{\mu + L}\right)^{k-k_\ell} \prod_{m=1}^\ell \left(1 -  \lambda_{\min}(\bP_{m-1})  \frac{2\gamma \mu L}{\mu + L}\right)^{k_m-k_{m-1}} \\
+%     &= \mathcal{O}\left( \left(1 -  \lambda  \frac{2\gamma \mu L}{\mu + L}\right)^{k} \right)
+% \end{align*}
+% with $\lambda  = \lim\inf_\ell \lambda(\bP_\ell) >0$.}\hfill\Halmos
+% \end{example}
+
+{
+\begin{remark}[On the adaptation frequency]
+Theorem\;\ref{th:conv_nondis_arbitrary} and Example\;\ref{ex:adapt_fixed} tell us that we have to respect a prescribed number of iterations between two adaptation steps. We emphasize here that if this inter-adaptation time is violated, the resulting algorithm may be highly unstable. We illustrate this phenomenon on a TV-regularized least squares problem: we compare two versions of \adaalgo~with the same adaptation strategy verifying 
+\eqref{eq:explicit} but with two different adaptation frequencies
+\begin{itemize}
+    \item at every iteration (i.e. taking $\mathbf{c}_\ell = 1$)
+    \item following theory (i.e. taking $\mathbf{c}_\ell = \mathbf{c}$ as per Eq.~\eqref{eq:min_adapt})
+\end{itemize}
+On Figure~\ref{fig:stab}, we observe that adapting every iteration leads to a chaotic behavior. Second, even though the theoretical number of iterations in an adaptation cycle is often pessimistic (due to the rough bounding of the rate), the iterates produced with this choice quickly become stable (i.e. identification happens, which will be shown and exploited in the next section) and show a steady decrease in suboptimality.
+
+\begin{figure}[H]
+\begin{center}
+ \scalebox{0.9}{\input{mor/figs/fused_lasso_sparsity}}
+ \scalebox{0.9}{\input{mor/figs/fused_lasso_suboptimality_vs_iteration}}
+\end{center}
+\caption{Comparisons between theoretical and harsh updating time for \adaalgo.}
+\label{fig:stab}
+\end{figure}
+
+\end{remark}}
+
+
+{
+A drawback of Theorem~\ref{th:conv_nondis_arbitrary} is that the adaptation cost, inter-adaptation time, and selection uniformity have to be bounded by deterministic sequences. This can be restrictive if we do not have prior knowledge on the problem or if the adaptation cost varies a lot. 
+%(see e.g.\,the upcoming Remark~\ref{rem:decrease}). 
+This drawback can be circumvented to the price of loosing the rate \emph{per iteration} to the rate \emph{per adaptation}, as formalized in the following result.
+        
+
+\begin{theorem}[\adaalgo~convergence: practical version]\label{th:aggressive}
+    Let Assumptions \ref{hyp:f} and  \ref{hyp:main_identif} hold. Take $\gamma\in(0,2/(\mu+L)]$, choose $\lambda>0$, and set $\beta = \gamma\mu L\lambda/(\mu+L)$. Consider the following adaptation strategy:
+    %at each  time $k_{\ell-1}$, 
+    \begin{itemize}
+        \item[1)] From the observation of $x^{k_{\ell-1}}$\!,\;choose a new sampling with $\bP_{\ell}$ and $\bQ_\ell$,\,such\;that\;$\lambda_{ \min}(\bP_{\ell}) \geq \lambda$;
+        \item[2)] Compute $\mathbf{c}_\ell$ so that $\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 (1-\alpha_{\ell-1})^{\mathbf{c}_\ell} \leq 1 - \beta$ where $\alpha_{\ell-1} = 2\gamma \mu L \lambda_{ \min}(\bP_{\ell-1})/(\mu + L)$;
+        \item[3)] Apply the new sampling %(i.e. perform an adaptation step with this new sampling) 
+        after $\mathbf{c}_\ell$ iterations ($k_{\ell} = k_{\ell-1}+\mathbf{c}_\ell$).
+    \end{itemize}
+%   keep $ \lambda_{ \min}(\bP_{\ell-1}) \geq \lambda$ so that $(1-\alpha_{\ell-1}) \leq 1-\alpha < 1 $ and
+    Then, we have for any $k\in [k_\ell,k_{\ell+1})$
+    \begin{align*}
+        \EE\left[\|x^{k+1}-x^\star\|_2^2\right] &\leq (1-\alpha_\ell)^{k-k_\ell}  \left(1-\beta\right)^{\ell}  \|z^{0}-\bQ_0\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)\|_2^2. 
+    \end{align*}
+    \end{theorem}
+
+\begin{proof}[Proof of Theorem \ref{th:aggressive}]
+The proof follows the same pattern as the one of Theorem~\ref{th:conv_nondis_arbitrary}.
+The only difference is that the three control sequences (adaptation cost, inter-adaptation time, and selection uniformity) are now random sequences
+%(more precisely $\FF^{k_{\ell-1}}$-measurable sequences) 
+since they depend on the iterates of the (random) algorithm. This technical point requires a special attention. 
+In \eqref{eq:Jadd}, the adaptation introduces a cost by a factor $\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 $, which is not deterministically upper-bounded  anymore. However it is $\FF^{k_{\ell-1}}$-measurable by construction of $\bQ_\ell$, so we can write
+\begin{align*}
+  \nonumber & \EE\left[\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell-1}}\right] \\[1.5ex]
+  \nonumber & = \EE\left[\EE\left[\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell}-2}\right]\,|\,\FF^{k_{\ell-1}}\right]\\[1.5ex]
+  &\leq   \EE\left[\EE\left[ \|  \bQ_\ell   \bQ_{\ell-1}^{-1}(z^{k_{\ell}-2} + P_{k_{\ell}-1}(y^{k_{\ell}-1}-z^{k_{\ell}-2}) - \bQ_\ell   \bQ_{\ell-1}^{-1}z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell}-2}\right]\,|\,\FF^{k_{\ell-1}}\right]\\[1.5ex]
+   \nonumber     &\leq \EE\left[\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2  (1-\alpha_{\ell-1}) \|z^{k_\ell-2}-z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell-1}}\right]\\[1.5ex]
+      \nonumber     &= \| \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2  (1-\alpha_{\ell-1}) \EE\left[ \|z^{k_\ell-2}-z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell-1}}\right].
+   \end{align*} 
+   Using Eq.~\eqref{eq:iterate_flexible_lambda}, this inequality yields  
+  \begin{align*}
+   \EE\left[\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell-1}}\right]
+   &\leq \|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2  (1-\alpha_{\ell-1})^{k_\ell-k_{\ell-1}}  \EE\left[  \|z^{k_{\ell-1}-1}-z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell-1}}\right]\\[1ex]
+&\leq (1-\beta) \EE\left[  \|z^{k_{\ell-1}-1}-z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell-1}}\right].
+\end{align*}
+where we used points $2)$ and $3)$ of the strategy to bound the first terms deterministically. Finally, we obtain
+\begin{align*}
+\EE\left[\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2\right]
+& = \EE\left[\EE\left[\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell-1}}\right]\right]\\[1.5ex]
+&\leq (1-\beta) \EE\left[\|z^{k_{\ell-1}-1}-z^{\star}_{\ell-1}\|_2^2\right]
+% \\[1.5ex]
+% &\leq (1-\beta) \EE\left[\|z^{k_{\ell-1}-1}-z^{\star}_{\ell-1}\|_2^2\,|\,\FF^{k_{\ell-2}}\right].
+\end{align*}
+then the rest of the proof follows directly by induction.
+\end{proof}
+        
+       
+% \begin{theorem}[\adaalgo~with aggressive sampling]\label{th:aggressive}
+%     Let Assumptions \ref{hyp:f} and  \ref{hyp:main_identif} hold.  For any $\gamma\in(0,2/(\mu+L)]$, let the user choose its adaptation strategy so that:
+%     \begin{itemize}
+%         \item  the \emph{adaptation cost} is upper bounded as $ \|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 \leq \mathbf{a}_\ell $;
+%         \item the \emph{inter-adaptation time} is lower bounded as $k_{\ell}-k_{\ell-1}\geq \mathbf{c}_\ell$;
+%         \item the \emph{selection uniformity} is lower bounded as $\lambda_{ \min}(\bP_{\ell-1}) \geq \lambda_{\ell-1} $;
+%     \end{itemize}
+%     with  $\mathbf{a}_\ell, \mathbf{c}_\ell, \lambda_{\ell-1}$ $\FF^{k_{\ell-1}}$-measurable sequences. 
+%     Then, provided that
+%     \begin{align}
+%         \label{eq:aggressive}
+%         \mathbf{a}_\ell  (1-\alpha_{\ell-1})^{\mathbf{c}_\ell} \leq 1 - \beta \text{ with probability $1$}
+%     \end{align}
+%     for some $\beta >0$, we have for any $k\in [k_\ell,k_{\ell+1})$
+%     \begin{align*}
+%         \EE\left[\|x^{k+1}-x^\star\|_2^2\right] &\leq (1-\alpha_\ell)^{k-k_\ell}  (1-\beta)^{\ell}  \|z^{0}-\bQ_0\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)\|_2^2. 
+%     \end{align*}
+%     \end{theorem}
+
+
+%     Even though we have no per-iteration rate, this result enables us to use the following technique at each adaptation time $k_{\ell-1}$: keep $ \lambda_{ \min}(\bP_{\ell-1}) \geq \lambda$ so that $(1-\alpha_{\ell-1}) \leq 1-\alpha < 1 $ and
+%     \begin{itemize}
+%         \item[1)] The user computes a new sampling (and $\bQ_\ell $) from the observation of $x^{k_{\ell-1}}$;
+%         \item[2)] Compute $\mathbf{c}_\ell$ so that $\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 (1-\alpha_{\ell-1})^{\mathbf{c}_\ell} \leq 1 - \alpha/2$;
+%         \item[3)] Apply the new sampling (i.e. perform an adaptation step with this new sampling) after $\mathbf{c}_\ell$ iterations (i.e. at time $k_{\ell-1}+\mathbf{c}_\ell$).
+%     \end{itemize}
+
+%     Theorem~\ref{th:aggressive} then ensures a  $(1-\alpha/2)$ rate \emph{in number of adaptations}.
+
+}
+
+% \proof{Proof.}
+% First of all, let us notice that for a minimizer $x^\star$ of \eqref{eq:main_problem}, the proof of Theorem~\ref{th:conv_nondis} introduces an annex variable $z^\star =  \bQ\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)$ which directly depends on $\bQ$, preventing us from a direct use of the former results. 
+
+% However, defining $z^{\star}_{\ell} =  \bQ_\ell\left(x^\star - \gamma\nabla f\left(x^\star\right)\right)$, Lemmas~\ref{lm:removing_exp} and \ref{lm:bub} can be directly extended to show that for any $\gamma\in(0,2/(\mu+L)$ and any $k>0$ 
+% \begin{equation}\label{eq:iterate_flexible_lambda}
+%     \EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\,|\,\FF^{k-1}\right] \leq \underbrace{  \left(1 -  \frac{2\gamma \mu L \lambda_{ \min}(\bP_\ell)}{\mu + L} \right) }_{:= 1- \alpha_\ell} \|z^{k-1}-z^{\star}_{\ell}\|_2^2 .
+% \end{equation} 
+
+% Let us focus on the quantity $(\|z^{k} - z^{\star}_{\ell}\|_2^2 )$ where $\ell$ is the time of the last adaptation before (or at) $k$, i.e. the distribution of the selection has not changed since ${k}_{\ell} = \max \{ k'<k : k'\in\Up\}$. Hence, iterating \eqref{eq:iterate_flexible_lambda} we obtain
+% \begin{equation}\label{eq:iterate_flexible_lambda2}
+%     \EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\,|\,\FF^{k_{\ell}-1}\right] \leq (1- \alpha_\ell)^{k-k_\ell} \|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2 .
+% \end{equation} 
+
+% At this point, one can observe that there is a mismatch in the term $\|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2 $ between the average projection associated with $z^{k_\ell-1}$, $\bP_{\ell-1}$, and the one related to $z^{\star}_{\ell}$, $\bP^{\ell}$. Using the fact that for any $\delta>0$ any pair of points $a,b$, $\|a+b\|_2^2 \leq (1+\delta)\|a\|_2^2 + (1+1/\delta)\|b\|_2^2$, one can correct the $\ell$-th adaptation by $\delta_\ell>0$ as
+% \begin{align}
+% \nonumber \|z^{k_\ell-1}-z^{\star}_{\ell}\|_2^2 &\leq (1+\delta_\ell)  \|z^{k_\ell-1}-z^{\star}_{\ell-1}\|_2^2 + (1+1/\delta_\ell)  \|z^{\star}_{\ell}-z^{\star}_{\ell-1}\|_2^2 \\
+% &\leq (1+\delta_\ell)  \|z^{k_\ell-1}-z^{\star}_{\ell-1}\|_2^2 + (1+1/\delta_\ell)  \|\bQ^{\ell}-\bQ_{\ell-1}\|_2^2 \|x^\star - \gamma\nabla f\left(x^\star\right)\|_2^2 .   \label{eq:adapt_change}
+% \end{align} 
+
+
+
+% Combining \eqref{eq:iterate_flexible_lambda2} and \eqref{eq:adapt_change},
+% we get that 
+% \begin{align*}
+%     &\EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\right] \leq (1- \alpha_\ell)^{k-k_\ell}   (1+\delta_\ell)   \EE\left[ \|z^{k_\ell-1}-z^{\star,{\ell-1}}\|_2^2 \right] \\
+%     & \hspace*{1.5cm} + (1- \alpha_\ell)^{k-k_\ell}  (1+1/\delta_\ell)   \|x^\star - \gamma\nabla f\left(x^\star\right)\|_2^2  \EE\left[ \|\bQ^{\ell}-\bQ_{\ell-1}\|_2^2 \right].
+% \end{align*}
+
+
+% Now,
+% \begin{itemize}
+%     \item  using the fact that all the selections are $\lambda$-nice, i.e. $\lambda_{ \min}(\bP_\ell)\geq \lambda>0$ for all $\ell$; thus getting $(1- \alpha_\ell) \leq (1- \alpha)$ where $\alpha :=  2\gamma \mu L \lambda/(\mu + L) $;
+%     \item  using the fact that $(1-\alpha)^{k_{\ell}-k_{\ell}-1}$ is stochastically upper bounded by $(1-\alpha)^{c(\ell)}$ ;
+%     \item taking $\delta_\ell=1$;
+%     \item bounding\footnote{one could also take a decreasing bound.} $\EE\left[ \|\bQ^{\ell}-\bQ_{\ell-1}\|_2^2 \right]<d$ and $C = d \|x^\star - \gamma\nabla f\left(x^\star\right)\|_2^2 $;
+% \end{itemize}
+% one can get 
+% \begin{align*}
+%     \EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\right] &\leq 2_\ell (1- \alpha)^{k-k_\ell}   \prod_{l=1}_{\ell-1}   (1- \alpha)^{c(l)}    \|z^{0}-z^{\star,{0}}\|_2^2   \\
+%     & \hspace*{1.0cm} + 2 (1- \alpha)^{k-k_\ell}  \left( \sum_{l=1}_\ell 
+%      2^{\ell-l} \prod_{m=l-1}_{\ell-1}    (1- \alpha)^{c(m)}     \right)   C  .
+% \end{align*}
+
+
+% In that view, it is imperative that $c$ grows with $\ell$.  Let us take $c(\ell)=\ell$, then
+% \begin{align*}
+%     \EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\right] &\leq 2_\ell (1- \alpha)^{k-k_\ell}   \prod_{l=1}_{\ell-1}   (1- \alpha)^{l}    \|z^{0}-z^{\star,{0}}\|_2^2   \\
+%     & \hspace*{1.0cm} + 2 (1- \alpha)^{k-k_\ell}  \left( \sum_{l=1}_\ell  2^{\ell-l} \prod_{m=l-1}_{\ell-1}    (1- \alpha)^{m}     \right)   C  \\
+%     &=  (1- \alpha)^{k-k_\ell}      2_\ell (1- \alpha)^{\ell(\ell+1)/2}    \|z^{0}-z^{\star,{0}}\|_2^2   \\
+%     & \hspace*{1.0cm} + 2 (1- \alpha)^{k-k_\ell}  \left( \sum_{l=1}_\ell 2^{\ell-l}  (1- \alpha)^{(\ell-l)(\ell+l+1)/2}       \right)   C  \\
+%     &=  (1- \alpha)^{k-k_\ell}      2_\ell (1- \alpha)^{\ell(\ell+1)/2}    \|z^{0}-z^{\star,{0}}\|_2^2   \\
+%     & \hspace*{1.0cm} + 2 (1- \alpha)^{k-k_\ell}  \left( \sum_{l=1}_\ell  2^{\ell-l}  (1- \alpha)^{(\ell-l)(\ell+l+1)/2}       \right)   C  .
+% \end{align*}
+
+% Finally, let us take:
+% \begin{itemize}
+%     \item $\ell$ large enough. Typically, fix $\beta\in(0,\alpha)$, for $\ell\geq 2(\log(1-\beta)-\log(2))/\log(1-\alpha)$, one has  $ 2_\ell (1- \alpha)^{\ell(\ell+1)/2}    \leq (1-\beta)_\ell$.
+%     \item \textbf{Show that the second part is bounded for all $\ell$.}
+% \end{itemize}
+
+% This means that 
+% \begin{align*}
+%     \EE\left[\|z^{k} - z^{\star}_{\ell}\|_2^2\right] &\leq (1-\beta)_\ell \|z^{0}-z^{\star,{0}}\|_2^2  +  (1- \alpha)^{k-k_\ell}  C'  .
+% \end{align*}
+
+
+% Let us consider the non-negative random variable $X_\ell := z^{k_{\ell}+\ell} - z^{\star}_{\ell}$, then, (using $k_{\ell+1}-1-k_\ell$ and $1-\alpha<1-\beta $ by construction),
+% \begin{align*}
+%      \EE\left[ \| X_\ell \|_2^2 \right] \leq (1-\beta)_\ell \|z^{0}-z^{\star,{0}}\|_2^2  +  (1- \alpha)^{\ell}  C' \leq (1-\beta)_\ell C''
+% \end{align*}
+% hence $X_\ell$ converges almost surely to $0$.
+
+
+% From this one and the fact that $\| (\bQ_\ell)^{-1}\|_2 < CCCC $, one can deduce that $(\bQ_\ell)^{-1} z^{k_{\ell}+\ell}$ converges almost surely to $x^\star - \gamma \nabla f(x^\star)$. In turn, we get the almost sure convergence of $x^k$ to $x^\star$. 
+
+
+% Finally,  using identification (Theorem~\ref{th:identification}), one gets that any $x^{k+1}$  for any $k\in[k_{\ell}+\ell,k_{\ell+1})$ should identified an enlarged optimal set for $\ell$ large enough (\textbf{to check}). One this identification took place, no selection update is needed and Theorem~\ref{th:conv_nondis} applies.
+% \hfill\Halmos\endproof
+
+% =============================================================================
+\subsection{Identification of proximal algorithms}\label{sec:identif}
+{\color{red} As we mentioned in Section \ref{sec:basics_identificationn} proximal algorithms could identify a near optimal subspace before the convegence moment.}
+
+This identification can be exploited within our adaptive algorithm \adaalgo~for solving Problem~\eqref{eq:main_problem}. Indeed, assuming that the two extreme subspaces of \eqref{eq:identification_result} coincide, the theorem says that the structure of the iterate $\S(x^k)$ will be the same as the one of the solution $\S(x^\star)$. In this case, if we choose the adaptation strategy of our adaptive algorithm \adaalgo~deterministically from $\S(x^k)$, then, after a finite time with probability one,  the selection will not be adapted anymore. This allows us to recover the rate of the non-adaptive case (Theorem~\ref{th:conv_nondis}), as formalized in the next theorem.
+
+
+\begin{theorem}[Improved asymptotic rate]\label{th:rate_identif}
+Under the same assumptions as in Theorems~\ref{th:conv_nondis_arbitrary} and~\ref{th:aggressive}, if the solution $x^\star$ of~\eqref{eq:main_problem} verifies the qualification constraint\footnote{The qualifying constraint \eqref{eq:qualif} may seem hard to verify at first glance but for most structure-enhancing regularizers, it simplifies greatly and {reduces} to usual nondegeneracy {assumptions}. Broadly speaking, this condition simply means that the point $u^\star = x^\star - \gamma\nabla f(x^\star)$ is not \emph{borderline} to be put to an identified value by the proximity operator of the regularizer $\prox_{\gamma r}$. 
+For example, {when} $g(x) = \lambda_1 \|x\|_1$, the qualifying constraint \eqref{eq:qualif} simply rewrites $x_i^\star = 0 \Leftrightarrow \nabla_{[i]} f(x^\star) \in ]-\lambda_1,\lambda_1[$; 
+for $r$ is the TV-regularization \eqref{eq:TV}, the qualifying constraint means that there is no point $u$ (in any ball) around $x^\star - \gamma \nabla f(x^\star)$ such that $\prox_{\gamma r}(u)$ has a jump that $x^\star$ does not have. 
+In general, this corresponds to the relative interior assumption of \cite{lewis2002active}; see the extensive discussion 
+of \cite{vaiter2015model}.}
+\begin{align}
+    \label{eq:qualif}\tag{QC}
+     \S(x^\star) ~=\!\! \bigcup_{u\in\mathcal{B}(x^\star-\gamma \nabla f(x^\star),\varepsilon)} \!\S(\prox_{\gamma g}(u))
+\end{align}
+for any $\varepsilon>0$ small enough, then, using an adaptation deterministically computed from $(\S(x^k))$, we have \begin{align*}
+     \EE[\|x^k-x^\star\|_2^2] = \mathcal{O}\left( \left( 1- \lambda_{\min} (\bP^\star) \frac{2\gamma \mu L}{\mu + L}  \right)^k \right)
+ \end{align*}
+ where $ \bP^\star$ is the average projection matrix of the selection 
+ associated with $\S(x^\star)$.
+\end{theorem}
+
+% cette preuve doit pouvoir s'etendre au cas de f convexe, ie x^star non unique. [en considerant le x^* limite des X^k] On oublie ce detail ici.
+\begin{proof}[Proof of Theorem \ref{th:rate_identif}]
+Let $u^\star = x^\star-\gamma \nabla f(x^\star)$ and observe from the optimality conditions of \eqref{eq:main_problem} that $x^\star =  \prox_{\gamma g}(u^\star)$. We apply Theorem~\ref{th:identification} and the qualification condition \eqref{eq:qualif} yields that $\S(x^k)$ will exactly reach $\S(x^\star)$ in finite time. Now we go back to the proof of Theorem~\ref{th:aggressive} to see that the random variable defined by
+\begin{align*}
+    X^k = \left\{ \begin{array}{cl}
+            x^{k_{\ell}} & \textrm{if } k\in(k_{\ell},k_{\ell}+\mathbf{c}_\ell]   \\
+        x^k & \textrm{if } k\in(k_{\ell}+\mathbf{c}_\ell , k_{\ell+1}]  
+    \end{array}\right. \textrm{ for some } \ell
+\end{align*}
+also converges almost surely to $x^\star$. Intuitively, this sequence is a replica of $(x^k)$ except that it stays fixed at the beginning of adaptation cycles when no adaptation is admitted. 
+%This means that the variable used for adapting the selection converge almost surely to the minimizer. 
+This means that $\S(X^k)$ which can be used for adapting the selection will exactly reach $\S(x^\star)$ in finite time.
+From that point on, since we use an adaptation technique that deterministically relies on $\S(x^k)$, there are no more adaptations and thus the rate matches the non-adaptive one of Theorem~\ref{th:conv_nondis}.
+\end{proof}
+
+{
+This theorem means that if $r$, $\M$, and $\C$ are chosen in agreement, the adaptive algorithm \adaalgo~eventually reaches a linear rate in terms of iterations as the non-adaptive \algo. In addition, the term $\lambda_{\min}(\bP)$ present in the rate now depends on the \emph{final} selection and thus on the optimal structure which is much better than the structure-agnostic selection of \algo~in Theorem~\ref{th:conv_nondis}.  In the next section, we develop  practical rules for an efficient interlacing of $r$, $\M$, and $\C$. %Then we illustrate in Section~\ref{sec:num} the behavior of the resulting instantations of \adaalgo.
+}
+
+
+% =============================================================================
+\subsection{Identification-based Subspace Descent}\label{sec:adapt}
+% =============================================================================
+
+{
+In this section, we provide practical rules to sample efficiently subspaces according to the structure identified by the iterates of our proximal algorithm. According to Theorem~\ref{th:rate_identif}, we need to properly choose $\C$ with respect to $r$ and $\M$ to have a good asymptotic regime. According to Theorem~\ref{th:aggressive},  we also need to follow specific interlacing constraints to have a good behavior along the convergence. These two aspects are discussed in Section \ref{sec:howto} and Section~\ref{sec:ex_ada}, respectively.}
+
+% Using the sparsity vector make belong to some subspaces after a finite but unknown number of iterations.
+
+% ==========================================================================================
+\subsubsection{How to update the selection}
+\label{sec:howto}
+
+We provide here general rules to sample in the family of subspaces $\C$ according to the structure identified with the family of $\M$.
+ %if $x \in \mathcal{M}_i$ implies that $x\notin \C_i$ or $x\in  \bigcap_i \C_i$. 
+To this end, we need to consider the two families $\C$ and $\M$ that closely related. We introduce the notion of generalized {complemented subspaces}.
+%examples for the axes and jumps families are provided in Section~\ref{sec:ex_ada}. 
+
+\begin{definition}[Generalized {complemented subspaces}]
+Two families of subspaces $\M = \{ \M_1,\ldots,\M_m\}$ and 
+$\C = \{ \C_1,\ldots,\C_m\}$ are said to be (generalized)  {complemented subspaces} if for all $i=1,\ldots,m$
+\[
+  \left\{ \begin{array}{l}
+    \left( \C_i \bigcap  \NC_i  \right) \subseteq  \bigcap_j \C_j  \\
+      \C_i  +  \NC_i = \mathbb{R}^n
+  \end{array} \right. 
+\]
+\end{definition}
+
+\begin{example}[{Complemented subspaces and sparsity vectors} for axes and jumps]\label{ex:supp}
+For the axes subspace set (see Section~\ref{sec:coordproj})
+\begin{equation}\label{eq:Ccoord}
+    \C = \{\C_1,\ldots,\C_n\} \qquad\text{ with } \C_i = \{x\in\mathbb{R}^n  : x_{[j]} = 0 ~~ \forall j \neq i \},
+\end{equation}
+a {complemented} identification set is 
+\begin{equation}\label{eq:Mcoord}
+    \NC = \{\NC_1,\ldots,\NC_n\} \quad\text{ with } \NC_i = \{x\in\mathbb{R}^n  : x_{[i]} = 0 \}, 
+\end{equation} 
+as $\NC_i \bigcap \C_i = \{0\} = \bigcap_j \C_j$ and $\C_i+\NC_i = \mathbb{R}^n$. 
+{In this case, the sparsity vector $\SC(x)$ corresponds to the \emph{support} of $x$ (indeed $(\SC(x))_{[i]} = 0$ iff $x \in \NC_i \Leftrightarrow x_{[i]}=0$). Recall that the support of a point $x\in\mathbb{R}^n$ is defined as the size-$n$ vector $\mathrm{supp}(x)$ such that $\mathrm{supp}(x)_i = 1$ if $x_{[i]}\neq 0$ and $0$ otherwise. By a slight abuse of notation, we denote by $|\mathrm{supp}(x)|$ the size of the support of $x$, i.e. its number of non-null coordinates and $|\mathrm{null}(x)| = n - |\mathrm{supp}(x)|$.}
+
+% As considered in , 
+% some regularizers such as the $1$D-Total Variation promote vectors of fixed variation (i.e. vectors for which $x_i = x_{i-1}$ except for a prescribed set of indices). For these case,  one can define the following covering family
+For the jumps subspace sets (see Section~\ref{sec:var})
+\begin{equation}\label{eq:Cjump}
+    \C = \{\C_1,..,\C_{n-1}\} \qquad\text{ with } \C_i = \left\{x\in\mathbb{R}^n  : 
+x_{[j]} = x_{[j+1]} \text{ for all $j\neq i$} \right\}
+\end{equation}  
+a  {complemented} identification set is 
+\begin{equation}\label{eq:Mjump}
+\NC = \{\NC_1,..,\NC_{n-1} \} \qquad\text{ with } \NC_i = \left\{x\in\mathbb{R}^n  :  x_{[i]} = x_{[i-1]} \right\},    
+\end{equation}
+as $\NC_i \bigcap \C_i = \mathrm{span}(\{1\}) = \bigcap_j \C_j$ and $\C_i+\NC_i = \mathbb{R}^n$. {Here $\SC(x^{k})$ corresponds to the \emph{jumps} of $x$ (indeed $(\SC(x^k))_{[i]} = 0$ iff $x^k \in \NC_i \Leftrightarrow x_{[i]}^k=x_{[i+1]}^k$). . The jumps of a point $x\in\mathbb{R}^n$ is defined as the vector $\mathrm{jump}(x)\in \mathbb{R}^{(n-1)}$ such that for all $i$ we have: $\mathrm{jump}(x)_{[i]} = 1$ if $x_{[i]}\neq x_{[i+1]}$ and $0$ otherwise.}
+\end{example}
+
+\smallskip
+
+The practical reasoning with using {complemented} families is the following. If the subspace $\NC_i$ is identified at time $K$ (i.e. $(\S(x^k))_{[i]}=0 \Leftrightarrow x^k\in\NC_i$ for all $k\geq K$), then it is no use to update the iterates in $\C_i$ in preference, and the next selection $\Sel_k$ should not include $\C_i$ anymore.
+%(as the dummy space is covered by the other sets). 
+Unfortunately, the moment after which a subspace is definitively identified is unknown in general; however, subspaces $\NC_i$ usually show a certain stability and thus $\C_i$ may be ``less included'' in the selection. This is the intuition behind our adaptive subspace descent algorithm: when the selection $\Sel^k$ is adapted to the subspaces in $\NC$ to which $x^k$ belongs, this gives birth to an automatically adaptive subspace descent algorithm, from the generic \adaalgo.
+
+Table~\ref{tab:comp} summarizes the common points and differences between the adaptive and non-adaptive subspace descent methods. Note that the two options introduced in this table are examples on how to generate reasonably performing admissible selections. {Their difference lies in the fact that for Option\;1, the \emph{probability} of sampling a subspace outside the support is controled, while for Option\;2, the \emph{number} of subspaces is controlled (this makes every iteration computationally similar which can be interesting in practice). }
+Option 2 will be 
+discussed in Section\;\ref{sec:ex_ada} and 
+illustrated numerically in Section~\ref{sec:mor-numerical}. 
+
+\begin{table}[h!]
+    \centering
+    \begin{tabular}{rl|c|c|}
+      &  & (non-adaptive) subspace descent & adaptive subspace descent   \\
+      &   &  \algo & \adaalgo \\
+         \hline
+            \multicolumn{2}{ c| }{Subspace family}  &  \multicolumn{2}{ c| }{
+$ \C = \{\C_1,..,\C_c\}$} \\   
+          \hline
+   \multicolumn{2}{ c| }{Algorithm}  &  \multicolumn{2}{ c| }{
+$ \left\{
+\begin{array}{rl}
+    y^k = &  \bQ\left(x^k - \gamma\nabla f\left(x^k\right)\right) \\
+     z^{k} = & P_{\Sel^k} \left(y^k\right) + (I- P_{\Sel^k} ) \left(z^{k-1}\right)  \\
+     x^{k+1} = & \prox_{\gamma g} \left(\bQ^{-1}\left(z^{k}\right)\right)
+\end{array}\right.   $ } \\   
+          \hline
+     \multirow{6}{*}{Selection} &    \multirow{2}{*}{Option 1}  &    &  $\C_i\in\Sel^k$ with probability  \\
+     & &  $\C_i\in\Sel^k$ with probability $p$ & $ \left\{
+\begin{array}{rl}
+    p &  \text{ if } x^k\in\NC_i \Leftrightarrow [\SC(x^k)]_i = 0 \\
+    1 & \text{ elsewhere } 
+\end{array}\right.$ \\
+\cline{2-4}
+ &    \multirow{4}{*}{Option 2}  &  &  Sample $s$ elements uniformly in \\
+      &  &  Sample $s$ elements uniformly in $\C$ &  $\{\C_i  :  x^k\in\NC_i  \text{ i.e. }  [\SC(x^k)]_i = 0  \}$  \\
+     & & & and add \emph{all} elements in \\
+          & & &  $\{\C_j : x^k\notin\NC_j \text{ i.e. }  [\SC(x^k)]_j = 1 \}$ \\
+     \hline 
+    \end{tabular}
+    \caption{Strategies for non-adaptive vs.\;adaptive algorithms}
+    \label{tab:comp}
+\end{table}
+
+
+Notice that, contrary to the importance-like adaptive algorithms of \cite{stich2017safe} for instance, the purpose of these methods is not to adapt each subspace probability to local \emph{steepness} but rather to adapt them to the current \emph{structure}. This is notably due to the fact that local steepness-adapted probabilities can be difficult to evaluate numerically and that in heavily structured problems, adapting to an ultimately very sparse structure already reduces drastically the number of explored dimensions, as suggested in \cite{grishchenko2018asynchronous} for the case of coordinate-wise projections. 
+
+% {
+% \begin{remark}[When to update the selection]
+% Theorem~\ref{th:conv_nondis_arbitrary} guarantees convergence under some conditions on the frequency and magnitude of adaptation. There is thus a natural tradeoff between adapting too much to the current iterates structure, sacrificing the convergence, and too little, blinding the algorithm to the identified structure. Best strategies are problem-dependent; we provide here two general comments. 
+
+% First, if the newly computed selection is \emph{too different} from the previous one (in the sense that $\|\bQ_\ell \bQ_{\ell-1}^{-1}\|_2^2$ is too big compared with the decrease brought by the prescribed number of iterations; see e.g.\;\eqref{eq:corr-rate}), two choices are available:
+% \begin{itemize}
+%     \item[1.] add more standard iterations before or after the adaption;
+%     \item[2.] perform a less drastic change, typically by taking a convex combination between the former and the newly computed one.
+% \end{itemize}
+% \end{remark}
+% }
+
+{
+% =============================================================================
+\subsubsection{Practical Examples and Discussion}\label{sec:ex_ada}
+% =============================================================================
+% ==========================================================================================
+
+We discuss further the families of subspaces of Example\;\ref{ex:supp} when selected with Option 2 of Table~\ref{tab:comp}.
+
+% =============================================================================
+\paragraph{Coordinate-wise projections}\label{Pex:l1}
+
+Using the subspaces \eqref{eq:Ccoord} and \eqref{eq:Mcoord}, a practical adaptative coordinate descent can be obtained from the following reasoning at each adaptation time $k = k_{\ell-1}$:
+\begin{itemize}
+    \item Observe $\SC(x^{k})$ i.e. the support of $x^{k}$.
+    \item Take all coordinates in the support and randomly select $s$ coordinates outside the support. %(For simplicity, we only consider the case $s \leq |\mathrm{null}(x^k)|$). 
+    Compute\footnote{Let us give a simple example in $\mathbb{R}^4$:
+    \begin{align*}
+        \text{for } x^k = \left( \begin{array}{c}
+            1.23 \\ -0.6 \\ 0 \\ 0 
+        \end{array}  \right) \text{,  } \SC(x^{k}) =  \left( \begin{array}{c}
+            1 \\ 1 \\ 0 \\ 0 
+        \end{array}  \right) \text{, ~then~ } \begin{array}{l}
+            \Prob[\C_1 \subseteq \Sel^k ] = \Prob[\C_2 \subseteq \Sel^k ] = 1 \\
+            \Prob[\C_3 \subseteq \Sel^k ] = \Prob[\C_4 \subseteq \Sel^k ] = p_\ell :=  s/|\mathrm{null}(x^k)|= s/2
+        \end{array}   
+    \end{align*}  
+    \begin{align*}
+\bP_\ell = \left( \begin{array}{cccc}
+            1 & & & \\  & 1 & &  \\   & & p_\ell &  \\   & & & p_\ell
+        \end{array} \right) ~~~~ \bQ_\ell = \left( \begin{array}{cccc}
+            1 & & & \\  & 1 & &  \\   & & 1/\sqrt{p_\ell} &  \\   & & & 1/\sqrt{p_\ell}
+        \end{array} \right) ~~~~  \bQ_\ell^{-1} = \left( \begin{array}{cccc}
+            1 & & & \\  & 1 & &  \\   & & \sqrt{p_\ell} &  \\   & & & \sqrt{p_\ell}
+        \end{array} \right)~~~~~
+    \end{align*}} associated $\bP_\ell  $, $\bQ_\ell$, and $\bQ_\ell^{-1}$. Notice that $ \lambda_{\min}(\bP_{\ell}) = p_{\ell} = s/|\mathrm{null}(x^k)|$.
+    \item  Following the rules of Theorem~\ref{th:aggressive}, compute
+    \begin{align*}
+        \mathbf{c}_\ell = \left\lceil \frac{\log\left(\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 \right) + \log(1/(1-\beta)) }{\log( 1/(1-\alpha_{\ell-1}))}\right\rceil \qquad
+        \text{with~}\alpha_{\ell-1} =2 p_{\ell-1} \gamma\mu L /(\mu+L)
+    \end{align*}  
+    for some small fixed $0<\beta \leq 2 \gamma\mu L /(n(\mu+L)) \leq\inf_{\ell} \alpha_\ell $. 
+    
+    
+    Apply the new sampling %(i.e. perform an adaptation step with this new sampling) 
+    after $\mathbf{c}_\ell$ iterations (i.e. $k_{\ell} = k_{\ell-1}+\mathbf{c}_\ell$).
+\end{itemize}
+
+\smallskip
+%\begin{remark}[Observed behavior]\label{rem:decrease}
+%The use of behavior is particularly interesting for coordinate updates. Indeed, one 
+Finally, we notice that the above strategy with Option\;2 of Table~\ref{tab:comp} produces moderate adaptations as long as the iterates are rather dense. To see this, observe first that $\bQ_\ell   \bQ_{\ell-1}^{-1}$ is a diagonal matrix, the entries of which depend on the support of the corresponding coordinates at times ${k_{\ell -1}}$ and ${k_{\ell -2}}$. More precisely, the diagonal entries are described in the following table:
+
+\begin{center}
+\smallskip
+\begin{tabular}{p{0.1\textwidth}|p{0.1\textwidth}|c}
+   \multicolumn{2}{c}{$i$ is in the support at} & \\%$i$-th diagonal entries  \\
+   ${k_{\ell -1}}$ & ${k_{\ell -2}}$ &  $\left[\bQ_\ell   \bQ_{\ell-1}^{-1}\right]_{ii}$\\
+    \hline
+   yes & yes &  $1$  \\
+    \hline
+   no & yes &  $\frac{1}{p_{\ell}} = \frac{|\mathrm{null}(x^{k_{\ell-1}})|}{s}$ \\
+    \hline
+    yes  & no & ${p_{\ell-1}} = \frac{s}{|\mathrm{null}(x^{k_{\ell-2}})|}$\\
+    \hline
+    no & no & $\frac{p_{\ell-1}}{p_{\ell}} = \frac{|\mathrm{null}(x^{k_{\ell-1}})|}{|\mathrm{null}(x^{k_{\ell-2}})|}$
+\end{tabular}
+\smallskip
+\end{center}
+Thus, as long as the iterates are not sparse (i.e. in the first iterations, when $|\mathrm{null}(x^k)|\approx s$ is small), the adaptation cost is moderate so the first adaptations can be done rather frequently. Also, in the frequently-observed case when the support only decreases ($\S(x^{k_{\ell-2}})\leq \S(x^{k_{\ell-1}})$), the second line of the table is not active and thus $\|\bQ_\ell  \bQ_{\ell-1}^{-1}\| = 1$, so the adaptation can be done without waiting.
+%\end{remark}    
+
+% =========================================================================
+\paragraph{Vectors of fixed variations}
+\label{Pex:TV}
+
+The same reasoning as above can be done for vectors of fixed variation by using the families \eqref{eq:Cjump} and \eqref{eq:Mjump}. At each adaptation time $k = k_{\ell-1}$:
+\begin{itemize}
+    \item Observe $\SC(x^{k})$ i.e. the \emph{jumps} of $x$;
+    \item The adapted selection consists in selecting all jumps present in $x^k$ and randomly selecting $s$ jumps that are not in $x^k$. Compute $\bP_\ell  $, $\bQ_\ell$, and $\bQ_\ell^{-1}$ (to the difference of coordinate sparsity they have to be computed numerically). 
+    \item For a fixed $\beta>0$, compute
+    \begin{align*}
+        \mathbf{c}_\ell = \left\lceil \frac{\log\left(\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 \right) + \log(1/(1-\beta)) }{\log( 1/(1-\alpha_{\ell-1}))}\right\rceil.
+    \end{align*}  
+     Apply the new sampling %(i.e. perform an adaptation step with this new sampling) 
+     after $\mathbf{c}_\ell$ iterations (i.e. $k_{\ell} = k_{\ell-1}+\mathbf{c}_\ell$).
+\end{itemize}
+}
+
+
+% ==========================================================================================
+%\subsubsection{Improved asymptotic rate.}
+
+
+% Identification may lead to a finite number of adaptions and an ultimately better rate, as formalized in the following result. In other words, 
+
+% On a bouge le 3.3.3 a la fin du 3.2
+% under some qualifying constraints for $k$ large enough, the structure of the iterate $\S(x^k)$ will coincide precisely with the one of the solution $\S(x^\star)$; as a consequence, the selection will not be adapted after a finite time with probability one, allowing us to recover the rate of the non-adaptive case (Theorem~\ref{th:conv_nondis}).
+
+
+% \begin{theorem}[Final rate]\label{th:rate_identif}
+% Under the same assumptions as in Theorem~\ref{th:conv_nondis_arbitrary}, if the solution $x^\star$ of Problem~\eqref{eq:main_problem} verifies the qualification constraint
+% \begin{align}
+%     \label{eq:qualif}\tag{QC}
+%      \S(x^\star) ~=\!\! \bigcup_{u\in\mathcal{B}(x^\star-\gamma \nabla f(x^\star),\varepsilon)} \!\S(\prox_{\gamma g}(u))
+% \end{align}
+% for any $\varepsilon>0$ small enough, then, using an adaptation deterministically computed from $\S(x^k)$ at any admissible~time~$k$, we have \begin{align*}
+%      \EE[\|x^k-x^\star\|_2^2] = \mathcal{O}\left( \left( 1- \lambda_{\min} (\bP^\star) \frac{2\gamma \mu L}{\mu + L}  \right)^k \right)
+%  \end{align*}
+%  where $ \bP^\star$ is the average projection matrix of the selection 
+%  associated with $\S(x^\star)$.
+% \end{theorem}
+
+% % cette preuve doit pouvoir s'etendre au cas de f convexe, ie x^star non unique. [en considerant le x^* limite des X^k] On oublie ce detail ici.
+% \proof{Proof.}
+% Let $u^\star = x^\star-\gamma \nabla f(x^\star)$ and observe from the optimality conditions of \eqref{eq:main_problem} that $x^\star =  \prox_{\gamma g}(u^\star)$. We apply Theorem~\ref{th:identification} and the qualification condition \eqref{eq:qualif} ensures that the left and right-hand sides in \eqref{eq:identification_result} coincide: we get that $\S(x^k)$ will exactly reach $\S(x^\star)$ in finite time.
+
+% Now we go back to the proof of Theorem~\ref{th:conv_nondis_arbitrary} to see that the random variable defined by
+% \begin{align*}
+%     X^k = \left\{ \begin{array}{cl}
+%             x^{k_{\ell}} & \textrm{if } k\in(k_{\ell},k_{\ell}+\mathbf{c}_\ell]   \\
+%         x^k & \textrm{if } k\in(k_{\ell}+\mathbf{c}_\ell , k_{\ell+1}]  
+%     \end{array}\right. \textrm{ for some } \ell
+% \end{align*}
+% also converges almost surely to $x^\star$. Intuitively, this sequence is a replica of $(x^k)$ except that it stays fixed at the beginning of adaptation cycles when no adaptation is admitted. 
+% %This means that the variable used for adapting the selection converge almost surely to the minimizer. 
+% This means that $\S(X^k)$ which can be used for adapting the selection will exactly reach $\S(x^\star)$ in finite time.
+% From that point on, since we use an adaptation technique that deterministically relies on $\S(x^k)$ at each admissible time $k$, there is more adaptation and thus the rate matches the non-adaptive one.
+% \hfill\Halmos\endproof
+
+
+% The qualifying constraint \eqref{eq:qualif} may seem hard to verify at first glance but for most structure-enhancing regularizers, it simplifies greatly and {reduces} to usual nondegeneracy {assumptions}. Broadly speaking, this condition simply means that the point $u^\star = x^\star - \gamma\nabla f(x^\star)$ is not \emph{borderline} to be put to an identified value by the proximity operator of the regularizer $\prox_{\gamma g}$. 
+% For example, {when} $g(x) = \lambda_1 \|x\|_1$, the qualifying constraint \eqref{eq:qualif} simply rewrites $x_i^\star = 0 \Leftrightarrow \nabla_i f(x^\star) \in ]-\lambda_1,\lambda_1[$; 
+% for $g$ is the TV-regularization \eqref{eq:TV}, the qualifying constraint means that there is no point $u$ (in any ball) around $x^\star - \gamma \nabla f(x^\star)$ such that $\prox_{\gamma g}(u)$ has a jump that $x^\star$ does not have. 
+% In general, this corresponds to the relative interior assumption of \cite{lewis2002active}; see the extensive discussion 
+% of \cite{vaiter-model-linear15}.

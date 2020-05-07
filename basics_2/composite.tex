@@ -1,0 +1,47 @@
+\subsection{Composite optimization}\label{sec:basics_composite}
+Let us consider composite optimization problem
+\begin{equation}\label{eq:pb_composite}
+\min_{x\in\RR^n} f(x) + r(x),
+\end{equation}
+where $f$ is smooth and convex and $r$ is convex, non-smooth. Moreover, we consider $r$ be a prox-easy function meaning that its proximal operator is easy to compute (wide class of regularizers used in ML suits to this requirement). As we already mentioned, this formulation corresponds to the regularized empirical loss minimization problem that appears extensively in signal processing and machine learning applications; we refer to e.g.\;\cite{candes2008enhancing,combettes2011proximal,bach2012optimization}, among a vast literature.
+
+% Large scale applications in these fields call for first-order optimization, such as proximal gradient methods
+% (see e.g.\;the recent\;\cite{teboulle2018simplified}) and coordinate descent algorithms (see e.g.\;the review\;\cite{wright2015coordinate}).
+
+
+\subsubsection{Proximal gradient descent}
+Let us start from the proximal gradient descent method with constant stepsize that performs alternatively the gradient step and the proximal one. This class of method is also known as iterative shrinkage-thresholding algorithms (ISTA) \cite{daubechies2004iterative}, also called forward-backward splitting method \cite{gabay1983chapter, combettes2011proximal, raguet2013generalized}.
+
+\begin{algorithm}
+    \caption{Proximal Gradient Descent (ISTA)}
+    \label{algo:pgd}
+    \begin{algorithmic}
+        \STATE Initialize $x^0\in\mathbb{R}^n$
+        \FOR{$k\geq 0$}{
+            \STATE $x^{k+1}\leftarrow \rprox(x^k - \gamma \nabla f(x^k))$
+        }
+        \ENDFOR
+    \end{algorithmic}
+\end{algorithm}
+
+At every iterate of this method, additionally to the step of gradient descent algorithm performs an additional proximal step on top of it that could be reformulated as
+\begin{equation}\label{eq:step_pgd}
+x^{k+1} = \argmin_{z\in\RR^n}\left\{\underbrace{f(x^k) + \langle\nabla f(x^k), z-x^k\rangle+\frac{1}{2\gamma}\|x^k-z\|_2^2}_{\hat{f}(z, x^k)} + r(z)\right\}.
+\end{equation}
+If $\gamma\leq \frac{1}{L}$, where $L$ is a smoothness parameter of $f$ then $\hat{f}(z, x^k)$ is a convex upper-bound to $f$ that is tight at $x^k$. This allows to interpret proximal methods as a majorization-minimization algorithm \cite{mairal2015incremental}.
+
+From this form it is easy to see that the stationary point of this algorithm is a minimizer of \eqref{eq:pb_composite}. Since objective in \eqref{eq:step_pgd} is strongly-convex we could write the optimality condition for fixed point
+\begin{align*}
+x^\star &= \argmin_{z\in\RR^n}\left\{\langle\nabla f(x^\star), z-x^\star\rangle+\frac{1}{2\gamma}\|x^\star-z\|_2^2 + r(z)\right\}\\
+&\Updownarrow\\
+0&\in \partial r(x^\star) + \nabla f(x^\star),
+\end{align*}
+that is an optimality condition for \eqref{eq:pb_composite}.
+
+When $r$ is the indicator of a convex set, the proximal operator projects the gradient step back to the constrained set, that yields to the generalization of the projected gradient method. In terms of convergence, these proximal variant has the same rate as the gradient descent (see for example Theorem $3.1$ of \cite{beck2009fast}).
+
+\subsubsection{Coordinate descent methods}
+\input{basics_2/coordinate_descent}
+
+\subsubsection{Incremental methods}
+\input{basics_2/incremental}

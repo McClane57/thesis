@@ -1,0 +1,44 @@
+\contentsline {chapter}{\numberline {1}From Gradient to Identification}{1}{chapter.1}% 
+\contentsline {section}{\numberline {1.1}Introduction}{1}{section.1.1}% 
+\contentsline {section}{\numberline {1.2}Convexity and smoothness}{3}{section.1.2}% 
+\contentsline {section}{\numberline {1.3}Gradient descent}{6}{section.1.3}% 
+\contentsline {section}{\numberline {1.4}Non-smooth optimization}{8}{section.1.4}% 
+\contentsline {subsubsection}{Proximal methods}{9}{section*.6}% 
+\contentsline {subsection}{\numberline {1.4.1}Moreau-Yosida regularization}{11}{subsection.1.4.1}% 
+\contentsline {subsection}{\numberline {1.4.2}Composite optimization}{13}{subsection.1.4.2}% 
+\contentsline {subsubsection}{Proximal gradient descent}{13}{section*.9}% 
+\contentsline {subsubsection}{Coordinate descent methods}{14}{section*.10}% 
+\contentsline {subsubsection}{Incremental methods}{15}{section*.11}% 
+\contentsline {section}{\numberline {1.5}Useful tools for stochastic processes analysis.}{17}{section.1.5}% 
+\contentsline {section}{\numberline {1.6}Identification}{18}{section.1.6}% 
+\contentsline {chapter}{\numberline {2}Automatic dimension reduction}{23}{chapter.2}% 
+\contentsline {section}{\numberline {2.1}Introduction}{23}{section.2.1}% 
+\contentsline {section}{\numberline {2.2}Randomized subspace descent}{24}{section.2.2}% 
+\contentsline {subsection}{\numberline {2.2.1}Subspace selection}{24}{subsection.2.2.1}% 
+\contentsline {subsection}{\numberline {2.2.2}Random Subspace Proximal Gradient Algorithm}{26}{subsection.2.2.2}% 
+\contentsline {subsection}{\numberline {2.2.3}Analysis and convergence rate}{27}{subsection.2.2.3}% 
+\contentsline {subsection}{\numberline {2.2.4}Examples and Connections with the existing work}{30}{subsection.2.2.4}% 
+\contentsline {subsubsection}{Projections onto coordinates}{30}{section*.14}% 
+\contentsline {subsubsection}{Projections onto vectors of fixed variations}{30}{section*.15}% 
+\contentsline {subsubsection}{Comparison with sketching}{31}{section*.16}% 
+\contentsline {section}{\numberline {2.3}Adaptive subspace descent}{32}{section.2.3}% 
+\contentsline {subsection}{\numberline {2.3.1}Random Subspace Descent with Time-Varying Selection}{32}{subsection.2.3.1}% 
+\contentsline {subsection}{\numberline {2.3.2}Identification of proximal algorithms}{37}{subsection.2.3.2}% 
+\contentsline {subsection}{\numberline {2.3.3}Identification-based Subspace Descent}{38}{subsection.2.3.3}% 
+\contentsline {subsubsection}{How to update the selection}{38}{section*.19}% 
+\contentsline {subsubsection}{Practical Examples and Discussion}{39}{section*.21}% 
+\contentsline {paragraph}{Coordinate-wise projections}{39}{section*.22}% 
+\contentsline {paragraph}{Vectors of fixed variations}{40}{section*.23}% 
+\contentsline {subsubsection}{Practical consideration for TV}{41}{section*.24}% 
+\contentsline {section}{\numberline {2.4}Numerical illustrations}{41}{section.2.4}% 
+\contentsline {subsection}{\numberline {2.4.1}Experimental setup}{41}{subsection.2.4.1}% 
+\contentsline {subsection}{\numberline {2.4.2}Illustrations for coordinate-structured problems}{42}{subsection.2.4.2}% 
+\contentsline {subsubsection}{Comparison with standard methods}{42}{section*.25}% 
+\contentsline {subsubsection}{Comparison with \texttt {SEGA}}{43}{section*.27}% 
+\contentsline {subsection}{\numberline {2.4.3}Illustrations for total variation regularization}{44}{subsection.2.4.3}% 
+\contentsline {chapter}{\numberline {3}Distributed learning}{47}{chapter.3}% 
+\contentsline {section}{\numberline {3.1}Introduction}{47}{section.3.1}% 
+\contentsline {section}{\numberline {3.2}Notations and Preliminaries}{48}{section.3.2}% 
+\contentsline {paragraph}{Convergence and rate for strongly convex objectives}{50}{section*.32}% 
+\contentsline {paragraph}{Discussion on communication.}{50}{section*.33}% 
+\contentsline {paragraph}{Outline.}{51}{section*.34}% 
