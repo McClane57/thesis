@@ -7,9 +7,9 @@ In this chapter, we consider composite optimization problems of the form
 \end{equation}
 where $f$ is convex and differentiable, 
 %a $\mu$-strongly convex $L$-smooth function ({i.e.} differentiable with $L$-Lipschitz continous gradient) 
-and $r$ is convex and nonsmooth. 
-This type of problem appears extensively in signal processing and machine learning applications; we refer to e.g.\;\cite{candes2008enhancing}, \cite{combettes2011proximal}, \cite{bach2012optimization}, among a vast literature. Large scale applications in these fields call for first-order optimization, such as proximal gradient methods
-(see e.g.\;the recent\;\cite{teboulle2018simplified}) and coordinate descent algorithms (see e.g.\;the review\;\cite{wright2015coordinate}). 
+and $r$ is convex and nonsmooth (see Section \ref{sec:basics_composite}). 
+% This type of problem appears extensively in signal processing and machine learning applications; we refer to e.g.\;\cite{candes2008enhancing}, \cite{combettes2011proximal}, \cite{bach2012optimization}, among a vast literature. Large scale applications in these fields call for first-order optimization, such as proximal gradient methods
+% (see e.g.\;the recent\;\cite{teboulle2018simplified}) and coordinate descent algorithms (see e.g.\;the review\;\cite{wright2015coordinate}). 
 
 {\color{blue} As we already mentioned in Section \ref{sec:basics_identificationn} proximal methods could identify the structure of the final solution.}
 % % =========== identification =============
@@ -29,7 +29,7 @@ This type of problem appears extensively in signal processing and machine learni
 
 % ============= contributions ===========
 
-We propose randomized proximal algorithms leveraging on structure identification: our idea is to sample the variable space according to the structure of $r$. To do so, we first introduce a randomized descent algorithm going beyond separable nonsmoothness and associated coordinate descent methods:
+We propose randomized proximal algorithms leveraging on structure identification: our idea is to sample the variable space according to the structure of $r$ (see Examples \ref{ex:intro_coordinate_strata}, \ref{ex:intro_jump_strata}). To do so, we first introduce a randomized descent algorithm going beyond separable nonsmoothness and associated coordinate descent methods:
 we consider ``subspace descent" extending ``coordinate descent" to generic subspaces.
 Then, we use a standard identification property of proximal methods to adapt our sampling of the subspaces with the identified structure. This results in a structure-adapted randomized method with automatic dimension reduction, which 
 performs better in terms of dimensions explored compared standard proximal methods and the non-adaptive version.
@@ -41,7 +41,7 @@ The use of \emph{adaptive} probabilities is more limited; some heuristics withou
 are usually expensive to compute \cite{dhillon2011nearest,nutini2015coordinate,nutini2017let}. Bridging the gap between greedy and fixed importance sampling, \cite{perekrestenko2017faster,namkoong2017adaptive,stich2017safe} propose adaptive coordinate descent methods based on the coordinate-wise Lipschitz constants and current values of the gradient. 
 % I think we can avoid refering to :
 % One can also mention \cite{csiba2015stochastic} where the duality gap is used to adapt coordinate probabilities for the stochastic dual coordinate ascent method (SDCA).
-The methods proposed in the present paper, even when specialized in the coordinate descent case, are the first ones where the \emph{iterate structure enforced by a non-smooth regularizer} is used to adapt the selection probabilities.
+The methods proposed in the present chapter, even when specialized in the coordinate descent case, are the first ones where the \emph{iterate structure enforced by a non-smooth regularizer} is used to adapt the selection probabilities.
 
 % ======= outline =========
 {\color{red} Outline of the chapter. In Section~\ref{sec:mor-randomized-subspace}, we introduce the formalism for subspace descent methods. First, we formalize how to sample subspaces and introduce a first random subspace proximal gradient algorithm. Then, we show its convergence and derive its linear rate in the strongly convex case. Along the way, we make connections and comparisons with the literature on coordinate descent and sketching methods, notably in the special cases of $\ell_1$ and total variation regularization. In Section~\ref{sec:mor-adaptive-subspace}, we present our identification-based adaptive algorithm. We begin by showing the convergence of an adaptive generalization of our former algorithm; next, we show that this algorithm enjoys some identification property and give practical methods to adapt the sampling, based on generated iterates, leading to refined rates. Finally, in Section~\ref{sec:mor-numerical}, we report numerical experiments on popular learning problems to illustrate the merits and reach of the proposed methods.

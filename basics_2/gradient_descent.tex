@@ -10,11 +10,11 @@ Consider the ordinary differential equation (ODE)
 $$
 \frac{d x}{d t} = -\nabla f(x),
 $$
-then the values of $f(x)$ are decreasing along the trajectories of it \cite{cauchy1847methode}. Another way to see that anti-gradient is a descent direction is the following. From the definition of the gradient we could have that
+then the values of $f(x)$ are decreasing along the trajectories of it \cite{cauchy1847methode}. Another way to see that anti-gradient is a descent direction is the following. From the definition of the gradient, we could have that
 $$
 df_x(u) = \nabla f(x)^\top u,
 $$
-for any small vector. It implies, that in this first-order approximation the best direction to select is anti-gradient, that is exactly the idea of the gradient descent.
+for any small vector. It implies that in this first-order approximation, the best direction to select is anti-gradient, that is exactly the idea of the gradient descent.
 
 \begin{algorithm}
     \caption{Gradient Descent (GD)}
@@ -99,4 +99,4 @@ For the $\mu$-strongly convex objective function $f$ the optimal $\gamma= \frac{
 \|x^k-x^\star\|_2^2\leq\left(1-\frac{4\mu L}{(\mu + L)^2}\right)^k\|x^0-x^\star\|_2^2 = \left(\frac{\kappa - 1}{\kappa + 1}\right)^{2k}\|x^0-x^\star\|_2^2.
 \end{equation}
 
-{\color{blue} The convergence rate depends on $\kappa$ and it is faster if the problem is better-conditioned. For example, if the problem is $1$-conditioned, then only $1$ iteration of GD is enough to converge.}
+{\color{blue} The convergence rate depends on $\kappa$, and it is faster if the problem is better-conditioned. For example, if the problem is $1$-conditioned, then only $1$ iteration of GD is enough to converge.}

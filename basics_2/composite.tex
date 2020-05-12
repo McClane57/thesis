@@ -10,7 +10,7 @@ where $f$ is smooth and convex and $r$ is convex, non-smooth. Moreover, we consi
 
 
 \subsubsection{Proximal gradient descent}
-Let us start from the proximal gradient descent method with constant stepsize that performs alternatively the gradient step and the proximal one. This class of method is also known as iterative shrinkage-thresholding algorithms (ISTA) \cite{daubechies2004iterative}, also called forward-backward splitting method \cite{gabay1983chapter, combettes2011proximal, raguet2013generalized}.
+Let us start from the proximal gradient descent method with constant stepsize that performs the gradient step and the proximal one alternatively. This class of method is also known as iterative shrinkage-thresholding algorithms (ISTA) \cite{daubechies2004iterative}, also called forward-backward splitting method \cite{gabay1983chapter, combettes2011proximal, raguet2013generalized}.
 
 \begin{algorithm}
     \caption{Proximal Gradient Descent (ISTA)}
@@ -28,7 +28,7 @@ At every iterate of this method, additionally to the step of gradient descent al
 \begin{equation}\label{eq:step_pgd}
 x^{k+1} = \argmin_{z\in\RR^n}\left\{\underbrace{f(x^k) + \langle\nabla f(x^k), z-x^k\rangle+\frac{1}{2\gamma}\|x^k-z\|_2^2}_{\hat{f}(z, x^k)} + r(z)\right\}.
 \end{equation}
-If $\gamma\leq \frac{1}{L}$, where $L$ is a smoothness parameter of $f$ then $\hat{f}(z, x^k)$ is a convex upper-bound to $f$ that is tight at $x^k$. This allows to interpret proximal methods as a majorization-minimization algorithm \cite{mairal2015incremental}.
+If $\gamma\leq \frac{1}{L}$, where $L$ is a smoothness parameter of $f$ then $\hat{f}(z, x^k)$ is a convex upper-bound to $f$ that is tight at $x^k$. This allows to interpret proximal methods as a majorization-minimization algorithm \cite{lange2000optimization} {\color{blue} that is widely used in optimization problems for minimizing an objective function \cite{cappe2009line, neal1998view,gasso2009recovering,wright2009sparse,mairal2015incremental}. The idea of such methods in iterative minimizing of surrogate upper-bounds that leads to the objective function value downhill.}
 
 From this form it is easy to see that the stationary point of this algorithm is a minimizer of \eqref{eq:pb_composite}. Since objective in \eqref{eq:step_pgd} is strongly-convex we could write the optimality condition for fixed point
 \begin{align*}

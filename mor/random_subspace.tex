@@ -2,7 +2,7 @@
 \label{sec:mor-randomized-subspace}
 
 
-The premise of randomized subspace descent consists in repeating two steps: i) randomly selecting some subspace; and ii) updating the iterate over the chosen subspace. {Such algorithms thus extend usual coordinate descent to general sampling strategies, which requires algorithmic changes and an associated mathematical analysis. }
+The premise of randomized subspace descent consists in repeating two steps: i) randomly selecting some subspace; and ii) updating the iterate over the chosen subspace. {Such algorithms thus extend usual coordinate descent (see Section \ref{sec:basics_composite}) to general sampling strategies, which requires algorithmic changes and an associated mathematical analysis. }
 This section presents a subspace descent algorithm along these lines for solving \eqref{eq:main_problem}. In Section\;\ref{sec:sub}, we introduce our subspace selection procedure. We build on it to introduce, in Section\;\ref{sec:algo}, our first subspace descent algorithm, the convergence of which is analyzed in Section\;\ref{sec:conv}. Finally, we put this algorithm into perspective in Section\;\ref{sec:comparison} by connecting and comparing it to related work.
 
 % ===============================================================
@@ -104,35 +104,35 @@ Consider the family of the axes from Example~\ref{ex:axes} and the selection gen
 % ===============================================================
 % ===============================================================
 
-An iteration of the proximal gradient algorithm (Algorithm \ref{algo:pgd})
-decomposes in two steps (sometimes called ``forward'' and  ``backward''):
-\begin{subequations}\label{eq:pgGradProx}
-    \begin{align}
-    \label{eq:pgGrad} z^k &= x^{k} - \gamma \nabla f(x^k)\\
-        \label{eq:pgProx} x^{k+1} &= \rprox(z^k)
-\end{align}
-\end{subequations}
-where the proximal operator is well-defined when $r$ is a proper, lower semi-continuous convex function \cite[Def.~12.23]{bauschke2011convex}. Furthermore, it is computationally cheap to compute in several cases, either from a closed form ({e.g.} for $\ell_1$-norm, $\ell_1/\ell_2$-norm, see among others \cite{combettes2008proximal} and references therein), or by an efficient procedure ({e.g.} for the 1D-total variation, projection on the simplex, see \cite{yuan2011efficient,condat2013direct}).
+% An iteration of the proximal gradient algorithm (Algorithm \ref{algo:pgd})
+% decomposes in two steps (sometimes called ``forward'' and  ``backward''):
+% \begin{subequations}\label{eq:pgGradProx}
+%     \begin{align}
+%     \label{eq:pgGrad} z^k &= x^{k} - \gamma \nabla f(x^k)\\
+%         \label{eq:pgProx} x^{k+1} &= \rprox(z^k)
+% \end{align}
+% \end{subequations}
+% where the proximal operator is well-defined when $r$ is a proper, lower semi-continuous convex function \cite[Def.~12.23]{bauschke2011convex}. Furthermore, it is computationally cheap to compute in several cases, either from a closed form ({e.g.} for $\ell_1$-norm, $\ell_1/\ell_2$-norm, see among others \cite{combettes2008proximal} and references therein), or by an efficient procedure ({e.g.} for the 1D-total variation, projection on the simplex, see \cite{yuan2011efficient,condat2013direct}).
 
+An iteration of the proximal gradient algorithm ISTA (Algorithm \ref{algo:pgd}) decomposes in gradient and proximal steps. In order to construct a ``subspace'' version of the proximal gradient, one has to determine which variable will be updated along the randomly chosen subspace (which we will call a projected update). In Section \ref{sec:basics_composite} we already presented Algorithm \ref{algo:cd_composite} where a projected update of $x^k$,  i.e. projecting after the proximity operation is used. This choice has limited interest in the general case where the proximity operator is not separable along subspaces and thus a projected update of $x^k$ still requires the computations of the full gradient. In the favorable case of coordinate projection and $r=\|\cdot\|_1$, it was studied in \cite{qu2016coordinate} using the fact that the projection and the proximity operator commute. Another possible choice is to project an update of $\nabla f(x^k)$,  i.e. projecting after the gradient. This option is considered recently in \cite{hanzely2018sega} in the slightly different context of sketching. A further discussion on related literature is postponed to Section~\ref{sec:comparison}. In this work, we will consider projecting after the gradient \emph{step}.
+% Three choices are possible: 
+% \begin{itemize}
+%     \item[(a)] a projected update of $x^k$,  i.e. projecting after the proximity operation;
+%     \item[(b)] a projected update of $\nabla f(x^k)$,  i.e. projecting after the gradient;
+%     \item[(c)] a projected update of $z^k$,  i.e. projecting after the gradient \emph{step}.
+% \end{itemize}
+% Choice (a) has limited interest in the general case where the proximity operator is not separable along subspaces and thus a projected update of $x^k$ still requires the computations of the full gradient. In the favorable case of coordinate projection and $r=\|\cdot\|_1$, it was studied in \cite{qu2016coordinate} using the fact that the projection and the proximity operator commute. Choice (b) is considered recently in \cite{hanzely2018sega} in the slightly different context of sketching. A further discussion on related literature is postponed to Section~\ref{sec:comparison}.
 
-In order to construct a ``subspace'' version of the proximal gradient \eqref{eq:pgGradProx}, one has to determine which variable will be updated along the randomly chosen subspace (which we will call a projected update). Three choices are possible: 
-\begin{itemize}
-    \item[(a)] a projected update of $x^k$,  i.e. projecting after the proximity operation;
-    \item[(b)] a projected update of $\nabla f(x^k)$,  i.e. projecting after the gradient;
-    \item[(c)] a projected update of $z^k$,  i.e. projecting after the gradient \emph{step}.
-\end{itemize}
-Choice (a) has limited interest in the general case where the proximity operator is not separable along subspaces and thus a projected update of $x^k$ still requires the computations of the full gradient. In the favorable case of coordinate projection and $r=\|\cdot\|_1$, it was studied in \cite{qu2016coordinate} using the fact that the projection and the proximity operator commute. Choice (b) is considered recently in \cite{hanzely2018sega} in the slightly different context of sketching. A further discussion on related literature is postponed to Section~\ref{sec:comparison}.
+% In this paper, we will consider %\footnote{Options (b) and (c) will be compared theoretically and practically.} 
+% Choice (c), 
+This choice inspired by recent works highlighting that combining iterates usually works well in practice (see \cite{mishchenko2018} and references therein). However, taking gradient steps along random subspaces introduce bias and thus such a direct extension fails in practice. In order to retrieve convergence to the optimal solution of \eqref{eq:main_problem}, we slightly modify the proximal gradient iterations by including a correction featuring the inverse square root of the expected projection denoted by $ \bQ= \bP^{-1/2}$ (note that as soon as the selection is admissible, $ \bQ$ is well defined from Lemma~\ref{lm:eligible}).
 
-In this paper, we will consider %\footnote{Options (b) and (c) will be compared theoretically and practically.} 
-Choice (c), inspired by recent works highlighting that combining iterates usually works well in practice (see \cite{mishchenko2018} and references therein). However, taking gradient steps along random subspaces introduce bias and thus such a direct extension fails in practice. In order to retrieve convergence to the optimal solution of \eqref{eq:main_problem}, we slightly modify the proximal gradient iterations by including a correction featuring the inverse square root of the expected projection denoted by $ \bQ= \bP^{-1/2}$ (note that as soon as the selection is admissible, $ \bQ$ is well defined from Lemma~\ref{lm:eligible}).
-
-
-Formally, our Random Proximal Subspace Descent algorithm \algo, displayed as Algorithm~\ref{alg:strata_nondis}, replaces \eqref{eq:pgGrad} by 
+Formally, our Random Proximal Subspace Descent algorithm \algo, displayed as Algorithm~\ref{alg:strata_nondis}, replaces the gradient step in Algorithm \ref{algo:pgd} by 
 \begin{equation}\label{eq:grad_step}
     y^k = \bQ\left(x^k - \gamma\nabla f\left(x^k\right)\right)\qquad\text{and}\qquad
     z^{k} = P_{\Sel^k} \left(y^k\right) + (I- P_{\Sel^k} ) \left(z^{k-1}\right).
 \end{equation}
-That is, we propose to first perform a gradient step followed by a change of basis {(by multiplication with the positive definite matrix $\bQ$), giving variable $y^k$}; then, variable $z^k$ is updated only in the random subspace $\Sel^k$: to  $P_{\Sel^k} \left(y^k\right)$ in $\Sel^k$, and keeping the same value outside. Note that $y^k$ does not actually have to be computed and only the ``$P_{\Sel^k}\bQ$-sketch'' of the gradient (i.e.\;$ P_{\Sel^k}\bQ\nabla f\left(x^k\right)$) is needed. Finally, the final proximal operation \eqref{eq:pgProx} is performed {after getting back to the original space (by multiplication with $\bQ^{-1}$)}:
+That is, we propose to first perform a gradient step followed by a change of basis {(by multiplication with the positive definite matrix $\bQ$), giving variable $y^k$}; then, variable $z^k$ is updated only in the random subspace $\Sel^k$: to  $P_{\Sel^k} \left(y^k\right)$ in $\Sel^k$, and keeping the same value outside. Note that $y^k$ does not actually have to be computed and only the ``$P_{\Sel^k}\bQ$-sketch'' of the gradient (i.e.\;$ P_{\Sel^k}\bQ\nabla f\left(x^k\right)$) is needed. Finally, the final proximal operation in forward-backward algorithm is performed {after getting back to the original space (by multiplication with $\bQ^{-1}$)}:
 \begin{align}\label{eq:prox_step}
    x^{k+1} = \rprox \left(\bQ^{-1}\left(z^{k}\right)\right).
 \end{align}
@@ -361,7 +361,7 @@ The vast majority of randomized subspace methods consider the coordinate-wise pr
 \begin{equation}\label{eq:TV}
     r(x) = \sum_{i=2}^n |x_{[i]}-x_{[i-1]}|
 \end{equation}
-featured for instance in the fused lasso problem \cite{tibshirani2005sparsity}. In order to project onto subspaces of vectors of fixed variation (i.e. vectors for which $x_{[j]} = x_{[j+1]}$ except for a prescribed set of indices), one can define the following covering family 
+featured for instance in the fused lasso problem \cite{tibshirani2005sparsity} (see Example \ref{ex:intro_jump_strata}). In order to project onto subspaces of vectors of fixed variation (i.e. vectors for which $x_{[j]} = x_{[j+1]}$ except for a prescribed set of indices), one can define the following covering family 
 {
 $$ \C = \{\C_1,..,\C_{n-1}\} \quad\text{ with } \C_i = \left\{x\in\mathbb{R}^n  : x_{[j]} = x_{[j+1]} \text{ for all } j\in \{1,..,n-1\}\setminus\{i\}  \right\} $$ }
 and an admissible selection $\Sel$ consisting in selecting uniformly $s$ elements in $\C$. {

@@ -10,7 +10,7 @@ $$
 where $f_i$ as=re convex and differentiable.
 }
 
-Since $r$ is non-smooth we could not calculate the gradient of it at any arbitrary point that leads to the other type of optimization methods for such methods. {\color{blue}Let us start with the definition of the object that could replace gradients for non-smooth functions.}
+Since $r$ is non-smooth, we could not calculate the gradient of it at any arbitrary point that leads to the other type of optimization methods for such methods. {\color{blue}Let us start with the definition of the object that could replace gradients for non-smooth functions.}
 
 \begin{definition}[Subgradient]
 Consinder convex function $r$. Vector $g$ is called subgradient of $r$ at point $y\in\dom r$ if for any $x\in\dom r$ holds
@@ -39,7 +39,7 @@ Now we are ready to present one of the basic algorithm \cite[Chapter $3$]{nester
     \end{algorithmic}
 \end{algorithm}
 
-As we could see from the definition, the norm of subgradient could be different, that is why in the algorithm used the normalized version. It is clear, that this method is worse than the gradient descent, as far as the direction of $-g^k$ has no reason to be the descent direction see Figure \ref{fig:nonsmooth_approx}. This explains the usage of decreasing stepsizes to converge to the minimizer and stay in its neighborhood after the next step.
+As we could see from the definition, the norm of subgradient could be different; that is why the algorithm used the normalized version. It is clear that this method is worse than the gradient descent; as far as the direction of $-g^k$ has no reason to be the descent direction, see Figure \ref{fig:nonsmooth_approx}. This explains the usage of decreasing stepsizes to converge to the minimizer and stay in its neighborhood after the next step.
 
 
 \begin{figure}[H]
@@ -60,11 +60,11 @@ Given a convex function $r:\RR^n\rightarrow \RR$, the proximal operator of $r$ i
 \prox_r(x) = \argmin_{y\in\RR^n}\left\{r(y) + \frac{1}{2}\|x-y\|_2^2\right\}.
 \end{equation}
 \end{definition}
-Since $r$ is convex, the objective of $\argmin$ is strongly convex that means the proximal operator of any point is well defined and unique.
+Since $r$ is convex, the objective of $\argmin$ is strongly convex, which means the proximal operator of any point is well defined and unique.
 
-In machine learning applications many regularizers are relatively simple that makes the computation of proximal operator cheap. More precisely, a proximal operator for such problems usually has a closed-form solution ($\ell_1$, Group-Lasso) or could be computed iteratively (TV). Moreover, if $r$ is the indicator function of a convex set, the proximal operator is an orthogonal projection onto this set. 
+In machine learning applications, many regularizers are relatively simple that makes the computation of proximal operator cheap. More precisely, a proximal operator for such problems usually has a closed-form solution ($\ell_1$, Group-Lasso) or could be computed iteratively (TV). Moreover, if $r$ is the indicator function of a convex set, the proximal operator is an orthogonal projection onto this set. 
 
-{\color{blue} Before presenting proximal algorithms let us recall some important properties of the proximal operator that will be useful.
+{\color{blue} Before presenting proximal algorithms, let us recall some important properties of the proximal operator that will be useful.
 First, let us present the lemma about the optimal solution of \eqref{eq:pb_r} that shows the interest of the proximal operator \cite[Section $2.3$]{parikh2014proximal}.
 
 \begin{lemma}\label{lm:stationary_point}
@@ -101,7 +101,7 @@ Thus, by the definition of subdifferential we have
 $$
 r(y^\prime)\geq r(x^\prime) + \langle x - x^\prime, y^\prime- x^\prime\rangle~~~~~\textnormal{and}~~~~~r(x^\prime)\geq r(y^\prime) + \langle y - y^\prime, x^\prime- y^\prime\rangle.
 $$
-Summing up these inequalities we get the statement of the lemma.
+Summing up these inequalities, we get the statement of the lemma.
 \end{proof}
 
 Finally, let us introduce the connection between proximal operator and subdifferential of function $r$ \cite{parikh2014proximal}.
@@ -159,5 +159,5 @@ is decreasing (in terms of $\|\cdot\|_1$, that motivates the following proximal 
     \end{algorithmic}
 \end{algorithm}
 
-This algorithm converges to the minimizer if this minimizier exists (see for example Theorem $23.41$ \cite{bauschke2011convex}).
-% The result above shows that in particular, the resolvent of subdifferential is a single-valued.
+This algorithm converges to the minimizer if this minimizer exists (see, for example, Theorem $23.41$ \cite{bauschke2011convex}).
+% The result above shows that in particular, the resolvent of subdifferential is single-valued.

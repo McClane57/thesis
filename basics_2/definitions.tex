@@ -12,7 +12,7 @@ $$
 Moreover, function $f$ is called $\mu$-strongly convex if function $g = f - \frac{\mu}{2}\|x\|_2^2$ is convex.
 \end{definition}
 
-From this definition we could immediately get the following interpretation for smooth functions $f$ that is more practical for further analysis. 
+From this definition, we could immediately get the following interpretation for smooth functions $f$ that is more practical for further analysis. 
 
 \begin{lemma}\label{lm:convex}[Theorem $2.1.2$ \cite{nesterov-book}]
     A continuously differentiable function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex iff for any $x,y\in\mathbb{R}^n$, we have
@@ -41,7 +41,7 @@ f(\alpha x + (1-\alpha)y) \leq f(y) - \langle \nabla f(\alpha x + (1-\alpha)y), 
 $$
 we immediately get \eqref{eq:conv_def}. 
 
-The proof of \eqref{eq:convex_2} immediately follows from the definition of the strongly convexity.
+The proof of \eqref{eq:convex_2} immediately follows from the definition of the strong convexity.
 \end{proof}
 
 Convexity implies that any stationary point is a global minima of $f$. In addition, the strong convexity implies the existence and uniqueness of $x^\star = \argmin_{x\in\mathbb{R}^n} f(x)$.
@@ -56,7 +56,7 @@ Differentiable function $f$ is called $L$-smooth if its gradient is $L$-Lipschit
 for any $x,y\in\mathbb{R}^n$.
 \end{definition}
 
-If function $f$ is $L$-smooth then the following upper bound takes place.
+If function $f$ is $L$-smooth, then the following upper bound takes place.
 
 \begin{lemma}\label{lm:descent}[Theorem $2.1.5$ \cite{nesterov-book}]
     Let us assume that $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex and $L$-smooth, then for any $x,y\in\mathbb{R}^n$

@@ -1,0 +1,246 @@
+\section{Sparsification of \dave}\label{sec:distributed-sparse}
+
+In this section, we present our distributed algorithm for solving \eqref{eq:pb} with sparse upward communications.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sparsification of local updates}\label{sec:algo}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+In the proposed method, the master machine asynchronously gathers \emph{sparsified} delayed gradient updates from slaves and sends them the current point. More specifically, each slave independently computes a gradient step on its local loss for a randomly drawn subset of coordinates only.
+The master machine keeps track of the weighted average of the most recent slave outputs, computes the proximity operator of the regularizer at this average point, and sends this result back to the updating worker $i^k$. 
+
+Thus the $k$-th iteration of our algorithm is the following.
+The randomly drawn subset of entries that worker $i^k$ updates at\;$k$ is called \emph{mask} and is denoted by $\mathbf{S}^k$ (in bold, to emphasize that it is the \emph{only} random variable in the algorithm).
+Iteration $k$ of our algorithm thus writes
+\begin{subequations}
+%\label{alg:base}
+ \begin{align*}
+%\label{alg:base1}
+x_{i[j]}^k &= \left\{ 
+\begin{array}{ll}
+ \!\!\!\left( x^{k-D_i^k}    - \gamma \nabla f_i( x^{k-D_i^k}) \right)_{[j]}  \hspace*{-0.2cm}  &  \hspace*{0ex} \text{ if } \left| \begin{array}{l}
+    i = i^k\\ j\in\mathbf{S}^{k-D_i^k}
+ \end{array} \right.  \\[0.5cm]
+x_{i[j]}^{k-1} & \hspace*{1ex}\text{ otherwise }
+\end{array}
+\right.
+% x_{i[j]}^k &= \left\{ 
+% \begin{array}{ll}
+%  \left( x^{k-D_i^k}    - \gamma \nabla f_i( x^{k-D_i^k}) \right)_{[j]}  \hspace*{-0.2cm}  &  \hspace*{-0.2cm} \begin{array}{l}
+%   \text{ if }  i = u^k \\
+%   \text{ and } j\in\mathbf{S}^{k-D_i^k}
+%  \end{array}  \\[0.5cm]
+% x_{i[j]}^{k-1} & \text{ otherwise }
+% \end{array}
+% \right.
+\\[-0.5ex]
+%\label{alg:base2}  
+% x^k &= \rprox \underbrace{\left( \sum_{i=1}^M \alpha_i x_i^k \right)}_{:=\barx^k} .
+x^k &= \rprox \left(\barx^k\right) \qquad \text{with }\quad \barx^k=\sum_{i=1}^M \alpha_i x_i^k ,
+\end{align*}
+\end{subequations}
+
+
+\begin{assumption}[On the random sparsification]
+\label{hyp:algo}
+The sparsity mask selectors $(\mathbf{S}^k)$ are independent and identically distributed random variables. We select a coordinate in the mask as follows:
+\[
+\mathbb{P}[j\in\mathbf{S}^k] = p_j > 0 ~~~~~ \text{for all $j\in\{1,..,n\}$,}
+\]
+with $\pvec = (p_1,..,p_n) \in(0,1]^n$.
+We denote
+$
+\pmax = \max_i p_i ~~~\text{and}~~~ \pmin = \min_i p_i.
+$
+\end{assumption}
+
+
+
+The mask selectors $(\mathbf{S}^k)$ being the only random variables of the algorithm,  it is natural to define the filtration $\mathcal{F}^k = \sigma( \{\mathbf{S}^\ell\}_{\ell<k} )$ so that all variables at time $k$ ($x_i^k$, $\barx^k$, $x^k$, $d_i^k$, $D_i^k$) are $\mathcal{F}^k$-measurable but $\mathbf{S}^k$ is not. This filtration will be used in the proofs.
+
+
+
+With the sparsification, this iteration corresponds to one iteration of randomized (block-)coordinate descent, locally at the worker. However, our algorithm does not correspond to an asynchronous stochastic block-coordinate descent algorithm \cite{liu2015asynchronous,sun2017asynchronous,peng2016arock,richtarik2016distributed}, since our method maintains a variable, $\barx^k$, aggregating all the workers' contributions asynchronously.
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Distributed implementation.}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+The proposed algorithm \salgo is generic as none of its ingredients (including the stepsize choice) depend on the computing system  (data distribution, agents delays). A unique feature of this algorithm is that although each master update relies on only one agent (and thus part of the data), all the data is always implicitly involved in the master variable, with even proportions. This allows the algorithm to cope with the heterogeneity of the computing system. Its presentation uses the following notation:
+for a vector of $x\in\mathbb{R}^n$ and a subset $S$ of $\{1,..,n\}$, $[x]_{S}$ denotes the sparse size-$n$ vector where $S$ is the set of non-null entries, for which they match those of $x$, i.e. $([x]_{S})_{[i]} = x_{[i]}$ if $i\in S$ and $0$ otherwise.
+
+The algorithm \salgo has the same arguments as \dave~plus a probability vector (see Assumption~\ref{hyp:algo}).
+
+\begin{algorithm}
+\caption{\textsc{\salgo} on $((\alpha_i),(f_i), r  ~ ; ~  p)$ with stopping criterion $\mathsf{C}$}
+\label{alg:spy}
+
+\tcbset{width=0.48\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
+
+\begin{tcolorbox}[title=\textsc{Master} \vphantom{\texttt{Worker  i}}]
+Initialize $\bar x^0$\\
+%Send $\overline x$ to each machine\\
+\While{stopping criterion $\mathsf{C}$ not verified}{
+    \hspace*{0ex}\\
+     {\color{blue!70!black}Receive\,$[\Delta^k]_{\mathbf{S}^{k-D_{i^k}^k}}$\,from\,agent\,$i^k$}\\
+     $\barx^k \leftarrow \barx^{k-1} + \alpha_i[\Delta^k]_{\mathbf{S}^{k-D_{i^k}^k}} $\\
+     $ x^k \leftarrow \rprox(\bar x^k )$\\
+    Draw sparsity mask $\mathbf{S}^k$\\[0.5ex]
+    {\color{red!80!yellow} Send $x^k, \mathbf{S}^k$ to agent $i^k$}\\
+    $k\leftarrow k+1$
+}
+Interrupt all slaves\\
+\textbf{Output} $x^k$
+\end{tcolorbox}
+\tcbset{width=0.48\columnwidth, colframe=black!50!black, coltitle=white, colbacktitle=black}
+\begin{tcolorbox}[title=\textsc{Worker } $i$]
+Initialize $x_i = x_i^+0$\\
+\While{not interrupted by master}{
+    \hspace*{0.1ex}\\
+     {\color{red!80!yellow}Receive  $x$ and $\mathbf{S}$ from master}\\
+    $[x^+_i]_{\mathbf{S}}   \leftarrow [  x - \gamma \nabla f_i( x)]_{\mathbf{S}} $\\[0.6ex]
+    $\Delta \leftarrow x_i^+ - x_i $ \\[0.7ex]
+    {\color{blue!70!black}Send $[\Delta]_{\mathbf{S}}$ to master}\\[0.7ex]
+    $[x_i]_{\mathbf{S}} \leftarrow [x^+_i]_{\mathbf{S}} $%\\[0.7ex]
+}
+\vspace*{1.6cm}
+\end{tcolorbox}
+\vspace*{-0cm}
+\end{algorithm}
+
+
+The communications per iteration are (i) a blocking {\color{blue!70!black}send/receive} from a slave to the master (in {\color{blue!70!black}blue}) of size $|\mathbf{S}|$, and (ii) a blocking {\color{red!80!yellow}send/receive} from the master to the last updating slave (in {\color{red!80!yellow}red}) of the current iterate.
+The upward communication is thus made sparse by the algorithm, and the downward communication cost depends on the structure of $x^k$, which is the output of a proximal operator on $r$. In the case of $\ell_1$-regularization, $x^k$ will become sparse after some iterations, leading to a two-way sparse algorithm. This particular case will be investigated in details in Section~\ref{sec:distributed-adaptive}. 
+
+
+
+Without sparsification (i.e.\;$\mathbf{S}^{k}= \{1\,\ldots,n\}$ at any time $k$), this iteration corresponds to the one of the asynchronous proximal-gradient algorithm \dave \cite{ICML18}.
+
+
+This distinguishing feature is inspired by \dave \cite{mishchenko2018}: though it may appear conservative, it performs well in practice due to the stability of the produced iterations. The intuitive reason is that combining delayed points is more stable than using a combination of delayed directions; see the numerical comparisons of section 2.4 of \cite{mishchenko2018} and section 5 of \cite{ICML18}. 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Convergence Analysis}\label{sec:analyze}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+We study the convergence properties of our algorithm under standard assumptions on the learning problem\;\eqref{eq:pb} and no apriori assumption on the system (neither on delays nor on data distribution).
+
+
+
+
+
+
+We emphasize here that we do not put assumptions on the delays; for instance they do not to need to be bounded or independent of the previous mask selectors $(\mathbf{S}^k)$. 
+
+\begin{theorem}[Reach and Limits of Sparsification]\label{lm:spy_diff}
+Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth. Let $r$ be convex lsc. 
+
+Suppose that Assumption~\ref{hyp:algo} holds for the probability vector $\pvec$, and take $\gamma \in (0, \frac{2}{\mu + L}]$,  then \salgo on $((\alpha_i),(f_i), r  ~ ; ~  p)$ verifies for all $k\in [k_m, k_{m+1})$
+\begin{align}
+\label{eq:dif_prob}
+   \mathbb{E} \left\| x^k - x^\star \right\|^2 \le \left( \pmax (1 - \gamma \mu)^2 + 1 - \pmin  \right)^{m} \max_i\left\|x_i^0-x_i^\star\right\|^2,
+\end{align}
+with the shifted local solutions $x_i^\star = x^\star - \gamma_i\nabla f_i(x^\star)$. 
+
+Furthermore, using the maximal stepsize $\gamma = \frac{2}{\mu + L}$, we obtain for all $k\in [k_m, k_{m+1})$
+\begin{align}
+\label{eq:ratebefore}
+ \mathbb{E}   \left\| x^k - x^\star \right\|^2 \le \left( \pmax \left(\frac{1-\kappa_{\eqref{eq:pb}}}{1+\kappa_{\eqref{eq:pb}}}\right)^2 + 1 - \pmin  \right)^{m} \max_i\left\|x_i^0-x_i^\star\right\|^2.
+\end{align}
+\end{theorem}
+
+\begin{proof}[Proof of Theorem \ref{lm:spy_diff}]\label{apx:proofsparse}
+
+
+The co-existence of both deterministic and stochastic delays in the algorithm calls for a fundamental mathematical analysis using the notation introduced in Section\;\ref{sec:distributed-prelim}, and in particular the notion of epoch sequence \eqref{eq:km}.
+
+First, let us notice that the local iterates $(x_i)$ do not converge to a minimizer of the individual functions $(f_i)$ since the algorithm aims at minimizing the global loss but rather to local shifts of the solution $x^\star$ of~\eqref{eq:pb} (unique from the strong convexity assumption):
+\[
+x_i^\star = x^\star - \gamma \nabla f_i(x^\star) \qquad \text{for slave $i$}.
+\]
+From those, one can define $\barx^\star = \sum_{i=1}^M \alpha_i x_i^\star$. First-order optimality conditions 
+\begin{align*}
+    0\in \sum_i \alpha_i \nabla f_i(x^\star) + \partial r(x^\star)
+\end{align*}
+imply that 
+\[
+\barx^\star = \sum_{i=1}^M \alpha_i x_i^\star = x^\star - \gamma \sum_{i=1}^M \alpha_i \nabla f_i(x^\star) \in x^\star  + \gamma \partial r(x^\star)
+\]
+which directly leads to $\rprox(\barx^\star) = x^\star$ (see Chap.\;16 of\;\cite{bauschke2011convex}).
+
+We can now lay down the proof using these above-defined variables. For a time $k$ and a worker $i$, we have that $x_i^k = x_i^{k-d_i^k}$ depends on i) $x^{k-D_i^k}$ which is $\mathcal{F}^{k-D_i^k}$-measurable; and ii) $\mathbf{S}^{k-D_i^k}$ which is i.i.d.\,. First, we are going to control the term $\|x_i^k - x_i^\star\|^2$.
+
+% We consider first Option I of Assumption~\ref{hyp:algo}. 
+Let us define $\|x\|_p^2 = \sum_{i=1}^d p_ix_{[i]}^2$ where  $(p_1,..,p_d)$ is the vector of probabilities of Assumption~\ref{hyp:algo}. The conditional  expectation can be developed as follows:
+\begin{align*}
+    \mathbb{E}[\|x_i^k - x_i^\star\|^2 | \mathcal{F}^{k-D_i^k} ]
+    =~ &  \mathbb{E}[\|x_i^{k-d_i^k} - x_i^\star\|^2 | \mathcal{F}^{k-D_i^k} ] = \sum_{j=1}^d  \mathbb{E}[ (x_{i[j]}^{k-d_i^k} - x_{i[j]}^\star)^2 | \mathcal{F}^{k-D_i^k} ] \\ 
+    =~ & \| x^{k-D_i^k} - \gamma \nabla f_i(x^{k-D_i^k})  - (  {x}^{\star} - \gamma \nabla f_i(x^\star) ) \|^2_p + \| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2_{1-p}.
+\end{align*}
+
+
+Let us now bound both terms of this sum above using $\pmax = \max_i p_i$ and $\pmin = \min_i p_i$.
+\begin{align*}
+   &  \| x^{k-D_i^k} - \gamma \nabla f_i(x^{k-D_i^k})  - (  {x}^{\star} - \gamma \nabla f_i(x^\star) ) \|^2_p     + \| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2_{1-p}\\
+    & ~~~~ \leq  \pmax\| x^{k-D_i^k} - \gamma \nabla f_i(x^{k-D_i^k})  - (  {x}^{\star} - \gamma \nabla f_i(x^\star) ) \|^2  + (1-\pmin)\| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2.
+\end{align*}
+We now use the $\mu$-strong convexity and $L$-smoothness of $f_i$ to write (see Lemma \ref{lm:bubeck}),
+\begin{align*}
+    \| x^{k-D_i^k} &- \gamma \nabla f_i(x^{k-D_i^k})  - (  {x}^{\star} - \gamma \nabla f_i(x^\star) ) \|^2\\
+    & \leq \left( 1 - \frac{2\gamma \mu L}{\mu+L} \right) \left\| x^{k-D_i^k} - x^\star \right\|^2  - \gamma \left( \frac{2}{\mu + L} - \gamma\right)   \left\|\nabla f_i(x^{k-D_i^k}) - \nabla f_i(x^\star) \right\|^2 \\
+        & \leq \left[ \left( 1 - \frac{2\gamma \mu L}{\mu+L} \right) - \mu^2 \gamma \left( \frac{2}{\mu + L} - \gamma\right)  \right] \left\| x^{k-D_i^k} - x^\star \right\|^2  \\
+        &=     \left( 1 - \gamma \mu \right)^2 \left\| x^{k-D_i^k} - x^\star \right\|^2.
+\end{align*}
+Thus, for any $\gamma \in (0,2/(\mu+L)]$, one can drop the last non-negative term, 
+\begin{align*}
+    \mathbb{E}[\|x_i^k - x_i^\star\|^2 | \mathcal{F}^{k-D_i^k} ]&\leq
+     \pmax \left(1-\gamma\mu\right)^2 \left\| x^{k-D_i^k} - x^\star \right\|^2 + (1-\pmin) \| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2 \\
+    &\leq \pmax \left(1-\gamma\mu\right)^2 \left\| \overline{x}^{k-D_i^k} - \overline{x}^\star \right\|^2 + (1-\pmin) \| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2,
+\end{align*}
+where we used that $\| x^{k-D_i^k} - x^\star \|^2 = \| \rprox (\overline{x}^{k-D_i^k}) - \rprox(\overline{x}^\star) \|^2 \leq \| \overline{x}^{k-D_i^k} - \overline{x}^\star \|^2 $ by definition and non-expansiveness of the proximity operator of $r$. 
+
+
+Taking full expectation on both sides, we get 
+\begin{align*}
+    \mathbb{E}\|x_i^k - x_i^\star\|^2 &\leq \pmax \left(1-\gamma\mu\right)^2 \mathbb{E}\left\| \overline{x}^{k-D_i^k} - \overline{x}^\star \right\|^2 + (1-\pmin) \mathbb{E}\| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2.
+\end{align*}
+Then,  using that $\overline{x}^{k-D_i^k} - \overline{x}^\star  =  \sum_{i=1}^M \alpha_i ( {x}_i^{k-D_i^k} - \overline{x}_i^\star)$ and the convexity of $\|\cdot\|^2$, we get
+\begin{align*}
+    \mathbb{E}\|x_i^k - x_i^\star\|^2 
+   \leq ~ &\pmax \left(1-\gamma\mu\right)^2 \sum_{j=1}^M \alpha_j \mathbb{E}\left\| x_j^{k-D_i^k} - x_j^\star \right\|^2 
+ + (1-\pmin)\mathbb{E} \| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2 \\
+   \leq ~ &\pmax \left(1-\gamma\mu\right)^2 \max_{j=1,..,M} \mathbb{E}\left\| x_j^{k-D_i^k} - x_j^\star \right\|^2 
+ + (1-\pmin) \max_{j=1,..,M}  \mathbb{E}\| x_{j}^{k-D_i^k} - {x}_{j}^{\star}\|^2 \\
+   \leq ~ & \left( \pmax\left(1-\gamma\mu\right)^2  + 1 - \pmin \right) \max_{j=1,..,M} \mathbb{E}\left\| x_j^{k-D_i^k} - x_j^\star \right\|^2.
+\end{align*}
+Let $c_k = \max_{i=1,..,M} \mathbb{E}\left\| x_j^{k} - x_j^\star \right\|^2$ and $\beta = \left( \pmax\left(1-\gamma\mu\right)^2  + 1 - \pmin \right)$, then the above result implies that
+$$
+    c_{k} \leq \beta \max_{j=1,..,M} c_{k-D_j^k}
+$$
+and using the definition of the sequence $(k_m)$, we get 
+\begin{align*}
+    c_{k_m} &\leq \beta ~ \max_{j} c_{k_m-D_j^{k_m}} \leq  \beta \max_{\ell\in[k_{m-1},k_m)} c_{\ell} \\
+  c_{k_m+1} &\leq  \beta ~ \max( c_{k_m} , \max_{\ell\in[k_{m-1},k_m)} c_{\ell}) \leq  \beta \max_{\ell\in[k_{m-1},k_m)} c_{\ell}.
+\end{align*}
+Thus for all $k \geq k_m$, $ c_k \leq  \beta ~ \max_{\ell\in[k_{m-1},k_m)} c_{\ell}$. This implies that the sequence $\widetilde{c}_{m}$ defined by $\widetilde{c}_{m}= \max_{\ell\in[k_{m},k_{m+1})} c_{\ell}$ has an exponential bound:
+\begin{equation*}
+    \widetilde{c}_{m} \leq   \beta ~ \widetilde{c}_{m-1} \leq \beta^m ~ \widetilde{c}_{0}\leq \beta^m ~ \max_{i=1,..,M} \|x_i^0 - x_i^\star\|^2.
+\end{equation*}
+
+Finally, it suffices to use once again the non-expansivity of the proximity operator of $r$ and the definitions to get that for all $k\in [k_m,k_{m+1}),$
+\begin{align}\label{eq:spy_rate}
+ \mathbb{E}\|x^k - x^\star\|^2 ~\leq~ \mathbb{E}\|\overline{x}^k - \overline{x}^\star\|^2 
+    ~\leq~ \sum_{i=1}^M \alpha_i \mathbb{E}\|{x}_i^k - {x}_i^\star\|^2
+    ~\leq~ c_k ~\leq~ \beta^m  \max_{i=1,..,M} \|x_i^0 - x_i^\star\|^2,
+\end{align}
+which concludes the proof.
+\end{proof}
+
+This result establishes bounds that may or may not lead to convergence, depending on the selection probabilities. First, if all probabilities are equal to $1$, the algorithm boils down to \dave~and Theorem~\ref{lm:spy_diff} coincides with Theorem~\ref{th:davepg}. However, in more general cases, this result has to be interpreted more carefully as developed in the following section.

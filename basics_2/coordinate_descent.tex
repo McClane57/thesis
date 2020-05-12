@@ -1,10 +1,10 @@
-Coordinate descent methods have a big history since the idea of simplifying the gradient descent update as old as a gradient descent scheme. Let us see the interest of such methods for the problem with a least-squares objective function
+Coordinate descent methods have a long history since the idea of simplifying the gradient descent update as old as a gradient descent scheme. Let us see the interest of such methods for the problem with a least-squares objective function
 $$
 f(x) = \|Ax-b\|_2^2,
 $$
-where $A$ is a matrix of examples and $b$ is a features vector. For such objective function, the computational cost of one coordinate of the gradient is $n$ times smaller than the full gradient computation thanks to the separable structure of the function.
+where $A$ is a matrix of examples, and $b$ is a features vector. For such objective function, the computational cost of one coordinate of the gradient is $n$ times smaller than the full gradient computation thanks to the separable structure of the function.
 
-The idea of the basic coordinate descent methods is the following: on every iteration, we compute one (or some) coordinate of gradient and make a move in that direction with some stepsize. There are different ways to select stepsize and the coordinate, based, for example on the smoothness constants of $i$-th coordinates of gradient \cite{richtarik2012efficient} or on the maximal absolute value of the gradient's coordinates correspondingly \cite{nesterov2012efficiency}. 
+The idea of the underlying coordinate descent methods is the following: on every iteration, we compute one (or some) coordinate of gradient and make a move in that direction with some stepsize. There are different ways to select stepsize and the coordinate-based, for example, on the smoothness constants of $i$-th coordinates of gradient \cite{richtarik2012efficient} or on the maximal absolute value of the gradient's coordinates correspondingly \cite{nesterov2012efficiency}. 
 
 Let us consider smooth optimization problem \eqref{eq:pb_simple}, where function $f$ has coordinate-wise Lipschitz continuous gradient
 $$
@@ -33,9 +33,9 @@ f(x^k) - f^\star\leq \frac{2nM}{k+4}\|x^0-x^\star\|_2^2,
 $$
 where we use the same notations as before. 
 
-As we could see from this result, the rate is $n$ times worse than the rate of gradient descent and every iteration requires the full gradient computation for coordinate selection. Moreover, it could happen that $M\gg L$ where $L$ is a smoothness constant of $f$ that makes algorithm worse even if only $1$ coordinate of the gradient is required.
+As we could see from this result, the rate is $n$ times worse than the rate of gradient descent, and every iteration requires the full gradient computation for coordinate selection. Moreover, it could happen that $M\gg L$ where $L$ is a smoothness constant of $f$ that makes algorithm worse even if only $1$ coordinate of the gradient is required.
 
-Together with the greedy strategy randomized and cyclic variations of this method also appear widely in the literature. Moreover, in such algorithms instead of selecting only one coordinate the block of coordinates is selected every time. Thus in practice, it is more popular to use a cyclic or randomized selection of coordinate to be updated.
+Together with the greedy strategy, randomized and cyclic variations of this method also appear widely in the literature. Moreover, in such algorithms, instead of selecting only one coordinate, the block of coordinates is selected every time. Thus in practice, it is more popular to use a cyclic or randomized selection of coordinate to be updated.
 
 Now, let us consider composite optimization problem \eqref{eq:pb_composite}, where $f$ has coordinate-wise Lipschitz continuous gradient and moreover regularizer $r$ is coordinate-wise separable
 $$
