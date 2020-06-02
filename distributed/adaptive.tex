@@ -23,16 +23,16 @@ Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth and 
 \end{lemma}
 \begin{proof}[Proof of Lemma \ref{lm:spydr_identification}]
 Recall first from the end of the proof of Theorem~\ref{lm:spy_diff} that we have
-for some $C$ and $\alpha\in]0,1]$
+for some $C$ and $\delta\in]0,1]$
 \begin{equation}\label{eq:recall}
-    \mathbb{E}\|\barx^k - \barx^\star\|^2 \leq C (1-\alpha)^m.
+    \mathbb{E}\|\barx^k - \barx^\star\|^2 \leq C (1-\delta)^m.
 \end{equation}
 Notice that the exponent is not the iteration number but rather the number of stopping times $(k_m)$ before $k$. Thus, we can decompose the sum of the  
 $( \|x^k - x^\star \|^2 )_k$ by epochs and get in expectation 
 \begin{align*}
     \EE\left[ \sum_{k=1}^{+\infty}  \|\barx^k - \barx^\star \|^2 \right] 
     \leq \EE\left[ \sum_{m=1}^{+\infty} \sum_{k=k_m}^{k_{m+1}-1} \|\barx^k -\barx^\star \|^2 \right]
-    \leq C \sum_{m=1}^{+\infty} (k_{m+1}-1 - k_m) (1-\alpha)^m.
+    \leq C \sum_{m=1}^{+\infty} (k_{m+1}-1 - k_m) (1-\delta)^m.
 \end{align*}
 Assumption~\ref{hyp:delident} now allows us to bound $k_{m+1}-1 - k_m$ and to get that this sum is finite almost surely:
 \[
@@ -92,10 +92,10 @@ This kind of sampling showed tremendous gains compared to uniform sampling; howe
     %\footnote{This difficulty can actually be overcome theoretically with a refined analysis but we delay this discussion to Appendix~\ref{sec:noniid} since it is not necessary in the upcoming methods.}.
 \end{itemize}
 
-Unfortunately, the algorithm with such selection could diverge; however, if it converges, it identifies the near-optimal support and has the same linear rate as \dave with fewer communication cost  (see Chapter YYY for numerical examples and further discussion).
+Unfortunately, the algorithm with such selection could diverge; however, if it converges, it identifies the near-optimal support and has the same linear rate as \dave~with fewer communication cost  (see Chapter YYY for numerical examples and further discussion).
 
 \paragraph{Scaled adaptive sparsification}
-{\color{blue}Adaptive coordinate selection could be combined with the scaling technique that is common for stochastic methods with random sparsification \cite{zhang2014asynchronous}. We propose to scale deterministic update by a factor of $\pi$ to make it ``expectation-like'' see Algorithm \ref{alg:spydr}.
+{Adaptive coordinate selection could be combined with the scaling technique that is common for stochastic methods with random sparsification \cite{zhang2014asynchronous}. We propose to scale deterministic update by a factor of $\pi$ to make it ``expectation-like'' see Algorithm \ref{alg:spydr}.
 
 
 \begin{algorithm}

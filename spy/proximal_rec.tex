@@ -1,0 +1,150 @@
+% ===========================================================
+% ===========================================================
+\section{Proximal reconditioning for adaptive sparsification}\label{sec:spy_recon}
+% ===========================================================
+% ===========================================================
+
+
+The learning problem~\eqref{eq:pb} should be well-conditioned to safely apply the random sparsification technique of \salgo with reasonable exploration probability $\pi$. The idea is then not to apply \salgo directly to~\eqref{eq:pb} but rather to a modified problem for which we control the condition number and thus the sparsification potential. 
+
+We thus propose to recondition the learning problem~\eqref{eq:pb} using the standard proximal algorithm (see e.g.\;\cite{rockafellar1976monotone}), as described in Section\;\ref{sec:proxrecon}. We present in Section\;\ref{sec:recoalgo} our algorithmic choices and the resulting algorithm, called \recoalgo.
+
+
+% ===========================================================
+\subsection{Proximal reconditioning}\label{sec:proxrecon}
+% ===========================================================
+
+This type of methods consist in iteratively regularizing the problem with the squared distance to some center point. We call \emph{outer iteration} the process of (approximatively) solving such a reconditioned problem. At outer loop\footnote{The quantities related to outer loop $\ell$ are denoted with a subscript $\ell$.} $\ell$, we define the worker $i$'s regularized function as 
+\begin{align*}
+    h_{i,\ell} =  f_i + \frac{\rho}{2} \| \cdot - x_\ell \|_2^2 
+\end{align*}
+where $\rho$ is the regularization factor and $x_\ell$ the center point at outer loop $\ell$. The \emph{reconditioned problem for loop $\ell$} then writes
+\begin{align}\label{eq:reco}
+\tag{$\mathsf{R}_\ell$}
+& \min_{x\in\mathbb{R}^d}  ~~ H_\ell(x)  :=  \sum_{i=1}^M  \alpha_i \underbrace{\left( f_i(x) + \frac{\rho}{2} \| x - x_\ell \|_2^2 \right)}_{h_{i,\ell}(x)}  +  r(x) .
+\end{align}
+For $\mu$-strongly convex $L$-smooth $(f_i)$, the regularized functions $h_{i,\ell}$ are $(\mu+\rho)$-strongly convex and $(L+\rho)$-smooth. Hence, the condition number of the smooth part of~\eqref{eq:reco} writes
+\begin{align*}
+   \kappa_{\eqref{eq:reco}} = \frac{\mu + \rho}{L+\rho}\, ~~\Big(\geq~\kappa_{\eqref{eq:pb}} = \frac{\mu}{L}\Big).
+\end{align*}
+The optimal solution of\;\eqref{eq:reco} is exactly the proximal point~\eqref{eq:prox} of $F/\rho$ at $x_\ell$ (see Section \ref{sec:basics_nonsmooth})
+\begin{align*}
+\prox_{F/\rho} (x_\ell) = \argmin_{x\in\mathbb{R}^d}  ~ \underbrace{  \sum_{i=1}^M \alpha_i f_i(x) +  r(x)}_{= F(x)} +  \frac{\rho}{2} \| x- x_\ell \|_2^2.
+\end{align*}
+
+Thus, for solving~\eqref{eq:pb}, each outer iteration consists in an (inexact) proximal step:
+\begin{align}
+\label{eq:approx}
+    x_{\ell+1} \approx \prox_{F/\rho} (x_\ell) 
+\end{align}
+
+% ===========================================================
+\subsection{\recoalgo}\label{sec:recoalgo}
+% ===========================================================
+
+We present our main algorithm, which consists in applying the inexact proximal scheme\;\eqref{eq:approx} with \salgo as inner algorithm to solve \eqref{eq:pb}. 
+
+
+At the outer iteration $\ell$, we run \salgo for solving \eqref{eq:reco} with i.i.d.\;non-uniform sparsification probabilities given, for a fixed $0<c\leq d$, by
+\begin{align}
+\label{eq:pvec}
+p_{j,\ell} = \left\{ \begin{array}{cr}
+ \pp_\ell := \min\left(\displaystyle\frac{c}{|\nullC(x_\ell)|};1\right) & \text{ if } (x_\ell)_{[j]} = 0 \\
+   1  &  \text{ if } (x_\ell)_{[j]} \neq  0 
+\end{array}   \right. ~~~~ \text{for all $j\in\{1,\dots,d\}$}.
+\end{align}
+The sparsification level over outer iterations is then bounded from below by
+\begin{align*}
+     \pp := \frac{c}{d} ~\leq~ \inf_\ell \pp_\ell.
+\end{align*}
+
+
+We now choose the reconditioning parameter $\rho$ from $\pp$ so that \salgo converges linearly to the solution of the reconditioned problem~\eqref{eq:reco}. We know, from Section~\ref{sec:adapt}, that this is the case as soon as
+\begin{align*}
+   \kappa_{\eqref{eq:reco}} = \frac{\mu + \rho}{L+\rho}  > \kappa_{\min} ~~\Longleftrightarrow~~  \rho > \frac{\kappa_{\min}L-\mu}{1-\kappa_{\min}} \quad\text{ with } \kappa_{\min} = \frac{1-\sqrt{\pp}}{1+\sqrt{\pp}}
+   \text{~as in~\eqref{eq:kappamin}}.
+\end{align*}
+% Not Fundamental:
+% %\begin{remark}[On the choice of $\rho$]
+% For simplicity, we choose to present here only the case where the regularization $\rho$ is constant over all outer loops. It is possible to take varying ones, to almost no change but i) it adds another moving part; and ii) the recovered rate is ultimately only slightly (if even) better. 
+% %\end{remark}
+To properly handle the strict inequality above, we propose to choose a conditioning which guarantees a $(1-\alpha)$ rate for \salgo on the reconditioned problems uniformly over $\ell$. Mathematically, for $0<\alpha<\pp$ (for instance $\alpha=\pp/2$), we choose
+\begin{align}
+\label{eq:rho}
+    \rho = \frac{\kappa_{\eqref{eq:reco}} L-\mu}{1-\kappa_{\eqref{eq:reco}}} \quad\text{ with }\quad \kappa_{\eqref{eq:reco}} = \frac{1-\sqrt{\pp-\alpha}}{1+\sqrt{\pp-\alpha}} .
+\end{align}
+Then, the contraction factor of \salgo~\eqref{eq:ratebefore} for the reconditioned problem \eqref{eq:reco} becomes
+% Not fundamental:
+% \footnote{If the problem is already well-enough conditioned (i.e.~\eqref{eq:kappamin} holds), $\rho$ might be negative and thus would imply \emph{deconditioning}. For the sake of simplicity, we will only consider in this section the most common case where the original problem is not well-enough conditioned.} 
+\begin{align}
+\label{eq:reco_contra}
+     \left( \left(\frac{1-\kappa_{\eqref{eq:reco}}}{1+\kappa_{\eqref{eq:reco}}}\right)^2 + 1 - \pi_\ell  \right) =  \left( \pi - \alpha + 1 - \pi_\ell  \right) = \underbrace{(1 - \alpha - (\pi_\ell - \pi) )}_{=: (1-\alpha_\ell)} \leq 1-\alpha < 1 .
+\end{align}
+This means that \salgo is linearly convergent on the reconditioned problem~\eqref{eq:reco}. Thus, it can safely be used as an inner method in the inexact proximal algorithm \eqref{eq:approx} to solve the original problem~\eqref{eq:pb}. 
+
+The remaining part is to the choice of a stopping criterion for the inner loop. We propose to use three different criteria: epoch budget, absolute accuracy, and relative accuracy (called $\mathsf{C}_1, \mathsf{C}_2$, and $\mathsf{C}_3$ respectively). Stopping criteria based on accuracy are usually much more stringent to enforce (see e.g. \cite[Sec.~2.3]{lin2017catalyst} and references therein), however they may bring significant performance improvement when the instantaneous rate is much better than the theoretical one. 
+
+The resulting algorithm, called\;\recoalgo, is presented as Algorithm\;\ref{algo:reco}. Under any of the three stopping criteria, we recover the same convergence result, formalized in the next theorem.
+
+% ===================================
+\begin{algorithm}[h!]
+\caption{\label{algo:reco}\recoalgo on $((\alpha_i),(f_i),r)$}
+Initialize $x_1$, $d\geq c>0$, and $\delta\in(0,1)$.
+\begin{align}
+\label{eq:set}
+ \text{Set } \rho = \frac{\kappa L-\mu}{1-\kappa} \text{ and } \gamma \in \left( 0, \frac{2}{\mu+L+2\rho} \right] \text{ with } \kappa = \frac{1-\sqrt{\pp -\alpha}}{1+\sqrt{\pp-\alpha}}; \pp = \frac{c}{d} \text{ and } \alpha = \frac{c}{2d}.
+\end{align}
+\While{the desired accuracy is not achieved}{
+Observe the support of $x_\ell$, compute $\pvec_\ell$ as
+\begin{align}
+\label{eq:proba}
+p_{j,\ell} = \left\{ \begin{array}{cr}
+ \pp_\ell := \min\left(\frac{c}{|\nullC(x_\ell)|};1\right) & \text{ if } [x_\ell]_j = 0 \\
+   1  &  \text{ if } [x_\ell]_j \neq  0 
+\end{array}   \right. ~~~~~ \text{for all $j\in\{1,\dots,d\}$}.
+\end{align}
+Compute an approximate solution of the reconditioned problem
+\begin{align}
+\label{eq:approxalgo}
+& x_{\ell+1} \approx \prox_{F/\rho} (x_\ell) =\argmin_{x\in\mathbb{R}^d}  ~ \left\{ %H_\ell(x) =  
+\sum_{i=1}^M  \alpha_i \underbrace{\left( f_i(x) + \frac{\rho}{2} \| x - x_\ell \|_2^2 \right)}_{h_{i,\ell}(x)}  +  r(x) \right\} 
+\end{align}
+with \salgo on $\Big((\alpha_i),(h_{i,\ell}), r  \;;\;  \pvec_\ell\Big)$ with $x_\ell$ as initial point and with the stopping criterion:\\[0.1cm]
+\begin{itemize}
+    \item[] $\mathsf{C}_1$ (epoch budget): Run \salgo with the maximal stepsize for
+    $$  \displaystyle \mathsf{M}_\ell = \left\lceil \frac{ (1+\delta) \log(\ell)}{\log\left( \frac{1}{1-\alpha+\pp - \pp_\ell} \right)} + \frac{\log\left(\frac{2 \mu+\rho}{(1-\delta)\rho}\right)}{\log\left( \frac{1}{1-\alpha+\pp - \pp_\ell} \right)} \right\rceil \text{ epochs.}$$
+    \item[or] $\mathsf{C}_2$ (absolute accuracy):  Run \salgo until it finds $x_{\ell+1}$ such that  
+    $$  \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|^2 \leq \frac{(1-\delta)\rho}{(2\mu+\rho) \ell^{1+\delta}} \|x_{\ell} -  \prox_{F/\rho}(x_\ell)\|^2  .$$ 
+    \item[or] $\mathsf{C}_3$ (relative accuracy):  Run \salgo until it finds $x_{\ell+1}$ such that  
+    $$  \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|^2 \leq \frac{\rho}{4(2\mu+\rho) \ell^{2+2\delta}} \|x_{\ell+1} -  x_\ell \|^2  .$$ 
+\end{itemize}
+}
+\end{algorithm}
+
+
+
+\begin{theorem} 
+\label{th:reco}
+Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu\geq0$) and $L$-smooth. Let $r$ be convex lsc. If $\mu=0$ and $\mathsf{C}_3$ is used, we furthermore require that $F$ has a unique minimizer $x^\star$ and that $\liminf_{x\to x^\star} (F(x)-F(x^\star))/\|x-x^\star\|^2 > 0$.
+
+Then, the sequence generated by \recoalgo on $((\alpha_i),(f_i),r)$ with stopping criterion $\mathsf{C}_1, \mathsf{C}_2$, or $\mathsf{C}_3$ converges almost surely to a minimizer of $F$.
+Furthermore, if $\mu>0$, then we have\footnote{We use the standard notation: $a_\ell = \tilde{\mathcal{O}} ( (1-r)^\ell)$ denotes that there exists $C,p$ such that $ a_\ell \leq C \ell^p (1-r)^\ell $. } 
+      \begin{align*}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2 \right] = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2} \right)^\ell \right) \quad\text{ for criterion } \mathsf{C}_1; \\
+      \left\|x_{\ell+1} - x^\star  \right\|^2  = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2}  \right)^\ell \right)  \quad\text{ for criteria } \mathsf{C}_2, \mathsf{C}_3.
+        \end{align*}
+\end{theorem}
+
+\begin{proof}
+Even though the final result is similar for the three cases, the proof techniques are rather different. We thus present them separated in Appendix~\ref{apx:reco}.
+\end{proof}
+
+This result thus establishes that \recoalgo converges linearly to a solution of \eqref{eq:pb}. This means that \recoalgo has qualitatively the same behavior as \dave, with the additional feature of having sparse local updates and therefore sparse upward communications. In other words, our algorithm is similar to the baseline in terms of iterations, but it is expected to be faster in terms of communications (more precisely in terms of quantity of information exchanged between master and workers) which would result in a wallclock gain in practice, as shown in Section\;\ref{sec:num}. Before this, we further investigate in the next section the theoretical gain of our sparsification technique in the case of sparse optimal solutions.
+
+
+\begin{remark}[Acceleration (with respect to iterations)]\label{rem:cata}
+In this paper, we are interested in sparsifying communications and we primarily consider the reconditioning aspect of proximal methods, leaving aside other aspects including acceleration. As proposed in\;\cite{guler1992new}, the iterations of the inexact proximal algorithm can indeed be accelerated using Nesterov's method\;\cite{nesterov1983method}.
+The recent works\;\cite{lin2017catalyst,lin2019inexact} also propose accelerated and quasi-Newton variants of the inexact proximal point algorithm as a meta-algorithm to improve the convergence of optimization methods (driven by machine learning applications \cite{lin2015universal}). 
+In this paper, we investigate the complexity in terms of communications rather than iterations, so we do not insist much on these accelerated variants. However the developments of this section could be extended with accelerated proximal algorithm, following the meta-algorithm of \cite{lin2017catalyst}. We briefly study this direction in Appendix\;\ref{apx:cata}.  
+In particular, Theorem~\ref{thm:cata} shows a gain of the square root on the rate for the accelerated version compared to Theorem~\ref{th:reco}, as usually observed with accelerated methods. 
+\end{remark}

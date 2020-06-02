@@ -1,0 +1,109 @@
+\section{Additional numerical experiments}
+In this appendix we provide more experimental results regarding the empirical study over the three benchmarks. 
+
+\subsection{Speed of convergence}
+
+\begin{figure}[h]
+\vspace*{-20pt}
+\begin{center}
+\begin{tabular}{c}
+ \includegraphics[width=0.6\textwidth]{SODA/Figs/madelon_legend.pdf}\vspace*{-100pt}
+\end{tabular}
+\end{center}
+ \subfloat[][suboptimality Vs exchanges]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/madelon_10w_002_0001_fun_vs_ex_log.pdf}\label{fig:real_f_vs_e}}
+ \hfill
+  \subfloat[][suboptimality Vs time]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/madelon_10w_002_0001_fun_vs_time_log.pdf}\label{fig:real_f_vs_t}}
+  \\
+   \subfloat[][suboptimality Vs epoch]{\includegraphics[width=0.49\linewidth]{SODA/Figs/madelon_10w_002_0001_fun_vs_ite_log.pdf}\label{fig:real_f_vs_i}}
+   \hfill\subfloat[][time per epoch]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/madelon_10w_002_0001_time_vs_ite.pdf}\label{fig:real_t_vs_i}}
+    \caption{madelon dataset, $10$ workers, $\lambda_1 = 0.02$, $\lambda_2 = 0.001$}
+\end{figure}
+
+
+
+\begin{figure}
+\begin{tabular}{cc}
+\multicolumn{2}{c}{\vspace{-4pt}\includegraphics[width = 0.9\textwidth]{SODA/Figs/legend.pdf}}\vspace*{-100pt}\\
+\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_00005_0001_fun_vs_ex_log.pdf}& % \label{fig:rcv_t_vs_i}}
+\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_00005_0001_fun_vs_time_log.pdf}\\%\label{fig:rcv_f_vs_t}\\
+(a) suboptimality Vs exchanges  & (b) suboptimality Vs time\\
+\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_00005_0001_fun_vs_ite_log.pdf} & %\label{fig:rcv_f_vs_i}}
+ \includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_00005_0001_time_vs_ite.pdf} \\%\label{fig:rcv_f_vs_e}}
+(c) suboptimality Vs epoch & (d) time per epoch\\
+\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv1_train_20w_diff_sp_fun_vs_ex_log.pdf} & %\label{fig:real_f_vs_e}}
+\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv1_train_20w_diff_sp_fun_vs_time_log.pdf}\\%\label{fig:real_f_vs_t}}
+(e) suboptimality Vs exchanges & (f) suboptimality Vs time\end{tabular}
+    \caption{RCV1 dataset, $20$ workers, $\lambda_1 = 0.0005$, $\lambda_2 = 0.001$}
+\end{figure}
+
+
+
+
+\begin{figure}
+\vspace*{-20pt}
+\begin{center}
+\begin{tabular}{cr}
+\multicolumn{2}{c}{\vspace{-4pt}\includegraphics[width = 0.9\textwidth]{SODA/Figs/legend.pdf}}\vspace*{-100pt}\\
+\end{tabular}
+\end{center}
+ \subfloat[][suboptimality Vs exchanges]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_00005_0001_fun_vs_ex_log.pdf}\label{fig:real_f_vs_e}}
+ \hfill
+  \subfloat[][suboptimality Vs time]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_00005_0001_fun_vs_time_log.pdf}\label{fig:real_f_vs_t}}
+  \\
+   \subfloat[][suboptimality Vs epoch]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_00005_0001_fun_vs_ite_log.pdf}\label{fig:real_f_vs_i}}
+   \hfill\subfloat[][time per epoch]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_00005_0001_time_vs_ite.pdf}\label{fig:real_t_vs_i}}
+  \\
+   \subfloat[][suboptimality Vs exchanges]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_diff_sp_fun_vs_ex_log.pdf}\label{fig:real_f_vs_i}}
+   \hfill\subfloat[][suboptimality Vs time]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_diff_sp_fun_vs_time_log.pdf}\label{fig:real_t_vs_i}}
+    \caption{Real-sim dataset, $20$ workers, $\lambda_1 = 0.0005$, $\lambda_2 = 0.001$}
+    \label{fig:real_full_pack}
+\end{figure}
+
+\newpage
+
+\subsection{Cost of communication}
+\begin{figure}[h]
+\begin{center}
+      \subfloat[][$20$ workers, $\lambda_1 = 0.02$, $\lambda_2 = 0.001$]{ \includegraphics[width=.49\textwidth]{SODA/Figs/madelon_20w_002_0001_robust.pdf}}
+      \subfloat[][$10$ workers, $\lambda_1 = 0.01$, $\lambda_2 = 0.001$]{ \includegraphics[width=.49\textwidth]{SODA/Figs/madelon_10w_001_0001_robust.pdf}}
+    \caption{madelon dataset}
+\end{center}
+\end{figure}
+
+
+\subsection{Evolution of sparsity}
+
+
+\begin{figure}
+\vspace*{-20pt}
+\begin{center}
+\begin{tabular}{cr}
+\multicolumn{2}{c}{\vspace{-4pt}\includegraphics[width = 0.9\textwidth]{SODA/Figs/legend.pdf}}\vspace*{-100pt}\\
+\end{tabular}
+\end{center}
+\subfloat[][$\lambda_1 = 0.00001$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_000001_0001_density.pdf}\label{fig:real_t_vs_i}}
+ \hfill
+ \subfloat[][$\lambda_1 = 0.00005$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_000005_0001_density.pdf}\label{fig:real_t_vs_i}}
+  \\
+   \subfloat[][$\lambda_1 = 0.001$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_00001_0001_density.pdf}\label{fig:real_t_vs_i}}
+   \hfill\subfloat[][$\lambda_1 = 0.0005$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/real-sim_20w_00005_0001_density.pdf}\label{fig:real_t_vs_i}}
+    \caption{Real-sim dataset, $20$ workers, $\lambda_2 = 0.001$}
+    \label{fig:identification_pack}
+\end{figure}
+
+\begin{figure}
+\vspace*{-20pt}
+\begin{center}
+\begin{tabular}{cr}
+\multicolumn{2}{c}{\vspace{-4pt}\includegraphics[width = 0.9\textwidth]{SODA/Figs/legend.pdf}}\vspace*{-100pt}\\
+\end{tabular}
+\end{center}
+\subfloat[][$\lambda_1 = 0.00001$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_000001_0001_density.pdf}\label{fig:real_t_vs_i}}
+ \hfill
+ \subfloat[][$\lambda_1 = 0.00005$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_000005_0001_density.pdf}\label{fig:real_t_vs_i}}
+  \\
+   \subfloat[][$\lambda_1 = 0.001$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_00001_0001_density.pdf}\label{fig:real_t_vs_i}}
+   \hfill\subfloat[][$\lambda_1 = 0.0005$]{\includegraphics[width = 0.49\linewidth]{SODA/Figs/rcv_20w_00005_0001_density.pdf}\label{fig:real_t_vs_i}}
+    \caption{RCV1 dataset, $20$ workers, $\lambda_2 = 0.001$}
+    \label{fig:identification_pack}
+\end{figure}

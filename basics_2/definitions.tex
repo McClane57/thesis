@@ -1,4 +1,4 @@
-\section{Convexity and smoothness}\label{sec:basics_conv_and_smoothness}
+\subsection{Convexity and smoothness}\label{sec:basics_conv_and_smoothness}
 In this section, we recall the basic definitions and properties that are used to analyse optimization methods for smooth and convex objective \cite{hiriart2012fundamentals}. 
 \begin{definition}[Convex function]
 A function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is called convex if $\dom f$ is a convex set and for any $x, y\in \dom f$ and $\alpha \in[0,1]$
@@ -102,14 +102,13 @@ Now setting $x^\prime = y$ we have the corresponding result.
 \label{fig:functional_approximations}
 \end{figure}
 
-In Figure \ref{fig:functional_approximations} we present the graphical illustration of lower \eqref{eq:convex_2} and upper \eqref{eq:descent_lemma_1} bounds for the $L$-smooth and $\mu$-strongly convex objective function $f$. {\color{red}As we could see from this figure, the quadratic lower bound provided by \eqref{eq:convex_2} approximates the functional value much better than first-order approximation, that leads to the intuition that $\mu$-strongly convex functions are easier to analyse.} The quality of these approximations could be characterized by {\textbf{condition number}} of the problem
+In Figure \ref{fig:functional_approximations} we present the graphical illustration of lower \eqref{eq:convex_2} and upper \eqref{eq:descent_lemma_1} bounds for the $L$-smooth and $\mu$-strongly convex objective function $f$. {As we could see from this figure, the quadratic lower bound provided by \eqref{eq:convex_2} approximates the functional value much better than first-order approximation, that leads to the intuition that $\mu$-strongly convex functions are easier to analyse.} The quality of these approximations could be characterized by {\textbf{condition number}} of the problem
 $$
 \kappa =  \frac{L}{\mu}.
 $$
 When this number is close to $1$ ({\textbf{well-conditioned}}) the problem is extremely well approximated and when it is big ({\textbf{ill-conditioned}}) problems have a weak approximation. It impacts on the speed of optimization algorithms: better-conditioned problems are easier to solve.
 
-{\color{blue}
-Finally, let us present the following auxiliary lemma (Lemma $3.11$ \cite{bubeck2015convex}) that is widely used in the convergence analysis of first-order methods for $L$-smooth and $\mu$-strongly convex objectives.
+{Finally, let us present the following auxiliary lemma (Lemma $3.11$ \cite{bubeck2015convex}) that is widely used in the convergence analysis of first-order methods for $L$-smooth and $\mu$-strongly convex objectives.
 
 \begin{lemma}\label{lm:bubeck}
 Let us assume that $f$ is $L$-smooth and $\mu$-strongly convex, then for any $x,y\in\mathbb{R}^n$ holds

@@ -1,0 +1,50 @@
+\section{Numerical illustrations}\label{sec:spy_exps}
+
+In this section, we illustrate the communication gain provided by our random sparsification algorithms on two classic $\ell_1$ regularized empirical risk minimization problems.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\medskip
+\noindent
+\textbf{Problems.}
+We first consider a synthetic LASSO problem
+$$
+\min_{x\in \RR^n} ~~\| Ax - b\|^2 + \lambda_1 \|x \|_1
+$$
+with $n=1000$ features and two different sizes of example set $m= 500$ and $m = 10,000$. Data matrix $A$ is generated from the standard normal distribution, $b = Ax_0 +e$ where $x_0$ is a $99\%$ sparse vector and $e$ is taken from the normal distribution with standard deviation $0.01$.  
+%\end{align*}
+We take $\lambda_1$ to reach the density of the final solution approximately $1.2\%$.
+
+We also examine the regularized logistic regression with elastic net
+%"epsilon" from LibSVM data set with 100,000 observations and 2,000 features. 
+% estimated over a training set $\mathcal S=\{(z_j,y_j), j\in\{1,\ldots,n\}\}$
+%\begin{align*}%\label{eq:reg-loss}
+ $$    \min_{x\in \RR^n}~~\frac{1}{m}\!\sum_{j=1}^m \log(1 \!+\! \exp(-y_j z_j^{\top} x)) + \lambda_1\!\left\|x\right\|_1 \!+ \frac{\lambda_2}{2}\!\left\|x\right\|_2^2
+ $$
+%\end{align*}
+on two data-sets from the LibSVM repository: the 
+\emph{madelon} data-set ($n=500$ $m=2000$) 
+with hyperparameters $\lambda_2 = 0.03$ and $\lambda_1 = 0.001$, chosen to reach a $99\%$ sparsity;
+the \emph{rcv1\_train} dataset ($n=47236$ $m=20242$) with parameters $\lambda_1 = 0.001$ and $\lambda_2  = 0.0001$ to reach a $99.7\%$ sparsity.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\medskip
+\noindent
+\textbf{Experimental set-up.} We used Python, and MPI (Message Passing Interface) for the distributed communications framework. To communicate sparse vectors, we send a list of coordinates then their values, as usual in sparse communications. 
+
+We run our experiments on a machine with $32$ cores and $256$ Gb of RAM: one core plays the role the master, $M$ cores are the slaves ($M=5$ for LASSO problems, $M=10$ for madelon, and $M=20$ for rcv1\_train). The data sets are split evenly between the $M$ slaves, each having access only to its own part.% which rules out using parallel algorithms.
+
+\textbf{Restart technique.} Let us precise the way we perform restarts for \recoalgo. Since, after the restart only two things changes for every worker: the prox-center and the probability vector, the first update received by master from any worker after the ``restart'' could be modified by master to the ``correct update'' (with a new prox-center but with a previous probability vector) by adding the weighted difference of old and new prox-centers to it. Furthermore, after sending the new prox-center to the worker, this ``shift'' could be also performed with worker's local variable $x_i$ that allows to make ``sliding'' restart without any synchronization rounds.
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\medskip
+\noindent
+\textbf{Algorithms.} We compare two algorithms: 
+\begin{itemize}
+\item `DAve-PG': \dave algorithm without any sparsification;
+\item `xxx': \recoalgo with simplified stopping criteria $\mathsf{C}_1$ that consider $\mathsf{M}_\ell=1$. XXX corresponds to the algorithm parameter $c$ - the amount of randomly chosen coordinates.
+\end{itemize}
+
+We display the performance of the algorithms in four ways: i) size of support vs number of iterations, showing the identification properties; functional suboptimality vs ii) communication cost, modelled as the number of couples (coordinate, value) sent from and to the master, iii) amount of epochs \eqref{eq:km}, and iv) computational time (only for rcv1\_train dataset, where the dimension of the problem is big enough to see the commucation bottle-neck in practice.

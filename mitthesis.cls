@@ -224,7 +224,7 @@
 \setlength{\evensidemargin}{0.0in}	% % 1.25in left margin (even pages)
 \setlength{\topmargin}{0.0in}		% % 1in top margin
 \setlength{\textwidth}{6.27in}		% % 6.0in text - 1.25in rt margin
-\setlength{\textheight}{9.44in}		% Body ht for 1in margins
+\setlength{\textheight}{8.44in}		% Body ht for 1in margins
 \addtolength{\topmargin}{-\headheight}	% No header, so compensate
 \addtolength{\topmargin}{-\headsep}	% for header height and separation
 
@@ -411,7 +411,7 @@ reserved.\par\permission}}
 %% notice.
 \ifodd\vithesis \copyrightnoticetext{\copyright\ \@author,
 \uppercase\expandafter{\romannumeral\@degreeyear}.  All rights reserved.\par\permission}
-%% or just
+%% or just margins in latex
 %%\@degreeyear}}
 \typeout{Copyright given to author,
 	permission to copy/distribute given to MIT.}
@@ -517,7 +517,7 @@ requirements for the \@degreeword\ of \\
 % The \kern0pt pushes any depth into the height.  Thanks to Richard Stone.
 \def\endtitlepage{\par\kern 0pt\egroup\vss\egroup\newpage}
 
-\def\UGA{UNIVERSITE GRENOBLE ALPES}
+\def\UGA{UNIVERSIT\'E GRENOBLE ALPES}
 \def\Uga{Universit\'e Grenoble Alpes}
 
 
@@ -532,4 +532,6 @@ requirements for the \@degreeword\ of \\
 
 \def\abstract{\subsection*{Abstract}\small\def\baselinestretch{1}\@normalsize}
 \def\endabstract{\par}
+
+
 

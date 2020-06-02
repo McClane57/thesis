@@ -12,7 +12,7 @@ $$
 $$
 where subscript $[i]$ means the $i$-th coordinate, $e_i$ is a $i$-th standart basis vector, and $h\in\RR$.
 \begin{algorithm}
-    \caption{Coordinate Descent (CD) for \eqref{eq:pb_simple}}
+    \caption{Coordinate Descent (\texttt{CD}) for \eqref{eq:pb_simple}}
     \label{algo:cd}
     \begin{algorithmic}
         \STATE Initialize $x^0\in\mathbb{R}^n$
@@ -53,7 +53,7 @@ $$
 The simplest version of the coordinate descent for \eqref{eq:pb_composite} is presented in Algorithm \ref{algo:cd_composite} (see Theorem $1$ of \cite{richtarik2012efficient} for the proof).
 
 \begin{algorithm}
-    \caption{Coordinate Descent (CD) for \eqref{eq:pb_composite}}
+    \caption{Coordinate Descent (\texttt{CD}) for \eqref{eq:pb_composite}}
     \label{algo:cd_composite}
     \begin{algorithmic}
         \STATE Initialize $x^0\in\mathbb{R}^n$
@@ -68,4 +68,4 @@ The simplest version of the coordinate descent for \eqref{eq:pb_composite} is pr
 
 Since a lot of common regularizers are not separable (for example $1$-d Total Variation \cite{bach2012optimization}) coordinate methods Algorithm \ref{algo:cd_composite} could not be widely used to solve arbitrary regularized ERM problem \eqref{eq:erm_reg}. This calls for some modern modifications that allow to use non-separable proximal term \cite{hanzely2018sega}. 
 
-{\color{red}\textbf{Part of our research consider the extension of Algorithm \ref{algo:cd_composite} with a surprising application to the non-separable regularizers.}}
+{\textbf{Part of our research consider the extension of Algorithm \ref{algo:cd_composite} with a surprising application to the non-separable regularizers.}}

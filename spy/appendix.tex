@@ -1,0 +1,360 @@
+% ===========================================================
+% ===========================================================
+\section{Proof of convergence of reconditioned algorithms} \label{apx:reco}
+% ===========================================================
+% ===========================================================
+
+
+% ===========================================================
+\subsection{Basic lemmas for proofs of reconditioned algorithms}
+% ===========================================================
+
+
+We state here two simple lemmas that we have not found as such in the literature and that are required in the proofs of section~\ref{sec:recoalgo}. They use the fact that the unique minimum $x^\star$ of a strongly convex function $F$ is a fixed point of $\prox_{F/{\rho }}$ for any $\rho>0$; see\;\cite[Prop.~12.28]{bauschke2011convex}).
+
+\begin{lemma}
+    \label{lem:opstrong}
+    Let $F: \mathbb{R}^d \to \mathbb{R}\cup\{+\infty\}$ be $\mu$-strongly convex lsc and $\rho>0$.
+    Then, %$F$ has a unique minimizer $x^\star$ and 
+    for any $x\in\mathbb{R}^d$,
+    \begin{align*}
+        \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2 \leq \frac{{\rho}}{2\mu + {\rho}} \| x - x^\star \|^2 - \frac{{\rho}}{2\mu + {\rho}} \| \prox_{F/{\rho}}(x) - x \|^2.
+    \end{align*}
+\end{lemma}
+\begin{proof}
+    The proof simply consists in developing norms as follows:
+    \begin{align*}
+        \| &\prox_{F/{\rho}}(x) - x \|^2 \\
+        &= \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) + x^\star - x \|^2 \\
+        &= \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2 + \| x-  x^\star  \|^2 - 2 \langle   \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) ; x-  x^\star \rangle  \\
+        &\leq  \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2 + \| x-  x^\star  \|^2 - 2(1+\mu/{\rho}) \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2 \\
+        &=  \| x-  x^\star  \|^2 - ( 1 + 2\mu/{\rho}) \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2;
+    \end{align*}
+    and a reordering concludes the proof. In words, we formalize the fact that the resolvent of the $\mu/{\rho}$ strongly monotone operator $\partial F/{\rho}$ is $(1+\mu/{\rho})$-cocoercive; see\;\cite{bauschke2011convex} for definitions.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:basereco}
+    Let $F: \mathbb{R}^d \to \mathbb{R}\cup\{+\infty\}$ be $\mu$-strongly convex lsc, $\rho>0$. Then, for any $x,x' \in\mathbb{R}^d$ such that 
+    \begin{align*}
+      \EE \left[  \left\|x' - \prox_{F/{\rho }}(x) \right\|^2 | x \right] \leq  \nu  \left\|x - \prox_{F/{\rho }}(x) \right\|^2 
+    \end{align*}
+    for some $\nu>0$, we have for any $\varepsilon\in(0,1)$
+    \begin{align}
+       \label{eq:basestrong} 
+        \EE \left[   \left\|x' - x^\star  \right\|^2 | x \right] &\leq \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\|x - x^\star \right\|^2 \\
+   \nonumber     &\hspace*{0.8cm} -\left[ (1 + \varepsilon) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \right]  \|x -  \prox_{F/{\rho }}(x)   \|^2.
+     \end{align}
+\end{lemma}
+
+
+\begin{proof}
+     Using Young's inequality, we get that for any $\varepsilon\in(0,1)$,
+\begin{align*}
+    \EE & \left[ \left\|x' - x^\star  \right\|^2  | x \right] \\
+    &\leq \left( 1 + \frac{1}{\varepsilon} \right)  \EE \left[ \left\|x' -  \prox_{F/{\rho }}(x)   \right\|^2  | x \right]   +   \left( 1 + \varepsilon \right)\left\| \prox_{F/{\rho }}(x) - \prox_{F/{\rho }}(x^\star ) \right\|^2 \\
+    &\leq \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \|x -  \prox_{F/{\rho }}(x)   \|^2 +   \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }} \left\|x - x^\star \right\|^2 \\
+    &\hspace*{0.8cm} -  \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\| x - \prox_{F/{\rho }}(x)  \right\|^2 \\
+     &= \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\|x - x^\star \right\|^2  -\left[ (1 + \varepsilon) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \right]  \|x -  \prox_{F/{\rho }}(x)   \|^2.
+ \end{align*}
+where we used Lemma~\ref{lem:opstrong}.
+\end{proof}
+
+
+% ===========================================================
+\subsection{Proof of Theorem~\ref{th:reco}}
+% ===========================================================
+
+Theorem~\ref{th:reco} gives very similar results for the three inner stopping criteria. The proof techniques though are quite different for each criteria.
+
+% ===========================================================
+\vspace*{1ex}
+\paragraph{Proof for criterion  $\mathsf{C}_1$ \emph{(epoch budget)} }
+
+We start by noticing that, at outer loop $\ell$, \salgo solves the reconditioned problem \eqref{eq:approxalgo} over which it has a contraction factor of $(1-\alpha_\ell)$ with $1-\alpha_\ell  := 1-\alpha+\pp - \pp_\ell$;
+%with the maximal (theoretical) stepsize; 
+see~\eqref{eq:reco_contra} and~\eqref{eq:ratebefore}.% in Theorem~\ref{lm:spy_diff}). 
+% with the maximal (theoretical) stepsize by the choice of~\eqref{eq:set} (See~\eqref{eq:reco_contra} and~\eqref{eq:ratebefore} in Theorem~\ref{lm:spy_diff}). 
+%Mathematically, at outer loop $\ell$, 
+This means that \salgo initialized with $x_\ell$ verifies after $m$ epochs with the maximal stepsize XXX why considerer que le max ici ? XX
+    \begin{align*}
+             \mathbb{E}   \left\| x^{k_m} - x_\ell^\star \right\|^2 \le \left( 1-\alpha_\ell  \right)^{m} \max_i\left\|x_i^0-x_{i,\ell}^\star\right\|^2 \le \left( 1-\alpha_\ell  \right)^{m} \left\|x_\ell -x_{\ell}^\star\right\|^2
+    \end{align*}
+    where $x_\ell^\star$ is the unique solution of \eqref{eq:reco}, and $x_{i,\ell}^\star = x_\ell^\star - \gamma \nabla h_{i,\ell}(x^\star_\ell)$ are its local shifts.
+    
+    We now apply Lemma~\ref{lem:basereco} with the following input: $x' = x_{\ell+1}$; $x = x_\ell$; $F = F$ (which is $\mu$ strongly convex); $x^\star =x^\star$ (minimizer of $F$); and $\nu = \left( 1-\alpha_\ell  \right)^{\mathsf{M}_\ell}$ (noting that this term only depends on $x_\ell$). We get for $\varepsilon = \frac{1}{\ell^{1+\delta}} \in (0,1)$
+        \begin{align*}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2 | x_\ell \right] &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\| x_\ell - x^\star \right\|^2 \\
+   \nonumber     &\hspace*{-1.2cm} - \underbrace{\left[ \left(1 + \frac{1}{\ell^{1+\delta}}\right) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \ell^{1+\delta} \right)  (1-\alpha_\ell)^{\mathsf{M}_\ell}  \right]}_{:= b_\ell}  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2.
+     \end{align*}
+     Choosing $\mathsf{M}_\ell$
+    %  \mathsf{M}_\ell = \left\lceil \frac{({1+\delta})\log(\ell)}{\log\left( \frac{1}{1-{\alpha_\ell}} \right)} + \frac{ \log\left(\frac{2 \mu+\rho}{(1-\delta)\rho}\right)}{\log\left( \frac{1}{1-{\alpha_\ell}} \right)} \right\rceil$
+     as per $\mathsf{C}_1$ guarantees that
+     $$
+     b_\ell \geq \delta \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \frac{{\rho }}{2\mu + {\rho }} \geq    \frac{{\delta  \rho }}{2\mu + {\rho }} .
+     $$ 
+     Thus, for any $\mu\geq 0$, %($0$ included), 
+     we have
+     \begin{align}\label{eq:C1base}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2 | x_\ell \right] &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right) \frac{{ \rho }}{2\mu + {\rho }}  \left\| x_\ell - x^\star \right\|^2 -  \frac{{\delta  \rho }}{2\mu + {\rho }} \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2.
+     \end{align}
+     
+     \vspace*{1ex}
+     \noindent\underline{Convergence.} By using $\mu\geq 0$ in \;\eqref{eq:C1base}, we get 
+          \begin{align}
+          \label{eq:RS}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2 | x_\ell \right] &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \left\| x_\ell - x^\star \right\|^2 -  \delta \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2 .
+     \end{align}
+     By Robbins-Siegmund theorem \cite[Th.~1]{robbins1971convergence} (see also \cite{iutzeler2013asynchronous,bianchi2015coordinate,combettes2015stochastic} for applications to optimization), we have that i) $(\left\|x_{\ell} - x^\star  \right\|^2)$ converges almost surely to a random variable with finite support; and ii) $ \sum_{\ell=1}^\infty \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2 < \infty$. This means that we can extract a subsequence $(x_{\ell^n})$ that converges almost surely to some $\overline{x}^\star$ which is necessarily a minimizer from ii). Using~\eqref{eq:RS} again with $x^\star = \overline{x}^\star$, we see that $(x_{\ell})$ converges to $\overline{x}^\star$ almost surely.
+     
+     \vspace*{1ex}
+     \noindent\underline{Rate.} Now, if $\mu>0$, we get by dropping the last term in~\eqref{eq:C1base} and successively taking expectations that  
+      \begin{align}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2 \right] &\leq \left( {\ell} + 1  \right)^{1+\delta}  \left( \frac{{\rho }}{2\mu + {\rho }} \right)^\ell  \left\| x_1 - x^\star \right\|^2 
+        = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2} \right)^\ell \right).
+     \end{align}
+
+
+% ===========================================================
+\vspace*{1ex}
+\paragraph{Proof for criterion $\mathsf{C}_2$ \emph{(absolute accuracy)}}
+
+We apply Lemma\;\ref{lem:basereco} with the following input:\;$x'\!= x_{\ell+1}$; $x = x_\ell$; $F = F$ (which is $\mu$ strongly convex); $x^\star =x^\star$ (minimizer of $F$); 
+%\rho = \rho$; 
+and $ \nu = (1-\delta)\rho/((2\mu+\rho)\ell^{1+\delta})$ (noting that the condition on $x_{\ell+1}$ is almost sure). We get for $\varepsilon = \frac{1}{\ell^{1+\delta}} \in (0,1)$
+        \begin{align*}
+  %\label{eq:C2base} 
+  \left\|x_{\ell+1} - x^\star  \right\|^2 &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\| x_\ell - x^\star \right\|^2 \\
+   \nonumber     &\hspace*{-1.2cm} - \underbrace{\left[ \left(1 + \frac{1}{\ell^{1+\delta}}\right) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \ell^{1+\delta} \right)  \frac{1}{\ell^{1+\delta}}  \frac{{(1-\delta)\rho }}{2\mu + {\rho }} \right]}_{\leq 0}  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2 \\
+ \nonumber  &\leq  \left( {\ell} + 1  \right)^{1+\delta}  \left( \frac{{\rho }}{2\mu + {\rho }} \right)^\ell  \left\| x_1 - x^\star \right\|^2 .
+     \end{align*}
+     This directly gives the rate of convergence when $\mu>0$. 
+    When $\mu=0$, the inequality can be simplified to
+    \begin{align}
+  \nonumber \left\|x_{\ell+1} - x^\star  \right\|^2 &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)    \left\| x_\ell - x^\star \right\|^2 \\
+   \nonumber     &\hspace*{-1.2cm} -  \left[ \left(1 + \frac{1}{\ell^{1+\delta}}\right)   - \left( 1 + \ell^{1+\delta} \right)  \frac{1}{\ell^{1+\delta}}  (1-\delta) \right]  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2 \\
+\nonumber  &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)    \left\| x_\ell - x^\star \right\|^2 - \delta  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2.
+     \end{align}
+     In this case, the same arguments as for criterion $\mathsf{C}_1$ enable to get almost sure convergence.
+
+
+% ===========================================================
+\vspace*{2ex}
+\paragraph{Proof for criterion $\mathsf{C}_3$ \emph{(relative accuracy)} }
+
+Denoting $\beta := \sqrt{\rho/(2\mu+\rho)} \in (0,1]$, the stopping criterion $\mathsf{C}_3$writes
+\begin{align}\label{eq:baseC3}
+    \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\| \leq   \varepsilon_\ell \|x_{\ell+1} -  x_\ell \|  \qquad\text{ with }    \varepsilon_\ell =  \frac{\beta}{2\ell^{1+\delta}} .
+\end{align}
+% This is the usual inexactness in proximal algorithms \cite{rockafellar1976monotone}.
+%\vspace*{1ex}
+\noindent\underline{Convergence.} The condition\;\eqref{eq:baseC3} matches condition\;(B) of\;\cite[Th.~2]{rockafellar1976monotone}. We also have clearly $\sum_\ell \varepsilon_\ell < +\infty$ and the regularity assumption of the operator is verified, by our extra assumption and   \cite[Prop.~7]{rockafellar1976monotone}. Thus \cite[Th.~2]{rockafellar1976monotone} directly gives us that $(x_\ell)$ converges to a minimizer of $F$, that we denote by $x^\star$.
+
+\vspace*{1ex}
+\noindent\underline{Rate.} When $F$ is $\mu$-strongly convex, we can furthermore develop:
+\begin{align*}
+    \left\| x_{\ell+1} - x^\star \right\| &\leq \left\| x_{\ell+1} - \prox_{F/\rho}(x_\ell) \right\| + \left\|\prox_{F/\rho}(x_\ell) - x^\star \right\| \\
+    &\leq \varepsilon_\ell \left\| x_{\ell+1} - x_\ell \right\| + \beta \left\|x_\ell - x^\star \right\| \\
+    &\leq  \varepsilon_\ell \left\| x_{\ell+1} - x^\star \right\|  + \varepsilon_\ell \left\| x_{\ell} - x^\star \right\| + \beta \left\|x_\ell - x^\star \right\|
+\end{align*}
+where the first inequality used both condition $\mathsf{C}_3$ and Lemma~\ref{lem:opstrong}. This implies that 
+\begin{align*}
+    \left\| x_{\ell+1} - x^\star \right\|^2 &\leq \left( \frac{\varepsilon_\ell + \beta}{1 - \varepsilon_\ell} \right)^2  \left\|x_\ell - x^\star \right\|^2 .
+\end{align*}
+Finally, denoting $d_\ell := \ell^{1+\delta}/(\ell^{1+\delta}-1) > 1 $, we have\footnote{Note that $
+   \varepsilon_\ell^2 = \frac{\rho}{4(2\mu+\rho) \ell^{2+2\delta}} \leq \left( \frac{\beta}{2} \right)^2 \frac{(d_\ell-1)^2}{d_\ell^2} \leq \beta^2 \frac{(d_\ell-1)^2}{(1+\beta d_\ell)^2} $.}
+\begin{align*}
+    \varepsilon_\ell \leq \beta \frac{(d_\ell-1)}{(1+\beta d_\ell)} ~~\Longrightarrow~~ \frac{\varepsilon_\ell + \beta}{1 - \varepsilon_\ell} \leq d_\ell \beta \leq \ell^{1+\delta}/((\ell-1)^{1+\delta}) \beta.
+\end{align*}
+This yields
+\begin{align*}
+    \left\| x_{\ell+1} - x^\star \right\|^2 &\leq \left( \frac{\ell}{\ell-1} \right)^{2+2\delta} \frac{{\rho }}{2\mu + {\rho }} \left\|x_\ell - x^\star \right\|^2 
+\end{align*}
+which gives the result.
+
+
+
+% ===========================================================
+% ===========================================================
+\section{Acceleration \emph{à la} Catalyst}\label{apx:cata} 
+% ===========================================================
+% ===========================================================
+Catalyst is a popular \emph{accelerated} inexact proximal point meta-algorithm for solving machine learning objective \cite{lin2015universal,lin2017catalyst}.
+%We could have been used Catalyst 
+It consists in adding an acceleration step in the outer problem to reach a fast rate. The parameters of Catalyst are i) the choice of the inertial sequence $(\beta_\ell)$; and ii) the choice of the stopping criteria that comes in the same flavor as for \recoalgo. Applied to our context, this gives Algorithm\;\ref{algo:cata} where the main difference with \recoalgo is the final line with the acceleration. 
+
+Under the parameters given in \cite{lin2017catalyst}, the fast outer rate is stated in the following result which shows in the square root compared to Theorem~\ref{th:reco} for the direct proximal reconditioning.
+
+\begin{theorem}
+\label{thm:cata}
+Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu\geq0$) and $L$-smooth. Let $r$ be convex lsc. 
+Then, \cataalgo on $((\alpha_i),(f_i),r)$ with stopping criterion $\mathsf{C}_2$ or $\mathsf{C}_3$  converges almost surely to a minimizer of $F$ at rate $1/\ell^2$.
+
+Furthermore, if $\mu>0$, then 
+      \begin{align}
+      \left\|x_{\ell+1} - x^\star  \right\|^2  ={\mathcal{O}} \left( \left(   1 - \sqrt{ \frac{{\mu }}{4\mu + 4{\rho }} }  \right)^\ell \right) .
+        \end{align}
+\end{theorem}
+
+\begin{proof}
+    Using that by the $(\mu+\rho)$-strong convexity of the inner problem, we write
+    $$ \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|^2 \leq \frac{H_\ell(x_{\ell+1}) - H_\ell\big(\prox_{F/\rho}(x_\ell)\big)}{\mu+\rho}
+    \leq \frac{H_\ell(x_{\ell+1}) - \min_x  H_\ell}{\mu+\rho}. $$.
+    Then the result directly follows from \cite{lin2017catalyst}.
+\end{proof}
+
+Note that \cite{lin2017catalyst} provides rates for the non-strongly convex case (however with different stopping criteria) whereas we only focus on convergence for simplicity. 
+More importantly, we also notice also that $\mathsf{C}_1$ is not supported in this result; this is also the case in \cite{lin2017catalyst} where $\mathsf{C}_1$ is used in the computational experiments, but not covered either by the theory.
+
+
+\begin{algorithm}[h!]
+\caption{\label{algo:cata}\cataalgo on $((\alpha_i),(f_i),r)$}
+Initialize $x_1$, $c>0$, $\delta\in(0,1)$, as well as $\rho$ and $\gamma$ as in \eqref{eq:set}.
+
+% \begin{align}
+% \label{eq:setCata}
+%  \text{Set } \rho = \frac{\kappa L-\mu}{1-\kappa} \text{ and } \gamma \in \left( 0, \frac{2}{\mu+L+2\rho} \right] \text{ with } \kappa = \frac{1-\sqrt{\pp -\alpha}}{1+\sqrt{\pp-\alpha}}; \pp = \frac{c}{d} \text{ and } \alpha = \frac{c}{2d}.
+% \end{align}
+\While{the desired accuracy is not achieved}{
+Observe the support of $y_\ell$, compute $\pvec_\ell$ as in \eqref{eq:proba}.
+% \begin{align}
+% p_{j,\ell} = \left\{ \begin{array}{cr}
+%  \pp_\ell := \min\left(\frac{c}{|\nullC(y_\ell)|};1\right) & \text{ if } [x_\ell]_j = 0 \\
+%   1  &  \text{ if } [x_\ell]_j \neq  0 
+% \end{array}   \right. ~~~~~ \text{for all $j\in\{1,\dots,d\}$}.
+% \end{align}
+Compute an approximate solution of the reconditioned problem
+$$%\begin{align} 
+x_{\ell+1} \approx \prox_{F/\rho} (y_\ell)
+% \argmin_{x\in\mathbb{R}^d}  ~ \left\{ H_\ell(x) = \sum_{i=1}^M  \alpha_i \underbrace{\left( f_i(x) + \frac{\rho}{2} \| x - y_\ell \|_2^2 \right)}_{h_{i,\ell}(x)}  +  r(x)  \right\}
+$$%\end{align}
+with \salgo on $((\alpha_i),(h_{i,\ell}), r  ~ ; ~  \pvec_\ell)$  with stopping criterion:\\%[0.1cm]
+\begin{itemize}
+    % \item[] $\mathsf{C}_1$: \emph{(epoch budget)} Run \salgo, initialized with $x_\ell$, with the maximal stepsize for
+    % $$  \displaystyle \mathsf{M}_\ell  \text{ epochs.}$$
+    \item[] $\mathsf{C}_2$ (absolute accuracy):  Run \salgo until it finds $x_{\ell+1}$ such that  
+    $$ \|x_{\ell+1} -  \prox_{F/\rho}(y_\ell)\|^2 \leq \frac{\varepsilon^{\mathrm{Catalyst}}_\ell }{\mu+\rho}  ( F(y_{1}) - \min_x  F )  .$$ 
+    \item[or] $\mathsf{C}_3$ (relative accuracy):  Run \salgo until it finds $x_{\ell+1}$ such that  
+    $$  \|x_{\ell+1} -  \prox_{F/\rho}(y_\ell)\|^2   \leq   \frac{\delta^{\mathrm{Catalyst}}_\ell}{\mu+\rho}  \| x_{\ell+1} - y_{\ell} \|^2   .$$
+    Compute the next point with Nesterov’s extrapolation step
+    $$ y_{\ell+1} = x_{\ell+1} + \beta_\ell (x_{\ell+1}-x_\ell). $$
+    \vspace*{-2ex}
+\end{itemize}
+}
+\end{algorithm}
+% XXXX attention j'ai change les criteres d'arret : F verifie que c'est OK.
+
+
+
+
+% ===========================================================
+% ===========================================================
+\section{Proofs related to identification}
+% ===========================================================
+% ===========================================================
+
+% ===========================================================
+\subsection{Proof of Theorem~\ref{th:ident}}\label{apx:ident}
+% ===========================================================
+
+Both \recoalgo and \cataalgo are of the form 
+\begin{align*}
+    x_{\ell+1} &\approx \prox_{F/\rho}(y_\ell)
+    \qquad\text{and}\qquad
+    y_{\ell+1} = x_{\ell+1} + \beta_\ell(x_{\ell+1} - x_\ell) 
+\end{align*}
+(with $\beta_\ell \equiv 0$ for \recoalgo and $\beta_\ell \in (0,1)$ for \cataalgo); and verify for all $\ell,k$
+\begin{align*}
+    \mathbb{E} \|x_{\ell} - x^\star \| &\leq C (1-\rho)^\ell
+    \qquad\text{and}\qquad
+    \mathbb{E} \|\overline{x}^k_{\ell} - \overline{x}_\ell^\star \| \leq C'  \|y_{\ell} - x_\ell^\star \| 
+\end{align*}
+for some $C,C'>0$ and $\rho\in(0,1)$, where 
+$$
+\overline{x}_\ell^\star :=  {x}_\ell^\star - \gamma \sum_{i=1}^M \alpha_i \nabla h_{i,\ell}({x}_\ell^\star).
+$$
+As in the proof in appendix~\ref{apx:proofsparse}, we also consider $\overline{x}^\star$ given by \eqref{eq:xbar}. 
+% define $\overline{x}^\star :=  {x}^\star - \gamma \sum_{i=1}^M \alpha_i \nabla f_i({x}^\star)$ and 
+Then we have
+\begin{align*}
+    \|\overline{x}_\ell^\star - \overline{x}^\star\| &=    \|{x}_\ell^\star - \gamma \sum_{i=1}^M \alpha_i \nabla h_{i,\ell}({x}_\ell^\star) - {x}^\star + \gamma \sum_{i=1}^M \alpha_i \nabla f_i({x}^\star) \| \\ 
+    &=  \|{x}_\ell^\star - \gamma \sum_{i=1}^M \alpha_i \nabla f_{i}({x}_\ell^\star) - \gamma \rho ({x}_\ell^\star - {y}_\ell) - {x}^\star + \gamma \sum_{i=1}^M \alpha_i \nabla f_i({x}^\star) \| \\ 
+    &\leq  \|{x}_\ell^\star - {x}^\star\| + \gamma \sum_{i=1}^M \alpha_i  \|\nabla f_i({x}_\ell^\star) - \nabla f_i({x}^\star)\| + \gamma \rho \|{x}_\ell^\star - {y}_\ell\| \\
+    &\leq  \|{x}_\ell^\star - {x}^\star\| + \gamma \sum_{i=1}^M \alpha_i L \|{x}_\ell^\star - {x}^\star\| + \gamma \rho \|{x}_\ell^\star - {x}_\ell\| \\
+    &\leq  D \|{x}_\ell^\star - {x}^\star\|  + D' \|y_\ell - {x}^\star_\ell\|
+\end{align*}
+For any $\ell,k$, we then have
+\begin{align*}
+    \EE \|\overline x_{ {\ell}}^k &-  \overline {x}^\star\|^2  \\
+    & \leq 2\EE\left[\|\overline x_{ {\ell}}^k -  \overline x^{\star}_{ {\ell}}\|^2 + \|\overline x^{\star}_{ {\ell}} -  \overline{x}^\star\|^2\right] \\
+    &\leq 2C' \EE \|y_{\ell} - x_{ {\ell}}^\star\|^2 + 2D  \EE\|x^{\star}_{ {\ell}} -  {x^\star}\|^2 + 2D'  \EE\|y_\ell - {x}^\star_\ell\|^2\\
+    &\leq 4C' \EE \|y_{\ell} - x^\star\|^2  + (4C'+2D) \EE \|x_{\ell}^\star - x^\star\|^2 + 2D'  \EE\|y_\ell - {x}^\star_\ell\|^2  \\
+    &\leq (8C'+2D+2D') \EE \|y_{\ell} - x^\star\|^2 \\
+    &\leq (8C'+2D+2D') \EE \|(1+ {\beta}_\ell)({ {x_{\ell}}} -  {x^\star}) -  {\beta_\ell}({ {x_{\ell-1}}} -  {x^\star})\|^2 + 2D'  \EE\|x^{\star}_{ {\ell}} -  {x_\ell}\|^2\\
+    &{\leq} 2(8C'+2D+2D')(1+ {\beta}_\ell)^2\EE \|{ {x_{\ell}}} -  {x^\star})\|^2  +2(8C'+2D+2D')(1+ {\beta}_\ell)^2 \EE\|{ {x_{\ell-1}}} -  {x^\star})\|^2\\
+    &{\leq} 2(8C'+2D+2D')(1+ {\beta}_\ell)^2 C (1-\rho)^\ell +2(8C'+2D+2D')(1+ {\beta}_\ell)^2 C (1-\rho)^{\ell-1} \\
+    &\leq 16(8C'+2D+2D') C  (1-\rho)^{\ell-1}.
+    \end{align*}
+Hence, by Markov's inequality and Borel-Cantelli's lemma, $\overline x_{ {\ell}}^k \to  \overline {x}^\star$ almost surely. As a direct result, we get
+$$
+x_\ell^k = \prox_{\gamma r}( \overline x_{ {\ell}}^k ) \to {x}^\star = \prox_{\gamma r}(  \overline {x}^\star ).
+$$
+Together with Assumption~\ref{hyp:ident}, this convergence implies identification of optimal support (see e.g.\;the recent survey\;\cite[Cor.\;1]{iutzeler2020SVAA}): there is a $\Lambda<\infty$ such that for all $\ell\geq \Lambda$,
+$$
+\nullC(x_\ell^k) = \nullC(x^\star) \qquad \text{and} \qquad \supp(x_\ell^k) = \supp(x^\star).
+$$
+%This exactly means $ \supp(x_\ell^k) = \supp(x^\star) $.
+Finally, it suffices to notice that $x_{\ell+1} = x_\ell^k$ for some $k$ to conclude the proof. 
+    
+% XXX t'as vu : pour le resultat d’identification, je me dis que c’est finalement plus simple de renvoyer a notre article SVAA. L’autre option est d’utiliser le fameux theorem 1 de l’article miroir-strat, mais il faut expliquer qu’on a bien inclusion dans le bon sous-diff et que la strate de droite coincide grace a l’hypothese. J’aime bien aussi et ca ajoute des maths "non calulatoire" a la preuve. A moins que tu trouves mieux ?
+
+
+
+% ===========================================================
+\subsection{Proof of Theorem~\ref{th:imprate}}\label{apx:imprate}
+% ===========================================================
+
+From Theorem~\ref{th:ident} we know that identification takes place i.e.\;that we have $\nullC(x^k_\ell) = \nullC(x^\star) := n^\star$ for all $k,\ell$ ($\ell\geq\Lambda$).
+%Let consider the iteration after the moment of 
+In this case, 
+\begin{align*}
+    [x^k_\ell]_{n^\star} = 0 \quad\text{ and }\quad [x^k_\ell]_{\overline{n^\star}} = x_\ell^k
+\end{align*}
+where we denote by $\overline{n^\star}$ the complementary of $n^\star$. Then, we have
+\begin{align*}
+  \nonumber   [x^k_\ell]_{\overline{n^\star}}  
+  &=\left[\prox_{\gamma r}([\overline{x}^k_\ell]_{\overline{n^\star}})\right]_{\overline{n^\star}}  
+  = \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i [x^{k-D_i^k}]_{\overline{n^\star}} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}} \\
+     &=  \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i x^{k-D_i^k} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}}.
+\end{align*}
+This exactly coincides with a non-sparsified update on the restriction of $f_i$ to the subspace of vectors with null coordinates in ${\overline{n^\star}}$. More specifically, let $S^\star = \{ x\in \mathbb{R}^d : \nullC(x) = n^\star \}$ be the subspace of vectors with null coordinates in ${\overline{n^\star}}$, and
+$f_{i|{\overline{n^\star}}}$ be the restriction of $f_i$ to $S^\star$.
+Then the above iteration coincides with non-sparsified update on
+$((\alpha_i),(f_{i|{\overline{n^\star}}}),r)$. In other words, after identification, \salgo is no longer random and has the same iterates as \dave on $S^\star$ (while in $S^{\star\perp}$, the algorithm has converged to $0$). Theorem\;\ref{th:davepg} therefore guarantees that \salgo benefits from a $(1-\gamma (\mu+\rho))^2$ rate in terms of epochs (since $(\mu+\rho)$ is the modulus of strong convexity).
+
+
+
+% ===========================================================
+\subsection{Proof of Theorem~\ref{th:com}}\label{apx:com}
+% ===========================================================
+
+Following the choice of~\eqref{eq:proba},
+\begin{align*}
+    \mathbf{M}^{\mathsf{C}} = \tilde{O}\left( \frac{1}{\gamma(\mu+\rho)} \right)
+\end{align*}
+for both $\mathsf{C}_2$ and $\mathsf{C}_3$ from Theorem~\ref{th:imprate} (see also \cite[Lemma~11]{lin2017catalyst}). Finally, 
+\begin{align*}
+    \mathbf{L}(\varepsilon) = {O}\left( \frac{\mu + \rho/2}{\mu} \log\left( \frac{1}{\varepsilon} \right) \right) 
+\end{align*}
+from Theorem~\ref{th:reco}.
+Put together, this gives the following complexity:
+\begin{align*}
+     \mathbf{C}(\varepsilon) = \tilde{O}\left( \frac{\mu + \rho/2}{\gamma \mu (\mu+\rho)} (2s^\star + c) \log\left( \frac{1}{\varepsilon} \right) \right).
+\end{align*}
+    Since $s^\star \ll d$, let us take $c$ as an estimate $c \ll d$ of $s^\star$. Then, by definition (in \eqref{eq:rho}) $\rho\gg L\geq\mu $. Taking  the maximal $\gamma = 2/(\mu+L+2\rho)$, we have 
+    \begin{align*}
+        \frac{\mu + \rho/2}{\gamma \mu (\mu+\rho)} (2s^\star + c) &\leq \frac{\mu + L + 2\rho}{2  \mu} (2s^\star + c)\\
+        &\approx_{c\ll d} \frac{(L-\mu)\sqrt{d}(2s^\star + c) }{  \mu \sqrt{ c}} \\
+        &= \frac{L-\mu}{\mu} \sqrt{d c } \left(1+2\frac{s^\star}{c} \right)\\
+        &= \frac{L-\mu}{\mu} \sqrt{d s^\star } \left(\sqrt{\frac{c}{s^\star}}+2\sqrt{\frac{s^\star}{c}} \right) \leq \frac{L-\mu}{\mu} \sqrt{d s^\star } ~ 2 \max \left(\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right).
+    \end{align*}

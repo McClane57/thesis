@@ -1,17 +1,23 @@
 \subsubsection{Practical consideration for TV}
-{\color{blue}
+{
 Before going to the numerical section, let us discuss the problem of computation of $\bQ_\ell$ for $1$-d Total Variation.
 
-First, to compute $\bP_\ell$ for arbitrary admissible selection $\Sel$ we need to calculate the sum of $2^d - 1$ matrices $n\times n$ where $d$ is the size of the subspace family $\C$. Second, the computation of the inverse matrix $\bQ_\ell$ is also expensive. To figure out both of these problems let us propose the following adaptive selection 
-$$
-\mathbb{P}[\C_i\in\Sel^k] = 
-\left\{
-    \begin{array}{rl}
-        1 &  \text{ if } i\in\mathcal{S} \\
-        1 &  \text{ if } [\SC(x^k)]_i = 1\\
-        p & \text{ elsewhere } 
-    \end{array}\right.
-$$
-where $\mathcal{S}$ is a set of artificial jumps $\{n_1, n_2, \ldots, n_{l-1}\}$. It is easy to see that small enough $l$ will not change the sparsisty property of the random projection $P_{\Sel^k}$ however this modification will force all the projection to be block-diagonal with blocks' ends on positions $n_1,\ldots n_{l-1}$. In contrast with $\jumps(x^k)$ that we could not control, by adding $l$ artificial jumps we could guarantee that each block of the $P_{\Sel^k}$ has at most $\lceil n/l\rceil$ rows. Since every random projection has end of the block on positions $\left\{n_i\right\}_{1\leq i \leq l -1}$\footnote{Of course, any projection also has the end of the block on positions $\{i:[\SC(x^k)]_i = 1\}$ but we will skip them for simplicity.} $\bP_\ell$ also has such block sructure and we could split the computation of $\bQ_\ell^{-1}$ and $\bQ_\ell$ into $l$ independent parts and could be done in parallel. Consider $n_i = \lceil
-\frac{ni}{l}\rceil$, then the computational cost of inversion cost will decrease by factor of $l^2$.
+First, to compute $\bP_\ell$ for arbitrary admissible selection $\Sel$ we need to calculate the sum of $2^d - 1$ matrices $n\times n$ where $d$ is the size of the subspace family $\C$. Second, the computation of the inverse matrix $\bQ_\ell$ is also expensive. To figure out both of these problems let us propose the following adaptive selection based on Option $2$ Table \ref{tab:comp}.
+
+Consider the set of artificial jumps  $\mathcal{S} = \{n_1, n_2, \ldots, n_{l-1}\}$ and denote by $\mathcal{R} = \{i\notin \mathcal{S}: [\SC(x^k)]_i=0\}$ the set of possible random entries. Fix the amount of sampled elements $s$ and sample ``first'' element $\mathcal{R}_0$ uniformly in $\mathcal{R} = \{\mathcal{R}_i\}_{1\leq i\leq r}$. Select ``first $s$'' elements starting from $\mathcal{R}_f$ considering the cyclic structure of the list of elements ($\mathcal{R}_{r+1} = \mathcal{R}_1$). 
+
+This selection allows to solve both issues stated above if the specific set $\mathcal{S}$ is chosen. If $l$ is small enough it will not change the sparsity property of the random projection $P_{\Sel^k}$; however, this modification will force all the projections to be block-diagonal with blocks' ends on positions $n_1,\ldots n_{l-1}$. In contrast with $\jumps(x^k)$ that we could not control, by adding $l$ artificial jumps we could guarantee that each block of the $P_{\Sel^k}$ has at most $\lceil n/l\rceil$ rows. Since every random projection has end of the block on positions $\left\{n_i\right\}_{1\leq i \leq l -1}$\footnote{Of course, any projection also has the ends of the blocks on positions $\{i:[\SC(x^k)]_i = 1\}$ but we will skip them for simplicity.} $\bP_\ell$ also has such block structure and we could split the computation of $\bQ_\ell^{-1}$ and $\bQ_\ell$ into $l$ independent parts and could be done in parallel.
+
+Second, the total amount of possible projections is equal to the $r$ that decrease the amount of terms in the sum; however, if $l$ is small and the final solution is sparse $r=\mathcal{O}(n)$ and the computational cost of $\bP_\ell$ is $\mathcal{O}(n^3)$. Due to our specific selection of $\mathcal{S}$ we could make this computation in parallel block by block and moreover, the amount of projections to be considered for every block is at most the size of block. All in all it leads to the same complexity as the inversion procedure and selecting $\mathcal{S}$ such that $n_i = \lceil
+\frac{ni}{l}\rceil$, the computational cost of update of $\bP_\ell$ and $\bQ_\ell$ is $\mathcal{O}(n^3l^{-2})$.
+% $$
+% \mathbb{P}[\C_i\in\Sel^k] = 
+% \left\{
+%     \begin{array}{rl}
+%         1 &  \text{ if } i\in\mathcal{S} \\
+%         1 &  \text{ if } [\SC(x^k)]_i = 1\\
+%         p & \text{ elsewhere } 
+%     \end{array}\right.
+% $$
+% where $\mathcal{S}$ is a set of artificial jumps $\{n_1, n_2, \ldots, n_{l-1}\}$. 
 }

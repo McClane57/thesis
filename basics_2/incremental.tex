@@ -16,7 +16,7 @@ if $i$ is selected uniformly at random from $[m] = [1,\dots,m]$ then $\nabla f_i
 
 Let us present the general scheme of stochastic gradient descent
 \begin{algorithm}
-    \caption{Stochastic Gradient Descent (SGD)}
+    \caption{Stochastic Gradient Descent (\texttt{SGD})}
     \label{algo:sgd}
     \begin{algorithmic}
         \STATE Initialize $x^0\in\mathbb{R}^n$
@@ -32,19 +32,19 @@ In particular, $g^k$ could be selected as $\nabla f_{i^k}(x^k)$ where $i^k$ is a
 \begin{equation}\label{eq:sg_variance}
     \EE\left[\|g^k - \nabla f(x^k)\|_2^2|x^k\right].
 \end{equation}
-This variance is usually non-zero for any $x^k$ and even in the optimal point $x^\star$. For example, the full gradient $\nabla f(x^\star) = 0$ but there is no reason for $\nabla f_i(x^\star)$ to vanish. {\color{blue} Consider Algorithm \ref{algo:sgd} with fixed stepsize $\gamma^k = \gamma$. Since, for any point $x^k$ the noise \eqref{eq:sg_variance} is separated from $0$ the point $x^\star$ is not fixed point of the algoithm.} This again (like for subgradient descent) leads to the slower rate than for the gradient descent, see the usual behaviour of convergence in Figure \ref{fig:sgd_vs_gd}.
+This variance is usually non-zero for any $x^k$ and even in the optimal point $x^\star$. For example, the full gradient $\nabla f(x^\star) = 0$ but there is no reason for $\nabla f_i(x^\star)$ to vanish. {Consider Algorithm \ref{algo:sgd} with fixed stepsize $\gamma^k = \gamma$. Since, for any point $x^k$ the noise \eqref{eq:sg_variance} is separated from $0$ the point $x^\star$ is not fixed point of the algoithm.} This again (like for subgradient descent) leads to the slower rate than for the gradient descent, see the usual behaviour of convergence in Figure \ref{fig:sgd_vs_gd}.
 
 \begin{figure}[H]
     \centering
     \input{basics_2/stoch_vs_grad}
-    \caption{Evolution of iterates for GD with fixed stepsize $\gamma = \frac{2}{\mu + L}$ and SGD with decreasing stepsize $\gamma^k = \frac{1}{k}$ for $L$-smooth and $\mu$-strongly convex objective $f(x) = \|Ax-b\|_2^2$, with random generated $A\in\RR^{100\times100},b\in\RR^{100}$. As we could see from this plot, in the beginning, when the stepsizes in these two algorithm are approximately the same SGD performs better, however when $\gamma^k\ll \frac{1}{L}$ it slows down fast.}
+    \caption{Evolution of iterates for \texttt{GD} with fixed stepsize $\gamma = \frac{2}{\mu + L}$ and \texttt{SGD} with decreasing stepsize $\gamma^k = \frac{1}{k}$ for $L$-smooth and $\mu$-strongly convex objective $f(x) = \|Ax-b\|_2^2$, with random generated $A\in\RR^{100\times100},b\in\RR^{100}$. As we could see from this plot, in the beginning, when the stepsizes in these two algorithm are approximately the same \texttt{SGD} performs better, however when $\gamma^k\ll \frac{1}{L}$ it slows down fast.}
     \label{fig:sgd_vs_gd}
 \end{figure}
 
-In \cite{solodov1998incremental, nedic2001convergence} authors propose SGD with a constant stepsize. In Proposition $2.4$ \cite{nedic2001convergence} it was proven that such algorithm has a convergence rate that could be split into two parts: first is dependent on the number of iteration and converges linearly (for the strongly convex objective) to $0$, though, the second part is independent on $k$ and does not go to $0$ that implies a linear convergence but only up to a fixed tolerance. In \cite{solodov1998incremental} the linear convergence takes place only under some additional assumptions about the relationship between $f_i$. In \cite{shalev2013stochastic} Stochastic Dual Coordinate Ascent (SDCA) was proposed, this algorithm has a linear convergence rate; however, it is limited to the finite sum problems with strongly convex $f_i$. This work was extended to the case when only the strong convexity of the global objective $f$ is required \cite{shalev2016sdca}.
+In \cite{solodov1998incremental, nedic2001convergence} authors propose \texttt{SGD} with a constant stepsize. In Proposition $2.4$ \cite{nedic2001convergence} it was proven that such algorithm has a convergence rate that could be split into two parts: first is dependent on the number of iteration and converges linearly (for the strongly convex objective) to $0$, though, the second part is independent on $k$ and does not go to $0$ that implies a linear convergence but only up to a fixed tolerance. In \cite{solodov1998incremental} the linear convergence takes place only under some additional assumptions about the relationship between $f_i$. In \cite{shalev2013stochastic} Stochastic Dual Coordinate Ascent (\texttt{SDCA}) was proposed, this algorithm has a linear convergence rate; however, it is limited to the finite sum problems with strongly convex $f_i$. This work was extended to the case when only the strong convexity of the global objective $f$ is required \cite{shalev2016sdca}.
 
 % The key bottleneck in stochastic methods is a variance of the gradient, that requires to use the decreasing sequence of stepsizes to guarantee the convergence to the minimizer. 
-Another possible solution is to decrease the variance of the gradient to guarantee the linear convergence for strongly convex objectives. One of the examples of such methods is SAG \cite{schmidt2017minimizing}. In this paper, authors propose a randomized variant of incremental aggregated gradient (IAG) \cite{blatt2007convergent} with the following iterations
+Another possible solution is to decrease the variance of the gradient to guarantee the linear convergence for strongly convex objectives. One of the examples of such methods is \texttt{SAG} \cite{schmidt2017minimizing}. In this paper, authors propose a randomized variant of incremental aggregated gradient (\texttt{IAG}) \cite{blatt2007convergent} with the following iterations
 $$
 x^{k+1} = x^k - \frac{\gamma^k}{m}\sum_{i=1}^m y_i^k,
 $$
@@ -54,12 +54,12 @@ y_i^k = \begin{cases} \nabla f_i(x^k)~~~\textnormal{if }i = i^k,\\y_i^{k-1}~~~~~
 $$
 This algorithm combines the low cost of each iteration with the linear rate in the strongly convex case.
 %  that is achieved because of keeping the most recent gradients for every component $f_i$ of the sum.
-Memory allows usage of better approximations of the full gradient on each iteration that allows using constant stepsize. This algorithm was further extended to the composite set up SAGA in \cite{defazio2014saga}. Another example of variance reduction in stochastic gradient descent methods is method SVRG \cite{johnson2013accelerating}. Every iteration of this algorithm could be written as
+Memory allows usage of better approximations of the full gradient on each iteration that allows using constant stepsize. This algorithm was further extended to the composite set up \texttt{SAGA} in \cite{defazio2014saga}. Another example of variance reduction in stochastic gradient descent methods is method \texttt{SVRG} \cite{johnson2013accelerating}. Every iteration of this algorithm could be written as
 $$
 x^{k+1} = x^k -\gamma^k\left(\nabla f_i(x^k) - y_i^{k-1} + \frac{1}{m}\sum_{i=1}^m y_i\right),
 $$
-where $y_i$ is a last stored gradient for $f_i$. The key difference of this algorithm is in the way of updating gradients in the memory. Unlikely to SAG/SAGA where on every iteration one gradient is updated in SVRG gradients are updated simultaneously every $p$ iterations
+where $y_i$ is a last stored gradient for $f_i$. The key difference of this algorithm is in the way of updating gradients in the memory. Unlikely to \texttt{SAG}/\texttt{SAGA} where on every iteration one gradient is updated in \texttt{SVRG} gradients are updated simultaneously every $p$ iterations
 $$
 y_i = \nabla f_i(x^d)~~~~\textnormal{for all }i,
 $$
-where $d$ is a moment of the last update of stored in memory gradients. It is now understood that these algorithms are conceptually almost the same, and even they could be proven using the same proof \cite{kovalev2019don, hofmann2015variance}. Another class of methods is majorization-minimization algorithms Finito \cite{defazio2014finito}, MISO \cite{mairal2015incremental}, DAve-RPG (asynchronous version of MISO) \cite{mishchenko2018}. The majorization-minimization approach goes beyond optimization that provides a good start for designing new incremental methods \cite{qian2019miso}.
+where $d$ is a moment of the last update of stored in memory gradients. It is now understood that these algorithms are conceptually almost the same, and even they could be proven using the same proof \cite{kovalev2019don, hofmann2015variance}. Another class of methods is majorization-minimization algorithms \texttt{Finito} \cite{defazio2014finito}, \texttt{MISO} \cite{mairal2015incremental}, \daveR (asynchronous version of \texttt{MISO}) \cite{mishchenko2018}. The majorization-minimization approach goes beyond optimization that provides a good start for designing new incremental methods \cite{qian2019miso}.

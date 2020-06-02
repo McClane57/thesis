@@ -1,0 +1,146 @@
+% ===========================================================
+% ===========================================================
+\section{Identification for two-way sparse communications}\label{sec:spy-identification}
+% ===========================================================
+% ===========================================================
+
+In the previous sections, we present an adaptive sparsification of upward communications (worker-to-master) and show that the resulting algorithm converges after proximal reconditioning. By construction, the downward communications (master-to-workers) depends on the structure of~$x^k$ (the master point of the inner method), which is the output of a proximal operator on $r$. In the case of $\ell_1$-regularization or other sparsity-promoting regularization\;\cite{bach2012optimization}, we show in Section\;\ref{sec:identif} that the $x^k$ eventually become sparse after some iterations. This automatically makes our algorithm a two-way sparse algorithm. 
+Finally, in Section\;\ref{sec:comm}, we take a closer look to the complexity of our algorithm with respect to the communication cost.
+
+For this study, we make an additional assumption that our problem has a strongly sparse solution. This assumption is divided into two parts: i) the regularizer $r$ should induce a \emph{stable} support at the optimum (through its proximity operator); and ii) this optimal support $\supp(x^\star)$ should be small with respect to the ambient dimension.
+\begin{assumption}[Strongly sparse optimal solution] \label{hyp:ident}
+Problem~\eqref{eq:pb} is $\mu$-strongly convex ($\mu>0$) and its solution $x^\star$ verifies
+\begin{itemize}
+   \item[i)] $\exists~ \varepsilon>0$ such that $\supp(x^\star) = \supp \left( \prox_{r} \left( x^\star - \sum_{i=1}^M  \alpha_i  \nabla f_i(x^\star) + \mathbf{e}   \right)   \right)~ \forall \mathbf{e} \in \mathcal{B}(0,\varepsilon) $;
+    \item[ii)] the size $s^\star =|\supp(x^\star)|$ of the optimal support is small compared to $d$: $s^\star\ll d$.
+\end{itemize}
+\end{assumption}
+While part ii) is rather explicit, part i) is quite abstract; let us illustrate it with the $\ell_1$-norm. When $r= \lambda \|\cdot\|_1$, using the explicit form of the proximity operator\;\eqref{eq:soft}, part i) directly translates to
+\begin{align*}
+   \sum_{i=1}^M  \alpha_i  \nabla_{[j]} f_i(x^\star)  \in (-\lambda,\lambda)  ~~~ \text{ for all } j \notin \supp(x^\star). 
+\end{align*}
+This condition matches the nondegeneracy condition for sparse solutions commonly admitted for exact recovery in machine learning; see e.g.~\cite{nutini2019active,pmlr-v89-sun19a}.
+The interest of the general assumption i) is that it accounts for a variety of sparsity-inducing regularizations, including weighted $\ell_1$-norms, ``group'' $\ell_1/\ell_q$-norms; see \cite[Sec.~3.3]{bach2012optimization}.
+
+% ===========================================================
+\subsection{Identification and consequences} \label{sec:identif}
+% ===========================================================
+
+The iterates of proximal algorithms usually \emph{identify} the optimal structure; see e.g\;\cite{vaiter2015low} or \cite{iutzeler2020SVAA}. In the case of $\ell_1$-regularization, this means that proximal algorithms produce iterates that eventually have the same support as the optimal solution of \eqref{eq:pb}. Unfortunately, randomness may break this identification property. For instance, it is well-known that for the proximal stochastic gradient descent, the sparse structure may not be identified with probability one; see e.g.\;\cite{lee2012manifold} and a counter-example in\;\cite{poon2018local}. We first establish that our algorithm does identify the optimal support under the non-degeneracy assumption~\ref{hyp:ident}.
+
+% All existing results (including \cite{lee2012manifold}) use a strong non-degeneracy assumption to establish identification results. The only exception is \cite{fadili2018sensitivity} that presents extended identification results without non-degeneracy for a large class of nonsmooth regularizers. Identification of our distributed algorithm in the $\ell_1$ regularization is based on these general identification results.% of \cite{fadili2018sensitivity}.
+% To the best of our knowledge, this is the first time that such a property is shown for an asynchronous algorithm.
+
+%\begin{assumption}[Additional assumption for identification]
+%\label{hyp:delident}
+%The number of iterations between two full updates cannot grow exponentially, i.e. $k_{m+1}-k_m = o(\exp(m))$. This assumption is rather mild and subsumes the usual bounded delay assumption.
+%\end{assumption}
+
+
+\begin{theorem}[Identification]\label{th:ident}
+Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth. Let $r$ be convex lsc. Under Assumption~\ref{hyp:ident}, the \emph{outer and inner} iterates of \recoalgo %and \cataalgo 
+identify the optimal structure in finite time with probability one: there exists a finite time $\Lambda<\infty$ such that
+$$ 
+\supp(x^k_\ell) = \supp(x_\ell)  = \supp(x^\star) ~~~ \text{ for any } k \text{ and all }  \ell \geq \Lambda
+$$
+where $x^k_\ell$ denotes the $k$-th iterate produced by \salgo during the $\ell$-th outer loop.
+\end{theorem}
+
+\begin{proof}
+We proved in the previous section that \recoalgo converges almost surely, but it is not enough to guarantee identification in general\footnote{Take $d=1$, $F(x) = |x|$, and $x_{\ell+1} = \prox_{|\cdot|}(x_\ell) + 1/\ell^2$. The minimum of $F$ is $0$ but we have $x_\ell = 1/(\ell-1)^2>0$ for all $\ell>1$.}. Here it is the fact that the inner algorithm \salgo features a proximity operator with a non-vanishing stepsize that yields the following identification property. This proof is detailed in Appendix~\ref{apx:ident}.
+\end{proof}
+
+This identification has two consequences on communications in our distributed setting. First, identification implies that the variables communicated by the master to the workers will eventually be sparse. Second, this sparsity is also leveraged in the sparsification strategies of \recoalgo where only the coordinates in $\null(x_\ell)$ are randomly zeroed. Thus, for sparsity inducing problems such as $\ell_1$-regularized learning problems, our distributed algorithm has, structurally, \emph{two-way sparse communications}. 
+
+
+Even better, once this identification occurs, the rate of the inner algorithm \salgo dramatically improves to match the rate of its non-sparsified version \dave.
+
+\begin{theorem}[Improved rate]\label{th:imprate}
+Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth. Let $r$ be convex lsc. Under Assumption~\ref{hyp:ident}, the \emph{inner} iterates of \recoalgo benefit from an improved rate after identification. There is $\Lambda<\infty$ such that for all $\ell>\Lambda$ and  $k\in [k_m, k_{m+1})$
+\begin{align*}
+    \left\| x_\ell^k - x_\ell^\star \right\|^2 \le \Big(1 - \gamma (\mu+\rho)  \Big)^{2m} \left\|x_{\ell}-x_\ell^\star\right\|^2
+\end{align*}
+where $x^k_\ell$ denotes the $k$-th iterate produced by \salgo during the $\ell$-th outer loop.
+
+Furthermore, using the maximal stepsize $\gamma = \frac{2}{\mu + L + 2\rho}$, we obtain for all $k\in [k_m, k_{m+1})$
+\begin{align*}
+    \left\| x_\ell^k - x_\ell^\star \right\|^2 \le \left( \frac{1-\kappa_{\eqref{eq:reco}}}{1+\kappa_{\eqref{eq:reco}}}  \right)^{2m} \left\|x_{\ell}-x_\ell^\star\right\|^2.
+\end{align*}
+\end{theorem}
+
+\begin{proof}
+    The proof is reported to Appendix~\ref{apx:imprate}.
+\end{proof}
+
+Thus our algorithm eventually has the practical interest of having sparse two-way communication, at almost no additional cost.
+
+% ===========================================================
+\subsection{Communication complexity}\label{sec:comm}
+% ===========================================================
+
+We study in this section the asymptotic communication complexity of our method in terms of \emph{number of coordinates (\emph{real} numbers) exchanged between the master and the workers}. 
+
+To do so, we combine the controlled number of (inner) iterations with the communication cost by iteration. The convergence rate analysis relies on the epoch sequence through the number of iterations (and thus communications) per epoch, which is unknown since it depends on the computing system. We thus make the assumption that the computing setup is able to perform an epoch within a predefined number of iterations, which is verified in many practical contexts e.g.\;when the delays are bounded (recall Corollary\;\ref{cor:bounded}). Note that this assumptions is only needed for the communication complexity analysis but not by any means for the algorithm nor the previous results.
+
+\begin{assumption}[Tamed epochs]
+\label{hyp:delident}
+The number of iterations between two epochs is bounded as $k_{m} - k_{m-1} \leq K$.
+\end{assumption}
+
+We now define the \emph{communication complexity} of our method as the number $ \mathbf{C}(\varepsilon)$ of coordinates exchanged between master and workers in order to reach an accuracy $\varepsilon$. For \recoalgo, we get that 
+\begin{align}\label{eq:commcomp}
+    \mathbf{C}(\varepsilon) = K( \mathbf{c}^{\mathrm{up}} + \mathbf{c}^{\mathrm{down}} ) \mathbf{M}^{\mathsf{C}} \mathbf{L}(\varepsilon) 
+\end{align}
+where 
+\begin{itemize}
+    \item $\mathbf{c^{\mathrm{up}}}$ (resp.\;$\mathbf{c^{\mathrm{down}}}$) is the (expected) number of coordinates communicated from the master to the active worker (resp. from the active worker to the master);
+    \item $\mathbf{M}^{\mathsf{C}}$ is the (expected) number of epochs of the inner method to reach stopping criterion $\mathsf{C}_2$ and $\mathsf{C}_3$
+    (Note that, for $\mathsf{C}_1$, the complexity is different, in $\tilde{O}(1)$ by construction);
+    \item $\mathbf{L}(\varepsilon)$ is the number of outer loops to reach accuracy $\varepsilon$:
+    $$
+    \mathbf{L}(\varepsilon) = \min \left\{ \ell : \|x_\ell - x^\star \|^2 \leq \varepsilon \right\}.
+    $$
+\end{itemize}
+
+Focusing on the final regime of the algorithm when identification has taken place (as per Section~\ref{sec:identif}), we get
+\begin{align*}
+    \mathbf{c^{\mathrm{up}}} = |\supp(x_\ell^k)| = |\supp(x^\star)| = s^\star \quad\text{ and }\quad \mathbf{c^{\mathrm{down}}} = s^\star + c
+\end{align*}
+which leads to the following communication complexity for \recoalgo.
+
+\begin{theorem}[Communication complexity of \recoalgo]\label{th:com}
+Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth ($\mu>0$). Let $r$ be convex lsc. Let assumptions \ref{hyp:ident} and \ref{hyp:delident} hold.
+If the parameter $c$ is of the same order as $s^\star$ compared to $d$ ($c\approx s^\star \ll d$), then the communication complexity \eqref{eq:commcomp} of \recoalgo with criteria $\mathsf{C}_2$ or $\mathsf{C}_3$ is:
+\begin{align*}
+     \mathbf{C}(\varepsilon) = \tilde{O}\left( \frac{L-\mu}{\mu} \sqrt{d \, s^\star } ~ \max \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} \log\left( \frac{1}{\varepsilon} \right) \right).
+\end{align*}
+\end{theorem}
+
+\begin{proof}
+The proof consists in evaluating the terms in \eqref{eq:commcomp}, one by one, in the right regime. It is given in Appendix~\ref{apx:com}.
+\end{proof}
+
+Comparing this result with the communication complexity of our baseline \dave shows the interest of our adaptive sparsification technique. For \dave, the communication complexity writes as 
+\begin{align*}%\label{eq:commcomp2}
+    \mathbf{C}(\varepsilon) = K( \mathbf{c}^{\mathrm{up}} + \mathbf{c}^{\mathrm{down}} ) \mathbf{M}(\varepsilon) 
+\end{align*}
+where $\mathbf{M}(\varepsilon)$ is the number of epochs to reach accuracy $\varepsilon$. Theorem~\ref{th:davepg} gives us  $\mathbf{M}(\varepsilon) = \mathcal{O}((\mu+L)/\mu\log(1/\varepsilon))$. 
+Noticing that \dave also identifies the optimal support (apply e.g.\;\cite[Cor.\;1]{iutzeler2020SVAA}),
+%but does not leverage it, 
+we get $\mathbf{c^{\mathrm{up}}} = s^\star$ as previously. However without the sparsification of \salgo, the cost of an upward communication is $\mathbf{c^{\mathrm{down}}} = d$. This yields the following gain in communication complexity of our algorithm %\recoalgo over \dave 
+(the greater, the more performing \recoalgo compared to \dave):
+\begin{align*}
+      \tilde{O}\left( \frac{1+\kappa_{\eqref{eq:pb}}}{1-\kappa_{\eqref{eq:pb}}}   ~ \min \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} ~ \frac{d+s^\star}{\sqrt{ds^\star}}  \right).
+\end{align*}
+% \begin{corollary}[Communication complexity speedup of \recoalgo vs \dave]\label{cor:comcomp}
+% Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth ($\mu>0$). Let $r$ be convex lsc. Let assumptions \ref{hyp:ident} and \ref{hyp:delident} hold.
+% If the parameter $c$ is of the same order as $s^\star$ compared to $d$ ($c\approx s^\star \ll d$), then, in terms of communication complexity, the gain of \recoalgo over \dave is 
+% \begin{align*}
+%       \tilde{O}\left( \frac{1+\kappa_{\eqref{eq:pb}}}{1-\kappa_{\eqref{eq:pb}}}   ~ \min \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} ~ \frac{d+s^\star}{\sqrt{ds^\star}}  \right).
+% \end{align*}
+% \end{corollary}
+The gain thus shows a product of three terms. 
+The first term depends on the condition number of the problem and indicates that our method dominates \dave for all problems.
+%well conditioned problems but even more for poorly conditioned ones. 
+% C'est juste mais je commente car je ne veux pas qu'on nous dise que c'est parce qu'on reconditionne...
+The second term is in $(0,1]$ but should be not too far from $1$, provided that the final sparsity is not poorly estimated. Finally, the last term fully exhibits the merits of adaptive sparsification with a term in $d + s^\star $ for \dave much greater than the $\sqrt{ds^\star}$ for \recoalgo. This last term really shows a nice dependence in the dimension of the problem and optimal solution for the proposed method. The theoretical gain of \recoalgo compared to \dave is confirmed in the next numerical illustrations.

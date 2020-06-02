@@ -4,6 +4,8 @@
 
 \usepackage{lineno}
 
+\usepackage[notref,notcite]{showkeys}
+
 %\usepackage[allfiguresdraft]{draftfigure}
 %\documentclass[11pt,twoside]{mitthesis}
 %% If you want blank pages before new chapters to be labelled ``This
@@ -35,17 +37,20 @@
 \counterwithin{table}{section}
 }
 
+\newcommand{\MRA}[1]{\color{blue}{#1}}
+
+
 \begin{document}
 \linenumbers
-% \includepdf[pages=-]{title.pdf}
-% %\include{cover}
-% \pagenumbering{roman}
-% \newpage
-% \null\vfill
-% \begin{center}
-% Copyright~\copyright~2020 by Dmitry Grishchenko\\
-% All rights reserved
-% \end{center}
+\includepdf[pages=-]{title.pdf}
+%\include{cover}
+\pagenumbering{roman}
+\newpage
+\null\vfill
+\begin{center}
+Copyright~\copyright~2020 by Dmitry Grishchenko\\
+All rights reserved
+\end{center}
 
 
 
@@ -58,14 +63,14 @@
 \begingroup
 \let\cleardoublepage\clearpage
 
-% \chapter*{R\'esum\'e}
-% \input{resume}
+\chapter*{R\'esum\'e}
+\input{resume}
 
-% \chapter*{Abstract}
-% \input{abstract}
+\chapter*{Abstract}
+\input{abstract}
 
-% \chapter*{Acknowledgements}
-% \input{acknowledgements}
+\chapter*{Acknowledgements}
+\input{acknowledgements}
 
 \endgroup
 \include{contents}
@@ -86,9 +91,14 @@
 
 \include{distributed}
 
-% \begin{subappendices}
-%     \include{app-spy}
-% \end{subappendices}
+\include{spy}
+\begin{subappendices}
+    \include{spy/appendix}
+\end{subappendices}
+
+
+\include{soda}
+
 
 
 

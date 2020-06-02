@@ -17,7 +17,7 @@ $$
 for any small vector. It implies that in this first-order approximation, the best direction to select is anti-gradient, that is exactly the idea of the gradient descent.
 
 \begin{algorithm}
-    \caption{Gradient Descent (GD)}
+    \caption{Gradient Descent (\texttt{GD})}
     \label{algo:gd}
     \begin{algorithmic}
         \STATE Initialize $x^0\in\mathbb{R}^n$
@@ -30,7 +30,7 @@ for any small vector. It implies that in this first-order approximation, the bes
 
 Let us now present the convergence result for the gradient descent algorithm with the fixed stepsize $\gamma^k = \gamma$ (Theorems $2.1.14$ and $2.1.15$ \cite{nesterov-book}).
 \begin{theorem}[Convergence of Gradient Descent]\label{th:gd}
-Let us assume that $f$ is convex and $L$-smooth, take $\gamma\in\left(0,\frac{2}{L}\right)$, then Algorithm \ref{algo:gd} generates the sequence of poits $(x^k)_{k\geq0}$ such that 
+Let us assume that $f$ is convex and $L$-smooth, take $\gamma\in\left(0,\frac{2}{L}\right)$, then Algorithm \ref{algo:gd} generates the sequence of points $(x^k)_{k\geq0}$ such that 
 \begin{equation}
     f(x^k) - f^\star \leq \frac{2(f(x^0)-f^\star)\|x^0-x^\star\|_2^2}{2\|x^0-x^\star\|_2^2 + \gamma k(2-\gamma L)(f(x^0) - f^\star)},
 \end{equation}
@@ -99,4 +99,4 @@ For the $\mu$-strongly convex objective function $f$ the optimal $\gamma= \frac{
 \|x^k-x^\star\|_2^2\leq\left(1-\frac{4\mu L}{(\mu + L)^2}\right)^k\|x^0-x^\star\|_2^2 = \left(\frac{\kappa - 1}{\kappa + 1}\right)^{2k}\|x^0-x^\star\|_2^2.
 \end{equation}
 
-{\color{blue} The convergence rate depends on $\kappa$, and it is faster if the problem is better-conditioned. For example, if the problem is $1$-conditioned, then only $1$ iteration of GD is enough to converge.}
+{The convergence rate depends on $\kappa$, and it is faster if the problem is better-conditioned. For example, if the problem is $1$-conditioned, then only $1$ iteration of \texttt{GD} is enough to converge.}

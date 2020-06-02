@@ -362,7 +362,7 @@ then the rest of the proof follows directly by induction.
 
 % =============================================================================
 \subsection{Identification of proximal algorithms}\label{sec:identif}
-{\color{red} As we mentioned in Section \ref{sec:basics_identificationn} proximal algorithms could identify a near optimal subspace before the convegence moment.}
+{As we mentioned in Section \ref{sec:basics_identificationn} proximal algorithms could identify a near optimal subspace before the convegence moment.}
 
 This identification can be exploited within our adaptive algorithm \adaalgo~for solving Problem~\eqref{eq:main_problem}. Indeed, assuming that the two extreme subspaces of \eqref{eq:identification_result} coincide, the theorem says that the structure of the iterate $\S(x^k)$ will be the same as the one of the solutions $\S(x^\star)$. In this case, if we choose the adaptation strategy of our adaptive algorithm \adaalgo~deterministically from $\S(x^k)$, then, after a finite time with probability one,  the selection will not be adapted anymore. This allows us to recover the rate of the non-adaptive case (Theorem~\ref{th:conv_nondis}), as formalized in the next theorem.
 
@@ -458,7 +458,7 @@ a  {complemented} identification set is
 \end{equation}
 as $\NC_i \bigcap \C_i = \mathrm{span}(\{1\}) = \bigcap_j \C_j$ and $\C_i+\NC_i = \mathbb{R}^n$. {Here $\SC(x^{k})$ corresponds to the \emph{jumps} of $x$ (indeed $(\SC(x^k))_{[i]} = 0$ iff $x^k \in \NC_i \Leftrightarrow x_{[i]}^k=x_{[i+1]}^k$). . The jumps of a point $x\in\mathbb{R}^n$ is defined as the vector $\mathrm{jump}(x)\in \mathbb{R}^{(n-1)}$ such that for all $i$ we have: $\mathrm{jump}(x)_{[i]} = 1$ if $x_{[i]}\neq x_{[i+1]}$ and $0$ otherwise.}
 \end{example}
-{\color{blue} In this example, we use different collections $\NC$ from Examples \ref{ex:intro_coordinate_strata}, \ref{ex:intro_jump_strata}. More precisely, the collections $\NC\prime$ from Section \ref{sec:basics_identificationn} could be interpreted as $\left\{\NC_{S} = \bigcup_{i\in S}\NC_i\right\}_{S\in\mathbf{S}}$, where $\mathbf{S}$ is a power set of $\{1,\ldots, n\}$ for the axes subspace set and a power set of $\{1,\ldots, n-1\}$ for jumps subspace set. Moreover, the big variety of admissible selections makes these two ``different'' subspace families indistinguishable.}
+{In this example, we use different collections $\NC$ from Examples \ref{ex:intro_coordinate_strata}, \ref{ex:intro_jump_strata}. More precisely, the collections $\NC^\prime$ from Section \ref{sec:basics_identificationn} could be interpreted as $\left\{\NC_{S} = \bigcup_{i\in S}\NC_i\right\}_{S\in\mathbf{S}}$, where $\mathbf{S}$ is a power set of $\{1,\ldots, n\}$ for the axes subspace set and a power set of $\{1,\ldots, n-1\}$ for jumps subspace set. Moreover, the big variety of admissible selections makes these two ``different'' subspace families indistinguishable.}
 \smallskip
 
 The practical reasoning with using {complemented} families is the following. If the subspace $\NC_i$ is identified at time $K$ (i.e. $(\S(x^k))_{[i]}=0 \Leftrightarrow x^k\in\NC_i$ for all $k\geq K$), then it is no use to update the iterates in $\C_i$ in preference, and the next selection $\Sel_k$ should not include $\C_i$ anymore.

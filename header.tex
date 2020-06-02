@@ -12,6 +12,8 @@
 \usepackage{multirow}
 \usepackage{color}
 
+\usepackage{etoc}
+
 \usepackage{caption}
 \captionsetup{labelsep=period}
 \usepackage{float}
@@ -54,6 +56,7 @@
 \newcommand{\dave}{\texttt{DAve-PG}}
 \newcommand{\daveR}{\texttt{DAve-RPG}}
 \newcommand{\spydr}{\texttt{SPY-DR}}
+\newcommand{\SP}{\texttt{SODA}{}}
 
 \newcommand{\data}{\mathcal{D}}
 
@@ -65,12 +68,14 @@
 \newcommand{\dom}{\mathrm{dom}}
 \newcommand{\supp}{\mathrm{supp}}
 \newcommand{\Span}{\mathrm{span}}
-\newcommand{\proj}{\mathrm{proj}}
+
 \newcommand{\jumps}{\mathrm{jumps}}
 \newcommand{\EE}{\mathbb{E}}
 
 \usepackage{tcolorbox}
 \usepackage{xcolor}
+
+\usepackage{tocloft}
 
 \newcommand{\RR}{\mathbb{R}}
 \newcommand{\Prob}{\mathbb{P}}
@@ -117,15 +122,34 @@
 \newcommand{\rprox}{\mathbf{prox}_{\gamma r}}
 \newcommand{\lprox}{\mathbf{prox}_{\gamma \lambda_1\|\cdot\|_1}}
 
+\DeclareMathOperator*{\proj}{\mathbf{proj}}
+\DeclareMathOperator*{\cproj}{\sideset{}{_{\mathcal{C}}}\proj}
+
 \newcommand{\pp}{\pi}
 \newcommand{\pvec}{{p}}
 
-\newcommand{\salgo}{\texttt{Spy}\xspace}
-\newcommand{\maskalgo}{\texttt{Spy-DR}\xspace}
-\newcommand{\recoalgo}{Reconditioned--\texttt{Spy}\xspace}
-\newcommand{\cataalgo}{Catalyst--\texttt{Spy}\xspace}
+\newcommand{\salgo}{\texttt{SPY}\xspace}
+\newcommand{\maskalgo}{\texttt{SPY-DR}\xspace}
+\newcommand{\recoalgo}{Reconditioned--\texttt{SPY}\xspace}
+\newcommand{\cataalgo}{Catalyst--\texttt{SPY}\xspace}
 
 \newcommand{\pmin}{p_{\min}}
 \newcommand{\pminl}{p_{\boldsymbol{\ell},\min}}
 \newcommand{\pmax}{p_{\max}}
 \newcommand{\pmaxl}{p_{\boldsymbol{\ell},\max}}
+
+
+\newcommand{\mask}{\mathbf{S}_{\pi}}
+\newcommand{\compmask}{{\overline{\mathbf{S}}}_{\pi}}
+
+\newcommand{\fullmask}{\mathbf{S}_1}
+\newcommand{\w}{x}
+\newcommand{\barw}{\barx}
+\newcommand{\obs}{\mathbf{x}}
+\newcommand{\Loss}{\mathcal{L}}
+
+\newcommand{\nullC}{\mathrm{null}}
+
+
+\def\mitya#1{{\color{blue}#1}}  
+
