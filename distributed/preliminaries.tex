@@ -1,6 +1,7 @@
-\section{Notations and Preliminaries}\label{sec:distributed-prelim}
+\subsection{Notations and preliminaries}\label{sec:distributed-prelim}
 
-We place ourselves in a \emph{totally asynchronous} as per the classification of Bertsekas and Tsitsiklis \cite[Chap.\;6.1]{bertsekas1989parallel}, meaning that all workers are responsive but without bounded delays. In this section, we recall the \dave~algorithm, notations, and results from \cite{mishchenko2019distributed}. 
+We place ourselves in a \emph{totally asynchronous} as per the classification of Bertsekas and Tsitsiklis \cite[Chap.\;6.1]{bertsekas1989parallel}, meaning that all workers are responsive but without bounded delays.
+%In this section, we recall the \dave~algorithm, notations, and results from \cite{mishchenko2018}. 
 
 Let us consider a distributed setup where $m$ observations are split down over $M$ machines, each machine $i$ having a private subset $\data_i$ of the examples.
 Learning over such scattered data leads to optimization problems with composite objective of the form
@@ -8,53 +9,18 @@ Learning over such scattered data leads to optimization problems with composite 
 \tag{$\mathsf{P}$}
 \min_{x\in\mathbb{R}^n}  ~ F(x) =  \sum_{i=1}^M  \alpha_i  f_i(x)  +  r(x),
 \end{align}
-with $\alpha_i= |\data_i|/m$ being the proportion of observations locally stored in machine\;$i$, hence $\sum_{i=1}^M\alpha_i = 1$. $f_i(x) = \frac{1}{|\data_i|}  \sum_{j\in\data_i}l_j(x) $ is the local empirical risk at machine\;$i$ ($l_j$ standing for the smooth loss function for example $j$) and $r$ is a regularization term. \dave~can solve Problem~\eqref{eq:pb} by representing it in the form of a triplet (\emph{workers weights},\emph{workers functions},\emph{global regularization}) i.e. $((\alpha_i),(f_i),r)$ and performing Algorithm~\ref{alg:dave}.
+with $\alpha_i= |\data_i|/m$ being the proportion of observations locally stored in machine\;$i$, hence $\sum_{i=1}^M\alpha_i = 1$. $f_i(x) = \frac{1}{|\data_i|}  \sum_{j\in\data_i}l_j(x) $ is the local empirical risk at machine\;$i$ ($l_j$ standing for the smooth loss function for example $j$) and $r$ is a regularization term.
 
 
 
-\begin{algorithm}
-\caption{\textsc{\dave} on $((\alpha_i),(f_i),r)$ with stopping criterion $\mathsf{C}$} 
-\label{alg:dave}
 
-\tcbset{width=0.48\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
-
-\begin{tcolorbox}[title=\textsc{Master} \vphantom{\texttt{Worker  i}}]
-Initialize $\bar x^0$\\
-\While{stopping criterion $\mathsf{C}$ not verified}{
-    \hspace*{0ex}\\
-     {\color{blue!70!black}Receive\,$\Delta^k$\,from\,agent\,$i^k$}\\
-     $\barx^k \leftarrow \barx^{k-1} + \alpha_i \Delta^k $\\
-     $ x^k \leftarrow \rprox(\bar x^k )$\\
-    {\color{red!80!yellow} Send $x^k$ to agent $i^k$}\\
-    $k\leftarrow k+1$
-}
-Interrupt all slaves\\
-\textbf{Output} $x^k$
-\end{tcolorbox}
-\tcbset{width=0.48\columnwidth, colframe=black!50!black, coltitle=white, colbacktitle=black}
-\begin{tcolorbox}[title=\textsc{Worker } $i$]
-Initialize $x_i = x_i^+0$\\
-\While{not interrupted by master}{
-    \hspace*{0.1ex}\\
-     {\color{red!80!yellow}Receive  $x$ from master}\\
-    $x^+_i  \leftarrow x - \gamma \nabla f_i( x)$\\[0.6ex]
-    $\Delta \leftarrow x_i^+ - x_i $ \\[0.7ex]
-    {\color{blue!70!black}Send $\Delta$ to master}\\[0.7ex]
-    $x_i \leftarrow x^+_i $%\\[0.7ex]
-}
-\vspace*{0.1cm}
-\end{tcolorbox}
-\vspace*{-0cm}
-\end{algorithm}
-
-
-An asynchronous distributed setting allows the algorithm to carry on computation without waiting for slower machines: the machine performs computations based on outdated versions of the main variable, and the master has to gather the slaves inputs into a productive update. We formalize this framework with the following notation. 
+An asynchronous distributed setting allows the algorithm to carry on computation without waiting for slower machines: the machine performs computations based on outdated versions of the main variable, and the master has to gather the slaves inputs into a productive update. We formalize this framework with the same notation as in \cite{mishchenko2018}. 
 \begin{itemize}
     \item \emph{For a worker $i\in\{1,\ldots,M\}$.} At time $k$, let $d_i^k$ be the elapsed moment since the last time the master has communicated with worker $i$ ($d_i^k = 0$ iff the master gets updates from worker $i$ at exactly time $k$, i.e. $i^k=i$). We also consider  $D_i^k$ as the elapsed time since the second last update. This means that, at time $k$, the last two moments that the worker $i$ has communicated with the master are $k-d_i^k$ and $k-D_i^k$ (see Figure \ref{fig:delays}). 
     %also if $i$ does not update at time $k$, then $k-d_i^k = k-1 - d_i^{k-1}$.
     \item \emph{For the master.} We define $k$, as the number of updates that the master has received from any of the worker machines. Thus, at time $k$, the master receives some input from a worker, denoted by $i^k$, updates its global variables, $\barx^k$ and $x^k$; and sends $x^k$ back to worker $i^k$, where $\bar{x}$ is equal to the average of received updates from workers
     \begin{equation}\label{eq:barx}
-    \barx^k = \sum_{i=1}^M\pi_i x_i^k = \sum_{i=1}^M \pi_i x^{k-d_i^k}.
+    \barx^k = \sum_{i=1}^M\alpha_i x_i^k = \sum_{i=1}^M \alpha_i x^{k-d_i^k}.
     \end{equation}
     \end{itemize}
 To handle asynchrony, we define the sequence of stopping times $(k_m)$  iteratively as $k_0 = 0$ and
@@ -111,23 +77,71 @@ k_{m+1} &= \min\left\{ k : k- D_i^k \geq k_m ~\text{for all $i$} \right\}.
      \label{fig:delays}
     \end{figure}
     
-The stopping moment $k_{m+1}$ is the first moment of time, when $\barx^k$ directly depends only on ``new epoch'' variables. More precisely, as we could see from \eqref{eq:barx} it depends directly on the $x_i^{k-d_i^k}$ that are the result of some computation on $i$-th worker while having $x_i^{k-D_i^k}$ and $x^{k-D_i^k}$ as a parameters.
+The stopping moment $k_{m+1}$ is the first moment of time when $\barx^k$ directly depends only on ``new epoch'' variables. More precisely, as we could see from \eqref{eq:barx} it depends directly on the $x_i^{k-d_i^k}$ that are the result of some computation on $i$-th worker while having $x_i^{k-D_i^k}$ and $x^{k-D_i^k}$ as a parameters.
 
-As in \cite{mishchenko2019distributed}, all convergence results will involve this notion of epochs.
 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%% DAve-PG
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\subsection{\dave}\label{sec:basics_dave}
+% \mitya{No identification results have been reported yet for the asynchronous algorithms. However, the recent \cite{mishchenko2018} provides \dave~Algorithm with a delay-independent analysis technique that allows integrating assumptions on the computing system with a constant stepsize. This feature enables verifying the active-set identification property for \dave~ (see Lemma SSS) and motivates us on developing the  \emph{identification-based} sparsification of \dave.
+% }
+
+There exists a lot of distributed optimization algorithms with no shared memory. In \cite{vanli2016stronger}, the authors propose Proximal Incremental Aggregated Gradient method \texttt{PIAG} that is proven to converge under the assumption on the bounded delays. However, the recent \cite{mishchenko2018} provides \dave~Algorithm with a delay-independent analysis technique that allows integrating assumptions on the computing system with a constant stepsize. In \dave~Algorithm, the master machine asynchronously gathers delayed updates from workers and sends back the global variable. More specifically, each worker independently compute\dg{s} a gradient step on its local loss, and the master machine keeps track of the weighted average of the most recent worker outputs, computes the proximity operator of the regularizer at this average point, and sends this result back to the updating worker\;$i^k$.  Maintaining a weighted average of worker outputs is a special feature \dg{of} \dave\dg{;} though it may appear conservative, it actually performs well in practice due to the stability of the produced iterations.  The intuitive reason is that combining delayed points is more stable than using a combination of delayed directions; see the numerical comparisons of Section 2.4 of \cite{mishchenko2018} and Section 5 of \cite{ICML18}.
+
+Let us recall \dave~which solves composite distributed problems of the form \ref{eq:pb} represented by a triplet $((\alpha_i),(f_i),r)$ for (\emph{workers weights},\emph{workers functions},\emph{global regularization}) in Algorithm~\ref{alg:dave}.
+
+
+
+\begin{algorithm}
+\caption{\textsc{\dave} on $((\alpha_i),(f_i),r)$ with stopping criterion $\mathsf{C}$} 
+\label{alg:dave}
+
+\tcbset{width=0.48\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
+
+\begin{tcolorbox}[title=\textsc{Master} \vphantom{\texttt{Worker  i}}]
+Initialize $\bar x^0$\\
+\While{stopping criterion $\mathsf{C}$ not verified}{
+    \hspace*{0ex}\\
+     {\color{blue!70!black}Receive\,$\Delta^k$\,from\,agent\,$i^k$}\\
+     $\barx^k \leftarrow \barx^{k-1} + \alpha_i \Delta^k $\\
+     $ x^k \leftarrow \rprox(\bar x^k )$\\
+    {\color{red!80!yellow} Send $x^k$ to agent $i^k$}\\
+    $k\leftarrow k+1$
+}
+Interrupt all slaves\\
+\textbf{Output} $x^k$
+\end{tcolorbox}
+\tcbset{width=0.48\columnwidth, colframe=black!50!black, coltitle=white, colbacktitle=black}
+\begin{tcolorbox}[title=\textsc{Worker } $i$]
+Initialize $x_i = x_i^+0$\\
+\While{not interrupted by master}{
+    \hspace*{0.1ex}\\
+     {\color{red!80!yellow}Receive  $x$ from master}\\
+    $x^+_i  \leftarrow x - \gamma \nabla f_i( x)$\\[0.6ex]
+    $\Delta \leftarrow x_i^+ - x_i $ \\[0.7ex]
+    {\color{blue!70!black}Send $\Delta$ to master}\\[0.7ex]
+    $x_i \leftarrow x^+_i $%\\[0.7ex]
+}
+\vspace*{0.1cm}
+\end{tcolorbox}
+\vspace*{-0cm}
+\end{algorithm}
 
 \paragraph{Convergence and rate for strongly convex objectives}
 
-Let us assume that all $(f_i)$ are $\mu$-strongly convex and $L$-smooth with the same constants. This may appear limiting, but actually, this achieved easily by \emph{exchanging} quadratic between functions. This setup allows us to feature a single stepsize in our algorithm, which simplifies the presentation to focus on the contributions.
+Let us assume that all $(f_i)$ are $\mu$-strongly convex and $L$-smooth with the same constants. This may appear limiting, but actually, this achieved quickly by \emph{exchanging} quadratic between functions. This setup allows us to feature a single stepsize in our algorithm, which simplifies the presentation to focus on the contributions.
 
 Under that assumption, we define the \emph{condition number} of the (smooth part of) Problem~\eqref{eq:pb} as 
 $$\kappa_{\eqref{eq:pb}} = \frac{\mu}{L}.$$
 
-This definition may be slightly unusual, but it is convenient in the present paper as we will consider the case when $\mu=0$ in the upcoming sections. 
+This definition may be slightly unusual, but it is convenient in the present work as we will consider the case when $\mu=0$ in the upcoming chapters. 
 
 
-\begin{theorem}[Th.~3.2~\cite{mishchenko2019distributed}] \label{th:davepg}
-Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth. Let $g$ be convex lsc. Using $\gamma \in (0, \frac{2}{\mu + L}]$, \dave~converges linearly on the epoch sequence $(k_m)$. More precisely, for all $k\in [k_m, k_{m+1})$
+\begin{theorem}[Th.~3.2~\cite{mishchenko2018}] \label{th:davepg}
+Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth. Let $r$ be convex lsc. Using $\gamma \in (0, \frac{2}{\mu + L}]$, \dave~converges linearly on the epoch sequence $(k_m)$. More precisely, for all $k\in [k_m, k_{m+1})$
 \begin{align*}
     \left\| x^k - x^\star \right\|^2 \le \left(1 - \gamma \mu  \right)^{2m} \max_i\left\|x_i^0-x_i^\star\right\|^2,
 \end{align*}
@@ -139,24 +153,47 @@ Furthermore, using the maximal stepsize $\gamma = \frac{2}{\mu + L}$, we obtain 
 \end{align*}
 \end{theorem}
 
+% As in \cite{mishchenko2018}, all convergence results will involve the notion of epochs \ref{eq:km}.
+This result is given with respect to the epoch sequence \eqref{eq:km} to encompass various system behaviors. When we consider bounded delays, which is the standard assumption, the particularization of the previous result leads to a rate depending as expected on the bound on delays, as formalized in the following corollary. 
+
+\begin{corollary}[Special case of bounded delays]\label{cor:bounded}
+Under the assumptions of Theorem\;\ref{th:davepg}, suppose that the delays are uniformly bounded over time and machines: $d_i^k\leq D$ for all\;$k$~and\;$i$. Then, the length of epochs is bounded $k_{m+1} - k_m \leq 2D+1$ and we have a rate over $k$ depending on the bound $D$
+$$ \mathbb{E}[\|x^k-x^\star\|^2] ~\leq~  \left( 1 - 2\frac{\gamma\,\mu}{2D+1} \right)^k  \frac{\max_i\left\|x_i^0-x_i^\star\right\|^2}{1-\gamma\mu} .
+$$
+\end{corollary}
+
+\begin{proof}
+Directly from the definition in \eqref{eq:km}, we have that $k_{m+1} - k_m \leq 2D+1$. Therefore, $k_m \leq (2D+1)m$. For all $k\in [k_m,k_{m+1})$, we deduce
+\[
+\left( 1 - \gamma\mu\right)^{2m}
+\leq  \frac{1}{1-\gamma\mu} \left( 1 - \gamma\mu\right)^{\frac{2k}{2D+1}}
+\leq \frac{1}{1-\gamma\mu}  \left( 1 - \frac{2\,\gamma\,\mu}{2D+1} \right)^k.
+\]
+by the concavity of $u\mapsto (1-u)^{2/(2D+1)}$ which gives $(1-u)^{2/(2D+1)}\leq 1-2u/(2d+1)$ for $u\in (0,1)$.
+\end{proof}
 
 {
 \paragraph{Discussion on communication.}
-\dave~is a delay-tolerant distributed algorithm that has an automatic sparsification of master-to-worker communications for many popular regularizations. For instance, for $\ell_0$ and $\ell_1$ norms, it corresponds respectively to the hard and soft thresholding operations, which set the smallest coordinates to zero, thus sparsifying the output. This kind of proximal sparsification was successfully used in the case of synchronous distributed learning; see e.g., \cite{wang2017efficient,smith2015l1}. However, worker-to-master communications do not need to be sparse, which implies that the communication cost is a bottleneck of this algorithm. As we have already mentioned, different techniques to solve this issue were developed for SGD: sparsification/quantization of updates \cite{horvath2019stochastic} and mini-batching/local SGD \cite{yang2013trading, khaled2019first}. In \cite{mishchenko2018,ICML18}, the authors propose \daveR~Algorithm that allows making a couple of repetitions $p$ of local proximal gradient steps. However, this requires the knowledge of $\barx$ by all workers that makes communication from master to worker not sparse.
+\dave~is a delay-tolerant distributed algorithm that has an automatic sparsification of master-to-worker communications for many popular regularizations. For instance, for $\ell_0$ and $\ell_1$ norms correspond respectively to the hard and soft thresholding operations, which set the smallest coordinates to zero, thus sparsifying the output. This kind of proximal sparsification was successfully used in the case of synchronous distributed learning; see e.g., \cite{wang2017efficient,smith2015l1}. However, worker-to-master communications do not need to be sparse, which implies that the communication cost is a bottleneck of this algorithm. As we have already mentioned, different techniques to solve this issue were developed for SGD: sparsification/quantization of updates \cite{horvath2019stochastic} and mini-batching/local SGD \cite{yang2013trading, khaled2019first}. In \cite{mishchenko2018,ICML18}, the authors propose \daveR~Algorithm that allows making a couple of repetitions $p$ of local proximal gradient steps. However, this requires the knowledge of $\barx$ by all workers that makes communication from master to worker not sparse.
 
-In this work, we focus on another way to resolve the communication bottleneck issue - the sparsification of the updates. We aim at providing a distributed optimization algorithm reducing the size of communications by using the model structure enforced by the regularization $r$. Our adaptive communication reduction technique would then be complementary to existing compression techniques (reviewed below).
+In this work, we focus on another way to resolve the communication bottleneck issue - the sparsification of the updates. We aim at providing a distributed optimization algorithm reducing the size of communications by using the model structure enforced by the regularization $r$. Our adaptive communication reduction technique would then be complementary to existing compression techniques (reviewed in Subsection \ref{sec:basics_dist-set}).
+}   
 
-We first propose an asynchronous distributed algorithm featuring a sparsification of upward communications (slave-to-master). Its sparsification mechanism consists in {{randomly and independly}} zeroing the local update entries. This randomized technique maintains the linear convergence in the mean-squared error sense for strongly convex objectives {{when difference in probabilities of coordinates to be selected is small enough}} and is adjustable to various levels of communication costs, machines' computational powers, and data distribution evenness. An attractive and original property of this algorithm is the possibility to use a fixed learning rate that depends neither on communication delays nor on the number of machines.
 
-Nevertheless, the theoretical analysis prevents us from using different probabilities in the case when the problem is ill-conditioned. Getting around this, we propose two different solutions. First, we analyze the practical interest of such algorithms and show empirically that algorithm converges often, and the ``expected'' amount of communications between machines is smaller than without sparsification. The second approach is in iterative proximal reconditioning of our problem. The same idea is used in the Catalyst acceleration scheme \cite{lin2015universal}, where the inner problem is well conditioned with any possible condition number.
 
-Moreover, in the case of $\ell_1$-regularized problems, we show that the generated master iterates identify some sparsity pattern after the finite time with probability one, resulting in sparse downward communications (master-to-slave). Thus, all communications are eventually sparse. 
 
-Finally, we furthermore leverage on this identification to improve our sparsification technique by preferably sampling the entries in the support of the master model; 
-this approach can be seen as an automatic dimension reduction procedure, resulting in better performance in terms of quantity of information exchanged {{that is proven to be better than the non-sparsified algorithm in terms of communications with specific probability for coordinates outside the support.}}
-\paragraph{Outline.}
+% \newpage
+% We first propose an asynchronous distributed algorithm featuring a sparsification of upward communications (slave-to-master). Its sparsification mechanism consists in {{randomly and independly}} zeroing the local update entries. This randomized technique maintains the linear convergence in the mean-squared error sense for strongly convex objectives {{when difference in probabilities of coordinates to be selected is small enough}} and is adjustable to various levels of communication costs, machines' computational powers, and data distribution evenness. An attractive and original property of this algorithm is the possibility to use a fixed learning rate that depends neither on communication delays nor on the number of machines.
 
-We split our work in three parts. In this chapter we present the general idea of sparsification, recall the idea of adaptive selection for $\ell_1$ regularized problems and prove the identification result. In Chapter XXX, we present the reconditioned modification of our algorithm and in Chapter YYY, we investigate the practical aspects of sparsified algorithm with adaptive selection that has no theoretical guarantees to converge. The rest of this chapter is organized as follows. In Section \ref{sec:distributed-sparse} we present the general idea of \salgo algorithm. First, we introduce useful notations for sparsified algorithms. Then in Section \ref{sec:distributed-sparse-impl} we present the general algorithm and in Section \ref{sec:distributed-sparse-analyze} we investigate its convergence. In Section \ref{sec:distributed-adaptive} we discuss different options for the sparsification choice. First, we show that uniform coordinate selection is inefficient. After, we prove that when the probability gap is relatively small the algorithm identifies the near optimal support for $\ell_1$ regularized problems that motivates the adaptive coordinate selection. Finally, we present the scaled version of our algorithm \maskalgo that combines both adaptive selection and theoretical convergence; however, this algorithm is proven to be less efficient than \dave.
-}
+% Nevertheless, the theoretical analysis prevents us from using different probabilities in the case when the problem is ill-conditioned. Getting around this, we propose two different solutions. First, we analyze the practical interest of such algorithms and show empirically that algorithm converges often, and the ``expected'' amount of communications between machines is smaller than without sparsification. The second approach is in iterative proximal reconditioning of our problem. The same idea is used in the Catalyst acceleration scheme \cite{lin2015universal}, where the inner problem is well conditioned with any possible condition number.
+
+% Moreover, in the case of $\ell_1$-regularized problems, we show that the generated master iterates identify some sparsity pattern after the finite time with probability one, resulting in sparse downward communications (master-to-slave). Thus, all communications are eventually sparse. 
+
+% Finally, we furthermore leverage on this identification to improve our sparsification technique by preferably sampling the entries in the support of the master model; 
+% this approach can be seen as an automatic dimension reduction procedure, resulting in better performance in terms of quantity of information exchanged {{that is proven to be better than the non-sparsified algorithm in terms of communications with specific probability for coordinates outside the support.}}
+% \paragraph{Outline.}
+
+% We split our work in three parts. In this chapter we present the general idea of sparsification, recall the idea of adaptive selection for $\ell_1$ regularized problems and prove the identification result. In Chapter XXX, we present the reconditioned modification of our algorithm and in Chapter YYY, we investigate the practical aspects of sparsified algorithm with adaptive selection that has no theoretical guarantees to converge. The rest of this chapter is organized as follows. In Section \ref{sec:distributed-sparse} we present the general idea of \salgo algorithm. First, we introduce useful notations for sparsified algorithms. Then in Section \ref{sec:distributed-sparse-impl} we present the general algorithm and in Section \ref{sec:distributed-sparse-analyze} we investigate its convergence. In Section \ref{sec:distributed-adaptive} we discuss different options for the sparsification choice. First, we show that uniform coordinate selection is inefficient. After, we prove that when the probability gap is relatively small the algorithm identifies the near optimal support for $\ell_1$ regularized problems that motivates the adaptive coordinate selection. Finally, we present the scaled version of our algorithm \maskalgo that combines both adaptive selection and theoretical convergence; however, this algorithm is proven to be less efficient than \dave.
+% }
 
 

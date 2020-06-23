@@ -1,16 +1,18 @@
 \section{Identification}\label{sec:basics_identificationn}
-As we mentioned, the use of a proximity operator to handle the nonsmooth part $r$ plays a prominent role, as it typically enforces some ``sparsity'' structure on the iterates and eventually on optimal solutions, see e.g.,\;\cite{vaiter2015model}. For instance, the popular $\ell_1$-norm regularization ($r=\|\cdot\|_1$) promotes optimal solutions with a few nonzero elements, and its associated proximity operator (called soft-thresholding, see\;\cite{donoho1995noising}) zeroes entries along the iterations. This is an example of \emph{identification}: in general, the iterates produced by proximal algorithms eventually reach some sparsity pattern close to the one of the optimal solution. For $\ell_1$-norm regularization, this means that after a finite but unknown number of iterations, the algorithm ``identifies'' the final set of non-zero variables. This active-set identification property is typical of constrained convex optimization (see e.g.\;\cite{wright1993identifiable}) and nonsmooth optimization (see e.g.\;\cite{hare2004identifying}).
+As mentioned in \cite{bach2012optimization}, the use of a proximity operator to handle the nonsmooth part $r$ plays a prominent role, as it typically enforces some ``sparsity'' structure on the iterates and eventually on optimal solutions, see, e.g.,\;\cite{vaiter2015model}. For instance, the popular $\ell_1$-norm regularization ($r=\|\cdot\|_1$) promotes optimal solutions with a few nonzero elements, and its associated proximity operator (called soft-thresholding, see\;\cite{donoho1995noising}) zeroes entries along the iterations. This is an example of \emph{identification}: in general, the iterates produced by proximal algorithms eventually reach some sparsity pattern close to the one of the optimal solution. For $\ell_1$-norm regularization, this means that after a finite but unknown number of iterations, the algorithm ``identifies'' the final set of non-zero variables. This active-set identification property is typical of constrained convex optimization (see e.g.\;\cite{wright1993identifiable}) and nonsmooth optimization (see e.g.\;\cite{hare2004identifying}).
 
+\subsubsection{Related literature}
 The study of identification dates back at least to \cite{bertsekas1976goldstein} who showed that the projected gradient method identifies a sparsity pattern when using non-negative constraints. Such identification has been extensively studied in more general settings; we refer to \cite{burke1988identification}, \cite{lewis2002active}, \cite{drusvyatskiy2014optimality} or the recent \cite{lewis2018partial}, among other references.
 Recent works on this topic include: i) extended identification for a class of functions showing strong primal-dual structure, including TV-regularization and nuclear norm \cite{fadili2018sensitivity}; ii) identification properties of various randomized algorithms, such as coordinate descent \cite{wright2012accelerated} and stochastic methods \cite{poon2018local,fadili2018model,sun2019we}.
 
-The knowledge of the optimal substructure would allow to reduce the optimization problem in this substructure and solve a lower dimension problem. While identification can be guaranteed in special cases  (e.g.\;using duality\;for $\ell_1$-regularized least-squares \cite{ogawa2013safe, fercoq2015mind}), 
-%dimension reduction methods have proven to be highly profitable it is usually unknown beforehand, and proximal algorithms can be exploited to obtain approximations of this substructure.
+The knowledge of the optimal substructure would reduce the optimization problem in this substructure and solve a lower dimension problem. While identification can be guaranteed in special cases  (e.g.\;using duality\;for $\ell_1$-regularized least-squares \cite{ogawa2013safe, fercoq2015mind}), 
+%dimension reduction methods have proven to be highly profitable; it is usually unknown beforehand, and proximal algorithms can be exploited to obtain approximations of this substructure.
 %  
-After some substructure identification, one could switch to a more sophisticated method, e.g.\,updating parameters of first-order methods (\cite{liang2017activity}).
+\dg{a}fter some substructure identification, one could switch to a more sophisticated method, e.g.\,updating parameters of first-order methods \cite{liang2017activity}.
 % or using restricted Newton's steps (XXX U-newton claudia, daniilidis-malick).
 Again, since the final identification moment is not known, numerically exploiting identification to accelerate the convergence of first-order methods has to be done with great care.
 
+\subsection{Active-set identification}
 In this section, we provide a general identification result for proximal algorithms useful for our developments, using the notion of sparsity vector.
 
 \begin{definition}[Sparsity vector]\label{def:sparsity}
@@ -21,20 +23,35 @@ Let $\M= \{ \M_1,\ldots,\M_m\}$ be a family of subspaces of $\mathbb{R}^n$ with 
 %The sparsity measure (with respect to a given $\M$) of a point $x$ is defined by the number of subspaces containing $x$, i.e.\;$s(x)=\|\S(x)\|_1$. We will use this measure in our numerical experiments.
 \end{definition}
 
-An identification result is a theorem stating that the iterates of the considered algorithm eventually belong to some -- but not all -- subspaces in $\M$. We formulate such a result of almost surely converging proximal-based algorithms as follows. This very simple result is inspired by the extended identification result of \cite{fadili2018sensitivity} (but does not rely on strong primal-dual structures as presented in \cite{fadili2018sensitivity}).
+An identification result is a theorem stating that the iterates of the considered algorithm eventually belong to some -- but not all -- subspaces in $\M$. We formulate such a result of almost surely converging proximal-based algorithms as follows. This straightforward result is inspired by the extended identification result of \cite{fadili2018sensitivity} (but does not rely on strong primal-dual structures as presented in \cite{fadili2018sensitivity}).
 
 \begin{theorem}[Enlarged identification]\label{th:identification}
-Let $(u^k)$ be an $\mathbb{R}^n$-valued sequence converging almost surely to $u^\star$ and define sequence $(x^k)$ as $x^k = \prox_{\gamma g}(u^k)$ and  $x^\star =  \prox_{\gamma g}(u^\star)$. Then $(x^k)$ identifies some subspaces with probability one; more precisely for any $\varepsilon>0$, with probability one, after some finite time,
+Let $(u^k)$ be an $\mathbb{R}^n$-valued sequence converging almost surely to $u^\star$ and define sequence $(x^k)$ as $x^k = \prox_{\gamma r}(u^k)$ and  $x^\star =  \prox_{\gamma r}(u^\star)$. Then $(x^k)$ identifies some subspaces with probability one; more precisely for any $\varepsilon>0$, with probability one, after some finite time,
 \begin{equation}\label{eq:identification_result}
-     \S(x^\star) ~\leq~ \S(x^k) ~\leq\!\!\bigcup_{u\in\mathcal{B}(u^\star,\varepsilon)} \!\S(\prox_{\gamma g}(u)).
+     \S(x^\star) ~\leq~ \S(x^k) ~\leq~\max\left\{\S(\prox_{\gamma r}(u))\colon u\in\mathcal{B}(u^\star,\varepsilon)\right\}.
 \end{equation}
 \end{theorem}
 \begin{proof}[Proof of Theorem \ref{th:identification}]
-The proof is divided between the two inequalities. We start with the right inequality. As $u^k \to u^\star$ almost surely, for any $\varepsilon>0$, $u^k$ will belong to a ball centered around $u^\star$ of radius $\varepsilon$ in finite time with probability one. Then, trivially, it will belong to a subspace if all points in this ball belong to it, which corresponds to the second inequality.
+The proof is divided between the two inequalities. We start with the right inequality. As $u^k \to u^\star$ almost surely, for any $\varepsilon>0$, $u^k$ will belong to a ball centered around $u^\star$ of radius $\varepsilon$ in finite time with probability one. Then, trivially, it will belong to a subspace if all points in this ball belong to it, which corresponds to the right inequality
+\begin{equation}\label{eq:ident_union}
+    \S(x^k) \leq~\max\left\{\S(\prox_{\gamma r}(u))\colon u\in\mathcal{B}(u^\star,\varepsilon)\right\}.
+\end{equation}
+% Using the definition of the union we have
+% $$
+% \bigcup_{u\in\mathcal{B}(u^\star,\varepsilon)} \!\S(\prox_{\gamma g}(u))_{[i]} = \max\left\{\S(\prox_{\gamma g}(u))_{[i]}\colon u\in\mathcal{B}(u^\star,\varepsilon)\right\}
+% $$
+% and as a result 
+% $$
+% \bigcup_{u\in\mathcal{B}(u^\star,\varepsilon)} \!\S(\prox_{\gamma g}(u)) \geq \max\left\{\S(\prox_{\gamma g}(u))\colon u\in\mathcal{B}(u^\star,\varepsilon)\right\}.
+% $$
+% Denote by $u_i = \max\left\{\S(\prox_{\gamma g}(u))_{[i]}\colon u\in\mathcal{B}(u^\star,\varepsilon)\right\}$. Since $\mathcal{B}(u^\star,\varepsilon)$ is a convex set $u=\frac{1}{m}\sum_{i=1}^mu_i\in\mathcal{B}(u^\star,\varepsilon)$. Moreover, every $\M_i$ is a subspace and as a result $x\in\M_i\Leftrightarrow \frac{1}{m}x\in \M_i$. This implies $$
+% \bigcup_{u\in\mathcal{B}(u^\star,\varepsilon)} \!\S(\prox_{\gamma g}(u)) \leq \max\left\{\S(\prox_{\gamma g}(u))\colon u\in\mathcal{B}(u^\star,\varepsilon)\right\}.
+% $$}
 
 Let us turn now to the proof of the left inequality.  Consider the sets to which $x^\star$ belongs i.e. $\M^\star = \{ \M_i\in\M : x^\star \in \M_i \}$; as $\M$ is a family of subspaces, there exists a ball of radius $\varepsilon'>0$ around $x^\star$ such that no point $x$ in it belong to {more} subspaces than $x^\star$ i.e. $x \notin \M \setminus \M^\star$. As $x^k \to x^\star $ almost surely, it will reach this ball in finite time with probability one and thus belong to fewer subspaces than $x^\star$.
 \end{proof}
 
+\subsubsection{Two examples}
 Let us present a couple of important examples of the regularizers that enforce sparsity of the final solution (\cite{argyriou2013sparsity}, \cite{jenatton2011structured}, \cite{zhao2006grouped}). The most common types of sparsity are (block) coordinate one, when there are only a few non-zero (blocks of) coordinates and variation one when there are few continuous blocks of coordinates such that the coordinates inside of each are the same.
 
 \begin{example}[$\ell_{1,2}$ regularizer]\label{ex:intro_coordinate_strata}
@@ -52,10 +69,10 @@ Let us present a couple of important examples of the regularizers that enforce s
     
     Let us define collection $\M = \{\M_i\}_{1\leq i\leq d}$ as the set of all subspaces $\M_i$ with fixed support i.e. $\supp(x) = \supp(y)$ for all $x,y\in \M_i$. In case of this collection, identification result \eqref{eq:identification_result} can be reformulated as
     \begin{equation}\label{eq:ident_l1}
-        \supp(x^\star) \subseteq \supp(x^k) \subseteq \bigcup_{u\in\mathcal{B}(u^\star,\varepsilon)} \supp(\prox_{\gamma r}(u)).
+        \supp(x^\star) \subseteq \supp(x^k) \subseteq \max\left\{ \supp(\prox_{\gamma r}(u))\colon{u\in\mathcal{B}(u^\star,\varepsilon)}\right\}.
     \end{equation}
     
-    To prove this it is enough to show that
+    \begin{proof}To prove this it is enough to show that
     \begin{equation}\label{eq:s_to_supp}
         \S(x)\leq\S(y) \iff \supp(x)\subseteq\supp(y).
     \end{equation}
@@ -65,13 +82,14 @@ Let us present a couple of important examples of the regularizers that enforce s
     $(\Rightarrow)$ Let  $\S(x)\leq\S(y)$ then for all $i = 1,\dots,d$ it is true that $(\S(x))_{[i]}\leq(\S(y))_{[i]}$. Choosing $j$ such that $\supp(\M_j) = \supp(y)$ we have $(\S(x))_{[j]}= 0$ that means $\supp(x)\subseteq\supp(y)$.
     
     $(\Leftarrow)$ $(\S(y))_{[i]} = 0$ if $\supp(y)\subseteq\supp(\M_i)$. In this case, $\supp(x)\subseteq\supp(y)\subseteq\supp(\M_i)$ that implies $(\S(x))_{[i]} = 0 = (\S(y))_{[i]}$. On the other hand, if $(\S(y))_{[i]} = 1$ then $(\S(x))_{[i]}\leq(\S(y))_{[i]}$ that finishes the proof of \eqref{eq:s_to_supp}.
+    \end{proof}
 \end{example}
 
 The identification result in case of regularizer $r$ that enforce (block) coordinate sparsity case can be clearly seen in the example of proximal gradient descent for $\ell_1$ regularized problems.
 
 %It also can be seen that before identification moment, some coordinates from the support of optimal points were outside of the current's point support even if they were before.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \centering
 
 \includegraphics{basics_2/l1_supp.pdf}
@@ -85,8 +103,8 @@ In Figure~\ref{fig:l1supp} we can see how support changes during proximal gradie
 $$
 \min~\frac12\|Ax-b\|_2^2 + \lambda_1\|x\|_1
 $$
-for random generated matrix $A\in\mathbb{R}^{100\times100}$ and vector $b\in\mathbb{R}^{100}$ and hyperparameter $\lambda_1$ chosen to reach $6\%$ of density (amount of non-zero coordinates) of the final solution.
-Starting from $500^{\text{th}}$ iteration, the support of iterates begins to change and becomes stable after $2000$.
+for random generated matrix $A\in\mathbb{R}^{100\times100}$ and vector $b\in\mathbb{R}^{100}$ and hyperparameter $\lambda_1$ chosen to reach $8\%$ of density (amount of non-zero coordinates) of the final solution.
+Starting from $500^{\text{th}}$ iteration, the support of iterates begins to change and becomes stable after $4000$. \mitya{Moreover, some of the coordinates from the optimal support disappeared after $2000$ iterations and re-appears only after the optimal support identification.}
 
 
 Another important example of sparsity inducing regularizer is $1$-d $\mathbf{TV}$ regularizer.
@@ -104,7 +122,7 @@ In this case the amount of jumps (blocks) in optimal solution $x^\star$ will be 
 
 Let us define collection $\M = \{\M_i\}_{1\leq i\leq d}$ as the set of all subspaces $\M_i$ with the fixed block structure i.e. $\jumps(x) = \jumps(y)$ for all $x,y\in \M_i$. In case of this collection, identification result \eqref{eq:identification_result} can be reformulated as
 \begin{equation}\label{eq:ident_tv}
-    \jumps(x^\star) \subseteq \jumps(x^k) \subseteq \bigcup_{u\in\mathcal{B}(u^\star,\varepsilon)} \jumps(\prox_{\gamma r}(u)).
+    \jumps(x^\star) \subseteq \jumps(x^k) \subseteq \max\left\{\jumps(\prox_{\gamma r}(u))\colon{u\in\mathcal{B}(u^\star,\varepsilon)} \right\}.
 \end{equation}
 
 To prove this it is enough to show that
@@ -118,3 +136,110 @@ which proves exactly the same way as \eqref{eq:s_to_supp}.
 
 % This result yields immediately that the iterates of the subspace descent method presented in Section~\ref{sec:algo} will reach some ``structure'': they will belong to some of the subspaces in $\M$ after some finite time with probability one, and these subspaces are sandwiched between the two extremes families of subspaces controlled by the pair $(x^\star, u^\star)$. 
 The Theorem \ref{th:identification} explains that iterates of any converging proximal algorithm will eventually be sandwiched between two extremes families of subspaces controlled by the pair $(x^\star, u^\star)$.
+
+
+Under some qualifying constraints, the structure of the iterate $\S(x^k)$ will coincide precisely with the one of the solution $\S(x^\star)$; as a consequence the left and right terms in \eqref{eq:identification_result} are the same, and the identification result from the Theorem \ref{th:identification} could be specified as follows.
+
+\begin{corollary}[Exact identification]\label{lm:exact_identification}
+Consider the solution $x^\star$ of Problem \eqref{eq:pb_composite} verifies the qualification constraint
+\begin{equation}\label{eq:qc}
+\tag{QC}
+\S(x^\star) = \max\left\{ \S(\prox_{\gamma r}(u))\colon{u\in\mathcal{B}(x^\star - \gamma\nabla f(x^\star),\varepsilon)}\right\}
+\end{equation}
+for any $\varepsilon >0$ small enough.
+Then, under the same assumptions as in Theorem \ref{th:identification}
+% If there exists the $\RR^n$-valued sequence of points $(u^k)$ that converges almost surely to $u^\star$ such that $\rprox(u^\star) = x^\star$, then 
+the sequence $(x^k)$ %defined as $x^k = \rprox(u^k)$ 
+identifies an optimal subspace with probability one, after some finite time
+$$
+\S(x^\star) = \S(x^k).
+$$
+\end{corollary}
+In general, this corresponds to the relative interior assumption of \cite{lewis2002active}; see the extensive discussion 
+of \cite{vaiter2015model}.
+\begin{proof}[Proof of Corollary \ref{lm:exact_identification}]
+Let $u^\star = x^\star - \gamma \nabla f(x^\star)$ and observe from the optimality conditions of \eqref{eq:pb_composite} that $x^\star = \rprox(u^\star)$. We apply Theorem \ref{th:identification} and the qualification condition \eqref{eq:qc} ensures that the left and right-hand sides in \eqref{eq:identification_result} coincide: we get $\S(x^k)$ will exactly reach $\S(x^\star)$ in finite time.
+\end{proof}
+\begin{remark}[Qualification constraint]
+The qualifying constraint \eqref{eq:qc} may seem hard to verify at first glance but for most structure-enhancing regularizers, it simplifies greatly and {reduces} to usual nondegeneracy {assumptions}. Broadly speaking, this condition simply means that the point $u^\star = x^\star - \gamma\nabla f(x^\star)$ is not \emph{borderline} to be put to an identified value by the proximity operator of the regularizer $\prox_{\gamma r}$. 
+For example, {when} $r(x) = \lambda_1 \|x\|_1$, the qualifying constraint \eqref{eq:qc} simply rewrites $x_i^\star = 0 \Leftrightarrow \nabla_{[i]} f(x^\star) \in ]-\lambda_1,\lambda_1[$; 
+for $r$ is the TV-regularization \eqref{eq:tvreg}, the qualifying constraint means that there is no point $u$ (in any ball) around $x^\star - \gamma \nabla f(x^\star)$ such that $\prox_{\gamma r}(u)$ has a jump that $x^\star$ does not have. 
+\end{remark}
+Let us present an example of exact identification result for $\ell_1$ regularized composite optimization problem \eqref{eq:pb_composite}.
+\begin{example}[Exact identification for $\ell_1$ regularizer]
+\label{ex:exact_ident}
+Let us consider that composite optimization problem
+$$
+\min_{x\in\RR^n} f(x) + \lambda\|x\|_1,
+$$
+where $f$ is $L$-smooth and convex is non-degenerate, that is
+\begin{equation}\label{eq:non-deg}
+\tag{ND}
+-\nabla f(\w^\star)\in \textnormal{ri } \partial r(x^\star).
+\end{equation}
+Then for $k>K$ big enough the iterates $(x^k)$ of Algorithm \ref{algo:pgd} identifies the optimal support with probability one
+$$
+\supp(x^k) = \supp(x^\star).
+$$
+\begin{proof}
+First, let us rewrite the non-degeneracy condition for $\ell_1$ norm in closed form
+\begin{equation}\label{eq:nondeg}
+\left|\nabla f(\w^\star)_{[j]}\right|<\lambda~~~~~\textnormal{for all $j\in\supp(\w^\star)$}.
+\end{equation}
+Denoting by $u^{k+1} = x^k - \gamma\nabla f(x^k)$, from the convergence of $x^k$ to $x^\star$ we have that $u^k$ converges to $u^\star = x^\star - \gamma\nabla f(x^\star)$.
+
+Now, let us prove the qualification constraint 
+$$
+\supp(x^\star) = \max\left\{ \supp(\prox_{\gamma \lambda\|\cdot\|_1}(u))\colon{u\in\mathcal{B}(x^\star - \gamma\nabla f(x^\star),\varepsilon)}\right\}.
+$$
+
+Using the non-degeneracy of the problem we have that for any coordinate $i$ such that $x^\star_{[i]} = 0$ we have
+$$
+\left|u^{\star}_{[i]}\right| = \left|x^{\star}_{[i]} - \gamma\nabla f(x^\star)_{[i]}\right| = \left|\gamma\nabla f(x^\star)_{[i]}\right| = \epsilon_i < \gamma\lambda.
+$$
+Selecting $\varepsilon = \min_{i\notin\supp(x^\star)} (\gamma\lambda - \epsilon_i)/2$ for any $u\in\mathcal{B}(x^\star - \gamma\nabla f(x^\star),\varepsilon)$ we have 
+$$
+\left|u_{[i]}\right| \leq \left|x^{\star}_{[i]} - \gamma\nabla f(x^\star)_{[i]}\right|+ \varepsilon \le \gamma\lambda ~~~~\textnormal{for all $i\notin\supp(x^\star)$}
+$$
+that implies
+$$
+\max\left\{ \supp(\prox_{\gamma \lambda\|\cdot\|_1}(u))\colon{u\in\mathcal{B}(x^\star - \gamma\nabla f(x^\star),\varepsilon)}\right\}\subseteq \supp(x^\star).
+$$
+Combining it with $x^\star = \prox_{\gamma\lambda\|\cdot\|_1}(x^\star - \gamma\nabla f(x^\star))$ we get the statement of the corollary.
+\end{proof}
+\end{example}
+
+{
+\subsection{Identification of \dave}\label{sec:dave_ident}
+No identification results have been yet reported in the literature for the asynchronous algorithms. However, the delay-tolerant analysis of \dave~\cite{ICML18} allows verifying the active-set identification property for the algorithm.
+\begin{corollary}[Identification of \dave]\label{cor:dave_ident}
+Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth. Let $r$ be convex lsc. Using $\gamma \in (0, \frac{2}{\mu + L}]$, iterates $(x^k)$ of \dave~after finite amount of epochs identifies some subspaces with probability one.
+\end{corollary}
+\begin{proof}[Proof of \ref{cor:dave_ident}]
+Let us denote by $u^k = \barx^k$. To use Theorem \ref{th:identification} we should find $u^\star$ and prove that $u^k$ converges almost surely to $u^\star$.
+First, let us notice that the local iterates $(x_i)$ do not converge to a minimizer of the individual functions $(f_i)$ since the algorithm aims at minimizing the global loss but rather to local shifts of the solution $x^\star$ of~\eqref{eq:pb} (unique from the strong convexity assumption):
+\[
+x_i^\star = x^\star - \gamma \nabla f_i(x^\star) \qquad \text{for worker $i$}.
+\]
+From those, one can define $u^\star = \barx^\star = \sum_{i=1}^M \alpha_i x_i^\star$. First-order optimality conditions 
+\begin{align*}
+    0\in \sum_i \alpha_i \nabla f_i(x^\star) + \partial r(x^\star)
+\end{align*}
+imply that 
+\[
+\barx^\star = \sum_{i=1}^M \alpha_i x_i^\star = x^\star - \gamma \sum_{i=1}^M \alpha_i \nabla f_i(x^\star) \in x^\star  + \gamma \partial r(x^\star)
+\]
+which directly leads to $\rprox(\barx^\star) = x^\star$ (see Chap.\;16 of\;\cite{bauschke2011convex}).
+Now, using the definition of $\barx$ we have
+\begin{align*}
+    \|\barx^k - \barx^\star\|_2^2 = \|\sum_{i=1}^M\alpha_i(x_i^k -x_i^\star)\|_2^2\leq\sum_{i=1}^M\alpha_i\|x_i^k-x_i^\star\|_2^2\leq\max_{i=1}^m\|x_i^k-x_i^\star\|_2^2.
+\end{align*}
+Now we could control the term $\|x_i^k-x_i^\star\|_2^2$ as follows
+\begin{align*}
+    \|x_i^k-x_i^\star\|_2^2= \|x_i^{k-d_i^k}-x_i^\star\|_2^2 & = \|x^{k-D_i^k}-\gamma\nabla f_i(x^{k-D_i^k}) - x^\star + \gamma\nabla f_i(x^\star)\|_2^2 \\
+    &\leq \left(1 - \frac{2\gamma\mu L}{\mu + L}\right)\|x^{k-D_i^k} - x^\star\|_2^2,
+\end{align*}
+where in \dg{the} last inequality we use Lemma \ref{lm:bubeck}.
+Finally, using the result of Theorem \ref{th:davepg} we have the convergence of $\barx^k$ to $\barx^\star$.
+\end{proof}
+}

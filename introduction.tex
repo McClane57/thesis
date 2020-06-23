@@ -1,0 +1,39 @@
+\chapter*{Introduction}\label{ch:intro}
+\addcontentsline{toc}{chapter}{Introduction}
+\chaptermark{Introduction}
+Mathematical optimization is one of the \dg{most} important tools \dg{in} machine learning.
+%and the algorithms are motivated by applications. 
+Often, learning \dg{cames with} some specific structure to the final solution and one of the popular ways to enforce \dg{it} is to add a regularization term to the problem.% or to consider the constraint optimization problem, when the solution is forced to belong some specific set.
+Such regularizers are often non-smooth, which calls for optimization methods \dg{able to} handle \dg{such} non-smooth objective\dg{s}.
+
+Proximal algorithms are methods of choice for solving optimization problems with explicit non-smooth objective\dg{s}. Such methods for sparsity-inducing regularizers (e.g. $\ell_1$, $\ell_{1,2}$ norms or $\mathbf{TV}$ regularizer) have the additional property of identifying (near-)optimal subspace\dg{s} in finite time. This property opens the way for various dimension reduction techniques.
+% One of the popular approaches to solve an optimization problem with non-smooth objective is using of proximal point methods. Such methods, allows identifying the near-optimal subspaces for sparsity inducing regularizers (e.g. $\ell_1$, $\ell_{1,2}$ norms or $\mathbf{TV}$ regularizer). This property of such algorithms open the way to different dimension reduction techniques; however, this moment of identification is usually unknown.
+In our work, we focus on the sparsification technique based on the identification property of proximal methods \dg{and} consider composite optimization problem with sparsity inducing regularizers.
+
+In Chapter \ref{ch:MOR}, we present our sketch-and-project approach for solving composite optimization problems with sparsity inducing regularizers. We propose a randomized proximal gradient method harnessing the underlying structure. This algorithm is the first algorithm that uses identification-based sketches. More precisely, we propose to select the projections based on the properties of the regu\dg{lar}izer. We introduce two key components: i) a random subspace proximal gradient algorithm; ii) an identification-based sampling of the subspaces. Their interplay brings a significant performance improvement in terms of dimensions explored on typical learning problems.
+
+In the second part of our work, we consider \dg{the} centralized setup. We propose different sparsified versions of the asynchronous proximal algorithm \cite{mishchenko2018}.
+
+In Chapter \ref{ch:soda}, we present a general framework \spy~for sparsification, where we propose sending randomly chosen set of worker's update coordinates. However, both theoretical and practical analysis shows that usage of different probabilities could lead to divergence of the algorithm. On the other hand, in case of uniform selection% or in case of different probabilities with scaling
+the algorithm converges and, moreover, identifies the near-optimal support for the $\ell_1$ regularized problems that motivate us to look at identification-based selection: \dg{some coordinates are selected with probability $1$ and other are selected with some fixed probability. This particular selection allows acceleration in terms of communications when it converges. To guarantee the convergence of different probabilities \spy~the scaling technique could be used; however, the performance of such methods is worse than without sparsification both in theory and in practice.}
+%Unfortunately, this particular selection does not prevent from divergence in practice; however, its scaled version converges almost surely to the minimizer but performs worse than without sparsification both in theory and in practice.
+
+In Chapter \ref{ch:spy}, we present a modification of \spy, that tackles the divergence issue by us\dg{ing} a proximal reconditioning scheme wrapping up the \spy~algorithm with different probabilities. This allows us to perform much more
+aggressive sparsifications. Furthermore, we show that when using a sparsity inducing regularizer, our reconditioned algorithm generates iterates that identify the optimal sparsity pattern
+of the model in finite time. This progressively uncovered pattern can be used to adaptively update the sparsification distribution of the inner method. All in all, this method only features sparse communications: the downward communications (master-to-worker) consist in sending the (eventually) sparse model, and the upwards communications (worker-to-master) are adaptively and aggressively sparsified. Finally, we show theoretically and numerically that our method has better performance than its non-sparsified version in terms of suboptimality with respect to the quantity of information exchanged.
+
+\paragraph{Corresponding articles}
+
+% During the work on this manuscript a couple of articles were prepared.
+
+The contribution of this manuscript consists of the following articles, prepared in scope of the research made during this Ph.D.
+\begin{itemize}
+    \item[] In Chapter \ref{ch:MOR}, we present the contribution from \cite{grishchenko2020proximal};
+    \item[] In Chapters \ref{ch:soda}, \ref{ch:spy}, we present the contributions from \cite{grishchenko2018asynchronous}.
+\end{itemize}
+
+In addition, a couple of articles were prepared outside of the scope of this work.
+\begin{itemize}
+    \item[] In \cite{ivanova2019adaptive}, we propose a universal acceleration technique for adaptive methods for smooth convex but not strongly convex objective functions. It allows accelerating such well-known methods as Steepest Descent, Random Adaptive Coordinate Descent Method, and others where Lipschitz constant of the gradient is either unknown (expensive to compute) or changes a lot along the method trajectory.
+    \item[] In \cite{bareilles2020solving}, we present an asynchronous version of the Progressive Hedging (a popular strategy in multistage stochastic programming) that is able to compute an update as soon as a scenario subproblem is solved. Based on the similar argum\dg{e}nts as in Asynchronous ADMM, we prove that the asynchronous version has the same converge properties as the standard one and we release an easy-to-use Julia toolbox\footnote{GitHub link: \href{https://github.com/yassine-laguel/RandomizedProgressiveHedging.jl}{https://github.com/yassine-laguel/RandomizedProgressiveHedging.jl}}.
+\end{itemize}

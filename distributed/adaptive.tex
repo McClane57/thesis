@@ -1,15 +1,39 @@
 \section{On the sparsification choice for $\ell_1$ regularized problems}\label{sec:distributed-adaptive}
 
+In this section, we present $3$ different options of sparsity mask selectors for $\ell_1$ regularized problems.
+
 Assuming that all machines are responsive (i.e. $m\to \infty$ when $k\to\infty$), the inequality \eqref{eq:dif_prob} gives linear convergence of the mean squared error in terms of epochs if
 \begin{equation}\label{eq:prob_gap}
     \frac{\pmin}{\pmax} > (1-\gamma \mu)^2 \stackrel{\gamma = \frac{2}{\mu + L}}{\geq} \left(\frac{1-\kappa_{\eqref{eq:pb}}}{1+\kappa_{\eqref{eq:pb}}}\right)^2
 \end{equation}
 and thus the behavior of the algorithm depends if the selection is performed uniformly (and thus structure-blind) or non-uniformly (to encompass some prior information).
 
-\paragraph{Inefficiency of uniform sparsification}
+\subsection{Inefficiency of uniform sparsification}
 
-If the selection is \emph{uniform}, i.e. if $p_i=\pp\in(0,1]$ for all $i$, $x^k\to x^\star$ in probability. Furthermore, the mean squared error vanishes linearly in terms of epochs with a rate $(1-\pp\gamma\mu(2-\gamma\mu))$. As a result, under the mild assumption over the delays (Assumption \ref{hyp:delident}) we could prove an almost sure convergence $\barx^k\to \barx^\star$ and as a corollary the identification property (see Theorem \ref{th:identification}) of \spy~with uniform sampling.
+If the selection is \emph{uniform} \spyU~(see Algorithm \ref{alg:uspy}), i.e. if $p_i=\pp\in(0,1]$ for all $i$, $x^k\to x^\star$ in probability. Furthermore, the mean squared error vanishes linearly in terms of epochs with a rate $(1-\pp\gamma\mu(2-\gamma\mu))$. As a result, under the mild assumption over the delays (Assumption \ref{hyp:delident}) we could prove an almost sure convergence $\barx^k\to \barx^\star$ and as a corollary the identification property (see Theorem \ref{th:identification}) of \spyU.
+\begin{algorithm}[t!]
+\caption{\textsc{\spyU} on $((\alpha_i),(f_i), r  ~ ; ~  \pi)$}
+\label{alg:uspy}
+\begin{center}
+\tcbset{width=0.48\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
 
+\begin{tcolorbox}[title=\textsc{Worker } $i$, box align=center]
+Initialize $x_i = x_i^+ = x = \bar x^0$\\
+\While{not interrupted by master}{
+    {\color{red!80!yellow}Receive  $x$ from master}\\
+    Draw sparsity mask $\mathbf{S}_{\pi}$ as\\
+    \vspace*{-10pt}
+    $$
+    \mathbb{P}\left[j\in\mathbf{S}_{\pi}\right] = \pi
+    $$
+    $[x^+_i]_{\mathbf{S}_{\pi}}   \leftarrow [  x - \gamma \nabla f_i( x)]_{\mathbf{S}_{\pi}} $\\[0.7ex]
+    $\Delta \leftarrow x_i^+ - x_i $ \\[0.7ex]
+    {\color{blue!70!black}Send $[\Delta]_{\mathbf{S}_{\pi}}$ to master}\\[0.7ex]
+    $[x_i]_{\mathbf{S}_{\pi}} \leftarrow [x^+_i]_{\mathbf{S}_{\pi}}$
+}
+\end{tcolorbox}
+\end{center}
+\end{algorithm}
 \begin{assumption}[Additional assumption for identification]
 \label{hyp:delident}
 The number of iterations between two full updates cannot grow exponentially, i.e. $k_{m+1}-k_m = o(\exp(m))$.
@@ -46,41 +70,72 @@ Almost sure convergence result guarantees the identification of the near-optimal
 
 Unfortunately, uniform selection usually results in poor performance in practice, as displayed in Figure~\ref{fig:uniform}. Hence the need for a more adaptive sparsification manner.
 
-\begin{figure}[H]
+\begin{figure}[h]
 \begin{center}
 \subfloat[][The functional suboptimality versus the amount of iterations/gradient computations/communication rounds done.]{\includegraphics[width = 0.49\linewidth]{distributed/figs/madelon_10w_001_0001_fun_vs_ite_log_coordinate.pdf}}
  \hfill
 \subfloat[][The functional suboptimality versus amount of coordinates sent during communication rounds.]{\includegraphics[width = 0.49\linewidth]{distributed/figs/madelon_10w_001_0001_fun_vs_ex_log_coordinate.pdf}}
 \end{center}
-\caption{Evolution of \salgo~iterates comparing to \dave. We consider logistic regression objective function with elastic net regularizer on Madelon dataset from LibSVM library \cite{chang2011libsvm}. We denote by ``SPY~+ $p$'' the \salgo with uniform probability $p$.}
+\caption{Evolution of \spyU~iterates comparing to \dave. We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite{chang2011libsvm}. We denote by ``SPY~+ $\pi$'' the \spyU~with probability $\pi$.}
 \label{fig:uniform}
 \end{figure}
 
 
-\paragraph{Efficiency of adaptive sparsification}
-\label{sec:adapt}
+\subsection{Efficiency of adaptive sparsification}
+\label{sec:adapt_eff}
 
-The idea of adaptively using the identified structure in coordinate descent for $\ell_1$-regularized problems methods was recently developed in \cite{grishchenko2020proximal} (see Section \ref{sec:mor-adaptive-subspace}. Mathematically, this means select coordinates in the mask as follows
+The idea of adaptively using the identified structure in coordinate descent for $\ell_1$-regularized problems methods was recently developed in \cite{grishchenko2020proximal} (see Section \ref{sec:mor-adaptive-subspace}). Mathematically, this means select coordinates in the mask as follows performing Algorithm \ref{alg:soda}
 \begin{assumption}[Sparsification with support identification]
 \label{hyp:algoident}
-The sparsity mask selectors $(\mathbf{S}^k)$ are random variables such that   $\mathbb{P}[j\in\mathbf{S}^k]=1$ if $j \in \supp({x^k})$ and either:
+The sparsity mask selectors $(\mathbf{S}_{\pi}^k)$ are random variables such that   $\mathbb{P}[j\in\mathbf{S}_{\pi}^k]=1$ if $j \in \supp({x^k})$ and either:
 \begin{itemize}
     \item[] \textbf{\emph{Option I.}}
-    $\mathbb{P}[j'\in\mathbf{S}^k] = \pi \in(0,1] $ for all $j'\!\notin \supp({x^k})$.
-    \item[] \textbf{\emph{Option II.}}  $|\mathbf{S}^k| = |\supp({x^k})| + \pi(n - |\supp({x^k})|) \in \{ 1,..,n \} $ almost surely and  $\mathbb{P}[j'\in\mathbf{S}^k]=\mathbb{P}[j''\in\mathbf{S}^k]$ for all $j',j''\notin \supp({x^k})$.
+    $\mathbb{P}[j'\in\mathbf{S}_{\pi}^k] = \pi \in(0,1] $ for all $j'\!\notin \supp({x^k})$.
+    \item[] \textbf{\emph{Option II.}}  $|\mathbf{S}_{\pi}^k| = |\supp({x^k})| + \pi(n - |\supp({x^k})|) \in \{ 1,..,n \} $ almost surely and  $\mathbb{P}[j'\in\mathbf{S}_{\pi}^k]=\mathbb{P}[j''\in\mathbf{S}^k]$ for all $j',j''\notin \supp({x^k})$.
 \end{itemize}
 % Furthermore, the delays $(D_i^k)_{i=1,..,M}$ are independent of the future mask selectors  $\{\mathbf{S}^\ell\}_{\ell\geq k}$.
 \end{assumption}
 
-In words, this means updating/communicate all coordinates in the support of the last computed master point $x^k$ and selecting coordinates outside the support with \emph{exploration probability} $\pp$ for the Option I and selection the set of fixed size for the Option II. These two different approaches has no difference in terms of theoretical proofs since the expectation $\EE\left[x_{[\mathbf{S}^k]}|x^k\right]$ is the same for both of them and defined as
+In words, this means updating/communicate all coordinates in the support of the last computed master point $x^k$ and selecting coordinates outside the support with \emph{exploration probability} $\pp$ for the Option I and select the set of fixed size for the Option II. These two different approaches have no difference in terms of theoretical proofs since the expectation $\EE\left[x_{[\mathbf{S}_{\pi}^k]}|x^k\right]$ is the same for both of them and defined as
 $$
-\left[\EE\left[x_{[\mathbf{S}^k]}|x^k\right]\right]_j = \left\{\begin{array}{ll}
+\left[\EE\left[x_{[\mathbf{S}_{\pi}^k]}|x^k\right]\right]_j = \left\{\begin{array}{ll}
  x_{[j]}  \hspace*{-0.2cm}  &  \hspace*{0ex} \text{ if } j\in\supp(x^k)  \\[0.5cm]
 \pi x_{[j]} & \hspace*{1ex}\text{ otherwise }
 \end{array}
 \right.
 $$
+\begin{algorithm}[t!]
+\caption{\textsc{\spyI} on $((\alpha_i),(f_i),\pi)$}
+\label{alg:soda}
 
+\tcbset{width=0.48\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
+\begin{center}
+\begin{tcolorbox}[title=\textsc{Worker } $i$]
+\begin{algorithmic}
+\STATE \textbf{Initialize} $x_i = x_i^+ = \barx^0$\\
+\WHILE{not interrupted}{
+    \STATE {\color{red!80!yellow}Receive  $x$ from master}
+    \STATE Draw sparsity mask $\mathbf{S}_{\pi}$ as
+    \vspace*{-6pt}
+    \begin{equation*}
+        \mathbb{P}[j\in\mathbf{S}_{\pi}] = \begin{cases}
+        1,& \text{ if } j\in\supp({x})\\
+        \pi,& \text{ if } j\notin\supp({x})
+        \end{cases}
+    \end{equation*}
+    \vspace*{-12pt}
+    \STATE $\left[x^+_i\right]_{\mathbf{S}_{\pi}} \leftarrow [  x - \gamma \nabla f_i(x)]_{\mathbf{S}_{\pi}}$
+    \vspace*{2pt}
+    \STATE  $\Delta = x_i^+ - x_i$%\hspace*{50pt} ($=[\Delta]_{\mask}$)
+    \STATE $x_i = x^+_i $
+    \vspace*{1pt}
+    \STATE {\color{blue!70!black}Send $\Delta$ to master}
+}\ENDWHILE
+
+\end{algorithmic}
+\end{tcolorbox}
+\end{center}
+\end{algorithm}
 This kind of sampling showed tremendous gains compared to uniform sampling; however, it adds two difficulties with respect to Lemma~\ref{lm:spy_diff}:
 \begin{itemize}
     \item a \emph{good conditioning} is necessary to allow for a small $\pmin=\pp$ and $\pmax=1$. More precisely, from Eq.~\eqref{eq:prob_gap}, we get the condition
@@ -91,15 +146,111 @@ This kind of sampling showed tremendous gains compared to uniform sampling; howe
     \item the sampling is \emph{not i.i.d.} anymore since the probabilities depend on the points generated by the algorithm.
     %\footnote{This difficulty can actually be overcome theoretically with a refined analysis but we delay this discussion to Appendix~\ref{sec:noniid} since it is not necessary in the upcoming methods.}.
 \end{itemize}
+\mitya{
+\begin{figure}[H]
+\begin{center}
+\subfloat[][The size of the support versus the amount of iterations/gradient computations/communication rounds done.]{\includegraphics[width = 0.49\linewidth]{distributed/figs/madelon_10w_002_0001_density.pdf}}
+ \hfill
+\subfloat[][The functional suboptimality versus amount of coordinates sent during communication rounds.]{\includegraphics[width = 0.49\linewidth]{distributed/figs/madelon_10w_002_0001_fun_vs_ex_log.pdf}}
+\end{center}
+\caption{Evolution of \spyI~iterates comparing to \dave. We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite{chang2011libsvm}. We present $3$ different runs of \spyI~with adaptive selection as in Option I of Assumption \ref{hyp:algoident} with probability $\pi = 0.1$ showing both convergence and divergence of \spyI.}
+\label{fig:soda}
+\end{figure}
+}
 
-Unfortunately, the algorithm with such selection could diverge; however, if it converges, it identifies the near-optimal support and has the same linear rate as \dave~with fewer communication cost  (see Chapter YYY for numerical examples and further discussion).
+\mitya{
+In Figure \ref{fig:soda}, we see that the algorithm with such selection (\spyI) could misidentify and diverge as a result; however, if it converges, it identifies the near-optimal support and has the same linear rate as \dave~with fewer communication cost. We further investigate this algorithm in Section \ref{sec:i-spy}.}
 
-\paragraph{Scaled adaptive sparsification}
-{Adaptive coordinate selection could be combined with the scaling technique that is common for stochastic methods with random sparsification \cite{zhang2014asynchronous}. We propose to scale deterministic update by a factor of $\pi$ to make it ``expectation-like'' see Algorithm \ref{alg:spydr}.
+\subsection{Scaled adaptive sparsification}
+\mitya{One of the possible modifications of \spy~is a scaled version of it \spyS~see Algorithm \ref{alg:sspy}. This is often used in sparsification methods for \texttt{SGD} (see e.g. \cite{wang2017efficient}) to have the unbiased estimator of the sparsified object. In our case, helps to figure out the difference in probabilities and keep the ``probability-gap'' equal to $0$.}
+\begin{algorithm}[t!]
+\caption{\textsc{\spyS} on $((\alpha_i),(f_i), r  ~ ; ~  \pvec)$}
+\label{alg:sspy}
+\begin{center}
+\tcbset{width=0.73\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
+
+\begin{tcolorbox}[title=\textsc{Worker } $i$, box align=center]
+Initialize $x_i = x_i^+ = x = \bar x^0$\\
+Calculate scaled probability vector $q = \left(\frac{\pmin}{p_1},\frac{\pmin}{p_2},\ldots,\frac{\pmin}{p_n}\right)$\\
+\While{not interrupted by master}{
+    {\color{red!80!yellow}Receive  $x$ from master}\\%\\[-1.9ex]\\
+    Draw sparsity mask $\mathbf{S}_p$ as\\
+    \vspace*{-10pt}
+    $$
+    \mathbb{P}\left[j\in\mathbf{S}_p\right] = p_j
+    $$
+    
+    $[x^+_i]_{\mathbf{S}_p}   \leftarrow [q]_{\mathbf{S}_p}*[  x - \gamma \nabla f_i( x)]_{\mathbf{S}_p}  + [\mathbf{1^n} - q]_{\mathbf{S}_p}*[x_i]_{\mathbf{S}_p}$\footnote{Here we denote by $\mathbf{1^n}\in\RR^n$ the identity vector and by $*$ we denote the coordinate-wise vector-to-vector multiplication.}\\[0.7ex]
+    $\Delta \leftarrow x_i^+ - x_i $ \\[0.7ex]
+    {\color{blue!70!black}Send $[\Delta]_{\mathbf{S}_p}$ to master}\\[0.7ex]
+    $[x_i]_{\mathbf{S}_p} \leftarrow [x^+_i]_{\mathbf{S}_p} $
+    }
+\end{tcolorbox}
+\end{center}
+\end{algorithm}
+\mitya{
+More precisely, every worker performs the following update
+\begin{align}
+\label{alg:spyS}
+x_{i[j]}^k &= \left\{ 
+\begin{array}{ll}
+ \frac{\pmin}{p_j}\!\!\!\left( x^{k-D_i^k}    - \gamma \nabla f_i( x^{k-D_i^k}) \right)_{[j]}  + \left(1-\frac{\pmin}{p_j}\right)x_{i[j]}^{k-1} \hspace*{-0.2cm}  &  \hspace*{0ex} \text{ if } \left| \begin{array}{l}
+    i = i^k\\ j\in\mathbf{S}_p^{k-D_i^k}
+ \end{array} \right.  \\[0.5cm]
+x_{i[j]}^{k-1} & \hspace*{1ex}\text{ otherwise }
+\end{array}
+\right.
+\end{align}
+}
+
+\mitya{
+The learning rate of the update is ``$\frac{1}{\pmin}$ times smaller'' than $\gamma$ because of the scaling. On the other hand, this algorithm is proven to converge for any $L$-smooth and $\mu$-strongly convex problem independent on its conditioning.}
+
+\mitya{\begin{theorem}[Convergence of \spyS]\label{th:spydr_conv}
+Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth. Let $r$ be convex lsc. 
+Suppose that Assumption~\ref{hyp:algo} holds for the probability vector $\pvec$, and take $\gamma \in (0, \frac{2}{\mu + L}]$,  then \spyS~on $((\alpha_i),(f_i), r  ~ ; ~  \pvec)$ verifies for all $k\in [k_m, k_{m+1})$
+\begin{align}
+\label{eq:dif_prob2}
+   \mathbb{E} \left\| x^k - x^\star \right\|^2 \leq\mathbb{E} \left\| x^k - x^\star \right\|^2\le \left( 1 - \pmin\gamma \mu(2-\gamma\mu)\right)^{m} \max_i\left\|x_i^0-x_i^\star\right\|^2,
+\end{align}
+with the shifted local solutions $x_i^\star = x^\star - \gamma_i\nabla f_i(x^\star)$. 
+% Furthermore, using the maximal stepsize $\gamma = \frac{2}{\mu + L}$, we obtain for all $k\in [k_m, k_{m+1})$
+% \begin{align}
+% \label{eq:ratebefore}
+%  \mathbb{E}   \left\| x^k - x^\star \right\|^2 \le \left(\frac{1-\kappa_{\eqref{eq:pb}}}{1+\kappa_{\eqref{eq:pb}}}\right)^{2m} \max_i\left\|x_i^0-x_i^\star\right\|^2.
+% \end{align}
+\end{theorem}
+\begin{proof}[Proof of Theorem \ref{th:spydr_conv}]
+The proof follows the same arguments as the one of Theorem \ref{lm:spy_diff}, expect for one crucial inequality. 
+Using the same notations as in the proof of Theorem~\ref{lm:spy_diff}, we have
+\begin{align*}
+\EE[\|x_i^k - x_i^\star\|^2&|\mathcal{F}^{k-D_i^k}]
+=~ \EE[\|x_i^{k-D_i^k} - x_i^\star\|^2|\mathcal{F}^{k-D_i^k}] = \sum_{j=1}^n \EE[([x_i^{k-D_i^k} - x_i^\star]_{[j]})^2|\mathcal{F}^{k-D_i^k}] \\
+=&\sum_{j = 1}^n p_j\left(\frac{\pmin}{p_j}\left[{x}^{k-D_i^k} - \gamma\nabla f_i(x^{k-D_i^k})\right]_{[j]} + \left(1-\frac{\pmin}{p_j}\right)\left[x^{k-D_i^k}_i\right]_{[j]}
+     - [x_i^\star]_{[j]}\right)^2  \\
+&\hspace*{190pt}+ (1-p_j)\left(\left[x^{k-D_i^k}_i\right]_{[j]}
+     - [x_i^\star]_{[j]}\right)^2\\
+     \leq&\sum_{j = 1}^n p_j\frac{\pmin}{p_j}\left(\left[{x}^{k-D_i^k} - \gamma\nabla f_i(x^{k-D_i^k})\right]_{[j]} - [x_i^\star]_{[j]}\right)^2\\
+     &+ p_j\left(1-\frac{\pmin}{p_j}\right)\left(\left[x^{k-D_i^k}_i\right]_{[j]}
+     - [x_i^\star]_{[j]}\right)^2+ (1-p_j)\left(\left[x^{k-D_i^k}_i\right]_{[j]}
+     - [x_i^\star]_{[j]}\right)^2\\
+%& = \sum\limits_{j=1}^d \big\{p( \bar{x}_{[j]}^{k-D_i^k} - \gamma \nabla f_i(\bar{x}^{k-D_i^k})_{[j]}   -  ({x}_i^{\star})_{[j]})^2 \\
+%& \hspace*{1cm} + (1-p)( (x_{i}^{k-D_i^k})_{[j]} -  ({x}_{i}^{\star})_{[j]})^2 \big\}\\
+% L
+ =~& \pmin \| x^{k-D_i^k} - \gamma \nabla f_i(x^{k-D_i^k})  - (  {x}^{\star} - \gamma \nabla f_i(x^\star) ) \|^2  + (1-\pmin) \| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2 
+\end{align*}
+where the inequality follows from convexity of $\|\cdot\|^2$.
+The rest of the proof follows unchanged.
+\end{proof}}
+
+\mitya{As we could see, the theoretical rate depends only on the minimal probability of coordinate to be selected; however, the size of communication is the smallest if all the probabilities are the same.}
 
 
-\begin{algorithm}
-\caption{\textsc{\maskalgo} on $((\alpha_i),(f_i), r  ~ ; ~  \pi)$ with stopping criterion $\mathsf{C}$}
+\mitya{Adaptive coordinate selection could be combined with this scaling technique to perform \spyIS~see Algorithm \ref{alg:spydr}.}
+
+
+\begin{algorithm}[t!]
+\caption{\textsc{\spyIS} on $((\alpha_i),(f_i), r  ~ ; ~  \pi)$}
 \label{alg:spydr}
 \begin{center}
 \tcbset{width=0.68\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
@@ -123,60 +274,29 @@ Unfortunately, the algorithm with such selection could diverge; however, if it c
 \begin{tcolorbox}[title=\textsc{Worker } $i$, box align=center]
 Initialize $x_i = x_i^+ = x = \bar x^0$\\
 \While{not interrupted by master}{
-    \hspace*{0.1ex}\\
-    $[x^+_i]_{\mathbf{S}\setminus\supp(x)}   \leftarrow [  x - \gamma \nabla f_i( x)]_{\mathbf{S}\setminus\supp(x)} $\\[-3ex]
+    {\color{red!80!yellow}Receive $x$ from master}\\%\\[-1.9ex]
+    Draw sparsity mask $\mathbf{S}_{\pi}$ as\\
+    \begin{equation*}
+    \mathbb{P}[j\in\mathbf{S}_{\pi}] = \begin{cases}
+    1,& \text{ if } j\in\supp({x})\\
+    \pi,& \text{ if } j\notin\supp({x})
+    \end{cases}
+    \end{equation*}
+    $[x^+_i]_{\mathbf{S}_{\pi}\setminus\supp(x)}   \leftarrow [  x - \gamma \nabla f_i( x)]_{\mathbf{S}_{\pi}\setminus\supp(x)} $\\[-3ex]
 $$
     [x^+_i]_{\supp(x)}   \leftarrow \pi [  x - \gamma \nabla f_i( x)]_{\supp(x)}+ (1-\pi) [x_i]_{\supp(x)} 
 $$
     \\[-4ex]
     $\Delta \leftarrow x_i^+ - x_i $ \\[0.7ex]
-    {\color{blue!70!black}Send $[\Delta]_{\mathbf{S}}$ to master}\\[0.7ex]
-    $[x_i]_{\mathbf{S}} \leftarrow [x^+_i]_{\mathbf{S}} $\\[0.8ex]
-        {\color{red!80!yellow}Receive  $x$ and $\mathbf{S}$ from master}%\\[-1.9ex]
+    {\color{blue!70!black}Send $[\Delta]_{\mathbf{S}_{\pi}}$ to master}\\[0.7ex]
+    $[x_i]_{\mathbf{S}_{\pi}} \leftarrow [x^+_i]_{\mathbf{S}_{\pi}} $
 }
 \end{tcolorbox}
 \end{center}
 \end{algorithm}
 
-On the one hand, this algorithm still has the dimension-reduction property - after the moment of identification (see Lemma \ref{lm:spydr_identification}), all the critical coordinates update every iteration. However, the learning rate of the update is ``$\pi$ times smaller'' than $\gamma$ because of the scaling. On the other hand, this algorithm is proven to converge for any $L$-smooth and $\mu$-strongly convex problem independent on its conditioning.
-
-\begin{theorem}[Convergence of \maskalgo]\label{th:spydr_conv}
-Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu>0$) and $L$-smooth. Let $r$ be convex lsc. 
-
-Suppose that Assumption~\ref{hyp:algoident} holds for the probability vector $\pvec$, and take $\gamma \in (0, \frac{2}{\mu + L}]$,  then \salgo on $((\alpha_i),(f_i), r  ~ ; ~  \pi)$ verifies for all $k\in [k_m, k_{m+1})$
-\begin{align}
-\label{eq:dif_prob}
-   \mathbb{E} \left\| x^k - x^\star \right\|^2 \le \left( 1 - \pi\gamma \mu(2-\gamma\mu)\right)^{m} \max_i\left\|x_i^0-x_i^\star\right\|^2,
-\end{align}
-with the shifted local solutions $x_i^\star = x^\star - \gamma_i\nabla f_i(x^\star)$. 
-
-Furthermore, using the maximal stepsize $\gamma = \frac{2}{\mu + L}$, we obtain for all $k\in [k_m, k_{m+1})$
-\begin{align}
-\label{eq:ratebefore}
- \mathbb{E}   \left\| x^k - x^\star \right\|^2 \le \left(\frac{1-\kappa_{\eqref{eq:pb}}}{1+\kappa_{\eqref{eq:pb}}}\right)^{2m} \max_i\left\|x_i^0-x_i^\star\right\|^2.
-\end{align}
-\end{theorem}
-\begin{proof}[Proof of Theorem \ref{th:spydr_conv}]
-The proof follows the same arguments as the one of Theorem \ref{lm:spy_diff}, expect for one crucial inequality. 
-Using the same notations as in the proof of Theorem~\ref{lm:spy_diff}, we have
-\begin{align*}
-\EE[\|x_i^k - x_i^\star\|^2&|\mathcal{F}^{k-D_i^k}]
-=~ \EE[\|x_i^{k-d_i^k} - x_i^\star\|^2|\mathcal{F}^{k-D_i^k}] = \sum_{j=1}^n \EE[([x_i^{k-d_i^k} - x_i^\star]_{[j]})^2|\mathcal{F}^{k-D_i^k}] \\
-=~  &\!\!\!\!\!\sum_{j\notin  \supp({{x}^{k-d_i^k}})} \!\!\!\!\!\pi\Big( [{x}^{k-D_i^k} - \gamma \nabla f_i({x}^{k-D_i^k} )  -  {x}_i^{\star}]_{[j]}\Big)^2  + (1-\pi) \Big( [x_{i}^{k-D_i^k}  -  {x}_{i}^{\star}]_{[j]} \Big)^2\\ 
-    &\!\!\!+ \!\!\!\!\!\sum_{j\in \supp({{x}^{k-d_i^k}})} \!\!\!\!\!\Big( [\pi({x}^{k-d_i^k} - \gamma\nabla f_i(x^{k-d_i^k})) + (1-\pi)x^{k-D_i^k}_i]_{[j]}
-     - [x_i^\star]_{[j]}\Big)^2  \\
-\leq~&\!\!\!\!\!\sum_{j \in  \supp({{x}^{k-d_i^k}})} \!\!\!\!\! \pi\Big( [{x}^{k-D_i^k} - \gamma \nabla f_i({x}^{k-D_i^k} )  -  {x}_i^{\star}]_{[j]}\Big)^2 
- + (1-\pi) \Big( [x_{i}^{k-D_i^k}  -  {x}_{i}^{\star}]_{[j]} \Big)^2 \\
-  &\!\!\!  + \!\!\!\sum_{j\notin  \supp({{x}^{k-d_i^k}})}\!\!\!\!\!\pi\Big( [{x}^{k-D_i^k} - \gamma \nabla f_i({x}^{k-D_i^k} )  -  {x}_i^{\star}]_{[j]}\Big)^2  + (1-\pi) \Big( [x_{i}^{k-D_i^k}  -  {x}_{i}^{\star}]_{[j]} \Big)^2\\
-%& = \sum\limits_{j=1}^d \big\{p( \bar{x}_{[j]}^{k-D_i^k} - \gamma \nabla f_i(\bar{x}^{k-D_i^k})_{[j]}   -  ({x}_i^{\star})_{[j]})^2 \\
-%& \hspace*{1cm} + (1-p)( (x_{i}^{k-D_i^k})_{[j]} -  ({x}_{i}^{\star})_{[j]})^2 \big\}\\
-% L
- =~& \pi \| x^{k-D_i^k} - \gamma \nabla f_i(x^{k-D_i^k})  - (  {x}^{\star} - \gamma \nabla f_i(x^\star) ) \|^2  + (1-\pi) \| x_{i}^{k-D_i^k} - {x}_{i}^{\star}\|^2 
-\end{align*}
-where the inequality follows from convexity of $\|\cdot\|^2$.
-The rest of the proof follows unchanged.
-\end{proof}
-As we could see from the theorem, the rate of Algorithm \ref{alg:spydr} is the same as for Algorithm \ref{alg:spy} with uniform sampling; however, in practice it performs better in case $r = \lambda\|\cdot\|_1$ thanks to the identification property (Lemma \ref{lm:spydr_identification}). More precisely, while uniform sampling takes place, coordinates from the support are selected with probability $\pi$ that makes it worse than selecting all of them but scaling. Unfortunately, even the identification property of the \spydr algorithm does not help it to perform at least as good as \dave~both in terms of iterations and communications (see Figure \ref{fig:spydr}). 
+On the one hand, this algorithm still has the dimension-reduction property - after the moment of identification (see Lemma \ref{lm:spydr_identification}), all the critical coordinates update every iteration. However, 
+\dg{a}s we could see from the theorem, the rate of Algorithm \ref{alg:spydr} is the same as for Algorithm \ref{alg:spy} with uniform sampling; however, in practice it performs better in case $r = \lambda\|\cdot\|_1$ thanks to the identification property (Lemma \ref{lm:spydr_identification}). More precisely, while uniform sampling takes place, coordinates from the support are selected with probability $\pi$ that makes it worse than selecting all of them but scaling. Unfortunately, even the identification property of the \spyIS~algorithm does not help it to perform at least as good as \dave~both in terms of iterations and communications (see Figure \ref{fig:spydr}). 
 
 \begin{figure}[H]
 \begin{center}
@@ -184,10 +304,9 @@ As we could see from the theorem, the rate of Algorithm \ref{alg:spydr} is the s
  \hfill
 \subfloat[][The functional suboptimality versus amount of coordinates sent during communication rounds.]{\includegraphics[width = 0.49\linewidth]{distributed/figs/madelon_10w_001_0001_fun_vs_ex_log_coordinate_stupid.pdf}}
 \end{center}
-\caption{Evolution of \maskalgo~iterates comparing to \dave. We consider logistic regression objective function with elastic net regularizer on Madelon dataset from LibSVM library \cite{chang2011libsvm}. We denote by ``SPY-DR~+ $p$'' the \maskalgo with selected as in Option I of Assumption \ref{hyp:algoident} with probability $\pi = p$.}
+\caption{Evolution of \spyIS~iterates comparing to \dave. We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite{chang2011libsvm}. We denote by ``IS-SPY~+ \dg{$\pi$}'' the \spyIS~with selected as in Option I of Assumption \ref{hyp:algoident} with probability $\pi$.}
 \label{fig:spydr}
 \end{figure}
 
-\section{Conclusion}
-In this chapter, we present the idea of sparsification of \dave~algorithm and showed that in case of uniform or ``scaled-adaptive'' sampling algorithm converges almost surely to the minimizer and as a result identifies the near-optimal sparsity structure of the solution. However, both in theory and in practice, the convergence of sparsified algorithm is worse than without sparsification that requires further development. First, in Chapter XXX, we propose the reconditioned version of the \salgo with adaptive sampling that could overcome both issues: non i.i.d. of the sparsity mask selectors and ill-conditioned problems. Second, in Chapter YYY we investigate the empirical performance of \salgo with adaptive selection to see if it performs well in practice.
-}
+\section{Better analysis for \spyI~in case of $\ell_1$ regularized problems}\label{sec:i-spy}
+In this section, we present some additional analysis of \spyI~see Algorithm \ref{alg:soda}.

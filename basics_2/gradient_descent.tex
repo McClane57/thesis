@@ -1,20 +1,20 @@
-\section{Gradient descent}\label{sec:basics_gd}
+\subsection{Gradient descent}\label{sec:basics_gd}
 Let us consider the following optimization problem
 \begin{equation}\label{eq:pb_simple}
     \min_{x\in\RR^n}f(x),
 \end{equation}
-where $f$ is convex and smooth. One of the most important methods in the mathematical optimization to minimize \eqref{eq:pb_simple} is a gradient descent method. This method was initially proposed in work of Cauchy \cite[Extrait $383$]{cauchy1847methode} and becomes popular after \cite{polyak1963gradient}. Thanks to its simplicity there are many extensions of it \cite{polyak1969minimization, polyak1969conjugate, nesterov2005smooth, beck2009fast}.
+where $f$ is convex and smooth. One of the most important methods in the mathematical optimization to minimize \eqref{eq:pb_simple} is gradient descent. This method was initially proposed in work of Cauchy \cite[Extrait $383$]{cauchy1847methode} and becomes popular after \cite{polyak1963gradient}. Thanks to its simplicity there are many extensions of it \cite{polyak1969minimization, polyak1969conjugate, nesterov2005smooth, beck2009fast}.
 % , that are widely used in the modern machine learning applications \cite{bottou2018optimization}. 
 
 Consider the ordinary differential equation (ODE)
 $$
 \frac{d x}{d t} = -\nabla f(x),
 $$
-then the values of $f(x)$ are decreasing along the trajectories of it \cite{cauchy1847methode}. Another way to see that anti-gradient is a descent direction is the following. From the definition of the gradient, we could have that
+then the values of $f(x)$ are decreasing along the trajectories of it \cite{cauchy1847methode}. Another way to see that anti-gradient is a descent direction is the following. From the definition of the gradient, we have that
 $$
 df_x(u) = \nabla f(x)^\top u,
 $$
-for any small vector. It implies that in this first-order approximation, the best direction to select is anti-gradient, that is exactly the idea of the gradient descent.
+for any small vector \dg{$u$}. \dg{Among all vectors $u$ with fixed norm, the scalar product would be the smallest if $u$ is opposite to $\nabla f(x)$.}It implies that in this first-order approximation, the best direction to select is anti-gradient, that is exactly the idea of the gradient descent.
 
 \begin{algorithm}
     \caption{Gradient Descent (\texttt{GD})}
@@ -28,7 +28,7 @@ for any small vector. It implies that in this first-order approximation, the bes
     \end{algorithmic}
 \end{algorithm}
 
-Let us now present the convergence result for the gradient descent algorithm with the fixed stepsize $\gamma^k = \gamma$ (Theorems $2.1.14$ and $2.1.15$ \cite{nesterov-book}).
+Let us now present the convergence result for \dg{a} gradient descent algorithm with the fixed stepsize $\gamma^k = \gamma$ (Theorems $2.1.14$ and $2.1.15$ \cite{nesterov-book}).
 \begin{theorem}[Convergence of Gradient Descent]\label{th:gd}
 Let us assume that $f$ is convex and $L$-smooth, take $\gamma\in\left(0,\frac{2}{L}\right)$, then Algorithm \ref{algo:gd} generates the sequence of points $(x^k)_{k\geq0}$ such that 
 \begin{equation}
@@ -85,11 +85,11 @@ $$
 Let us now assume that $\mu> 0$ using the same notation as in the first part
 \begin{align}
 r^{k+1} = \|x^k - x^\star - \gamma \nabla f(x^k)\|_2^2 &= r^k - 2\gamma\langle \nabla f(x^k), x^k - x^\star\rangle + \gamma^2\|\nabla f(x^k)\|_2^2\nonumber\\
-&\leq \left(1-\frac{2\gamma\mu L}{\mu + L}\right) + \underbrace{\gamma\left(\gamma - \frac{2}{\mu + L}\right)}_{\leq 0}\|\nabla f(x^k)\|_2^2,
+&\leq \left(1-\frac{2\gamma\mu L}{\mu + L}\right) \mitya{r^k}+ \underbrace{\gamma\left(\gamma - \frac{2}{\mu + L}\right)}_{\leq 0}\|\nabla f(x^k)\|_2^2,
 \end{align}
 where we use Lemma \ref{lm:bubeck} and $\nabla f(x^\star) = 0$.
 \end{proof}
-As we could see from this theoretical result, the best theoretical rate for non-strongly convex fuctions is achieved when $\gamma = \argmax\left(\gamma\left(1 - \frac{\gamma L}{2}\right)\right) = \frac{1}{L}$ that leads to the following rate
+As we can see from this theoretical result, the best theoretical rate for non-strongly convex fuctions is achieved when $\gamma = \argmax\left(\gamma\left(1 - \frac{\gamma L}{2}\right)\right) = \frac{1}{L}$ that leads to the following rate
 \begin{equation}\label{eq:gd_rate}
     f(x^k) - f^\star \leq \frac{2L(f(x^0)-f^\star)\|x^0-x^\star\|_2^2}{2L\|x^0-x^\star\|_2^2 +k(f(x^0) - f^\star)}\leq \frac{2L\|x^0-x^\star\|^2_2}{k+4},
 \end{equation}

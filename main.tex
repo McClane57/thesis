@@ -1,10 +1,11 @@
 % -*- Mode:TeX -*-
 %\documentclass[11pt]{mitthesis}
 \documentclass[12pt,singlespace]{mitthesis}
+\usepackage{setspace}
+\setstretch{1.25}
+%\usepackage{lineno}
 
-\usepackage{lineno}
-
-\usepackage[notref,notcite]{showkeys}
+%\usepackage[notref,notcite]{showkeys}
 
 %\usepackage[allfiguresdraft]{draftfigure}
 %\documentclass[11pt,twoside]{mitthesis}
@@ -17,14 +18,15 @@
 %%  pagestyle{plain}
 % Macros
 \input{header}
-%\pagestyle{headings}
-\usepackage{fancyhdr}
-\pagestyle{fancy}
-\fancyhf{}
-\fancyhead[LE,RO]{\thepage}
-\fancyhead[LO]{\itshape \leftmark}
-\fancyhead[RE]{\itshape \rightmark}
-\renewcommand{\headrulewidth}{0pt}
+\pagestyle{headings}
+% \usepackage{fancyhdr}
+% \pagestyle{fancy}
+% \fancyhf{}
+% \fancyhead[LE,RO]{\thepage}
+% \fancyhead[LO]{\itshape \leftmark}
+% \fancyhead[RE]{\itshape \rightmark}
+%\renewcommand{\headrulewidth}{0pt}
+% \renewcommand{\familydefault}{\sffamily}
 
 \usepackage{appendix}
 \usepackage{chngcntr}
@@ -41,9 +43,10 @@
 
 
 \begin{document}
-\linenumbers
-\includepdf[pages=-]{title.pdf}
-%\include{cover}
+%\linenumbers
+
+%\includepdf[pages=-]{title.pdf}
+\include{cover_simple}
 \pagenumbering{roman}
 \newpage
 \null\vfill
@@ -69,19 +72,19 @@ All rights reserved
 \chapter*{Abstract}
 \input{abstract}
 
-\chapter*{Acknowledgements}
-\input{acknowledgements}
+% \chapter*{Acknowledgements}
+% \input{acknowledgements}
 
 \endgroup
 \include{contents}
 \clearpage
 \pagenumbering{arabic}
 
-% \include{intro}
+\include{introduction}
 
 \include{basics_2}
 
-
+    
 \include{mor}
 
 % \begin{subappendices}
@@ -89,20 +92,19 @@ All rights reserved
 % \end{subappendices}
 
 
-\include{distributed}
+% \include{distributed}
 
-\include{spy}
-\begin{subappendices}
-    \include{spy/appendix}
-\end{subappendices}
+
 
 
 \include{soda}
 
 
-
-
-% \include{conclusion}
-
+\include{spy}
+% \begin{subappendices}
+%     \include{spy/appendix}
+% \end{subappendices}
+\include{conclusion}
+%\include{appendix}
 \include{biblio}
 \end{document}

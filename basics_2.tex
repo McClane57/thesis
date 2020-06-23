@@ -1,15 +1,38 @@
-\chapter{From Gradient to Identification}
+\chapter[Background material]{Background material: from gradient to identification.}
 \label{ch:basics}
 \etocsettocstyle{\subsubsection*{Chapter Contents}}{}
 \localtableofcontents
-\input{basics_2/introduction}
-\section{Convex optimization}
+\newpage
+\section*{Introduction}
+\addcontentsline{toc}{section}{Introduction}
+Mathematical optimization is a tool to chose some ``optimal'' parameter $x$ within the \emph{constraint set} $X$ such that it minimizes \emph{objective} function $f$. More formally, an optimization problem could be written in the following general form
+$$
+\min_{x\in X} f(x),
+$$
+that corresponds to a lot of practical applications in \dg{areas} such as: bioinformatics, advertising, visual object recognition, and other applications. However, this problem is general and there is no general algorithm to solve this problem.
+
+To produce an efficient algorithm with guarantee\dg{s} to solve the problem some additional assumptions of $f$ and $X$ are commonly added. One of the common assumptions is \dg{the} convexity of objective function and constraint set. In our work, we consider convex functions $f:\RR^n\rightarrow \RR\cup+\infty$ and $X = \RR^n$, and in this chapter, we present an important background to discover new algorithms.
+
+In order to make good prediction\dg{s} large-scale data is used when training the models: the number of observations $m$ is large and the dimension of each observation (or the number of features) $n$ is big. It raises a lot of questions, including, how to make the existing optimization algorithms computationally more efficient? In this context, classical optimization methods like gradient descent and its variations \dg{are} computationally expensive, because every step of these algorithms requires \dg{a} pass through the full dataset. In contrast, incremental methods, that use a single data point \dg{(or a minibatch)} to compute an estimator for the gradient reduce the computational cost of iteration. However,  state-of-the-art algorithms are distributed to accept bigger datasets. In such algorithms, the communication process between machines is also expensive process and methods that \dg{can} reduce the amount of communications or the size of every single update are \dg{sought after}.
+
+\mitya{
+\paragraph{Outline.} This chapter is organized as follows. In Section \ref{sec:basics_convex}, we introduce basic definitions from convex optimization. Furthermore, we recall some first-order optimization methods and theoretical results that we use in later chapters. \dg{In Section \ref{sec:basics_intro}, we discuss Machine Learning.} In Section \ref{sec:distributed-intro}, we present an overview of distributed learning : setting, context, methods. In particular, we recall the asynchronous distributed proximal algorithm \cite{ICML18}. We present in Section \ref{sec:basics_identificationn}, an active-set identification property and prove this result for this algorithm.  
+}
+\section{Convex optimization}\label{sec:basics_convex}
+\mitya{
+In this section, we \dg{provide a} convex optimization background.%, that next chapters assume to be known.
+In Subsection \ref{sec:basics_conv_and_smoothness}, we introduce the definitions of convex, strongly-convex, and $L$-smooth (with $L$-Lipschitz gradient) functions and prove some important properties, that are widely used in our further theoretical proofs. In Subsection \ref{sec:basics_gd}, we recall the \emph{Gradient Descent} algorithm (see Algorithm \ref{algo:gd}) and \dg{its} convergence. In Subsection \ref{sec:basics_nonsmooth}, we present the notion of \emph{subgradient}, \emph{proximal operator}, and \emph{Moreau-Yosida regularization}. Furthermore, we recall the basic methods for the minimization of non-smooth functions: \emph{Subgradient Descent} (see Algorithm \ref{algo:sd}) and \emph{Proximal Minimization} (see Algorithm \ref{algo:pm}). Finally, in Subsection \ref{sec:basics_nonsmooth}, we overview the optimization methods to solve regularized \dg{Empirical Risk Minimization problem}: \emph{Coordinate Descent} (see Algorithm \ref{algo:cd_composite}), \emph{Proximal Gradient Descent} (see Algorithm \ref{algo:pgd}), and \emph{Stochastic Gradient Descent} variations.
+}
 \input{basics_2/definitions}
 \input{basics_2/gradient_descent}
 \input{basics_2/nonsmooth}
 \input{basics_2/moreau-yosida}
 \input{basics_2/composite}
 
+%\section{Distributed learning}\label{sec:basics_distributed}
+\input{basics_2/introduction}
+\input{distributed/introduction}
+\input{distributed/preliminaries}
 
 \input{basics_2/identification}
 

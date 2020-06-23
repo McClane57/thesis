@@ -1,117 +1,50 @@
-\section{XXX}\label{sec:soda-identiification}
+\subsection{Identification and better rate}\label{sec:soda-identiification}
 Let us consider the optimization problem \eqref{eq:pb} with $\ell_1$ regularization term
 \begin{align}\label{eq:pb_l1}
 \tag{$\mathsf{P}_{\ell_1}$}
 \min_{x\in\mathbb{R}^n}  ~ F(x) =  \sum_{i=1}^M  \alpha_i  f_i(x)  +  \lambda\|x\|_1.
 \end{align}
-As in the previous chapter, we consider the distributed setup, where $m$ observations are split down over $M$ machines, each machine $i$ having a private subset $\data_i$ of the examples. We also denote by $\alpha_i= |\data_i|/m$ the proportion of observations locally stored in machine\;$i$, hence $\sum_{i=1}^M\alpha_i = 1$. $f_i(x) = \frac{1}{|\data_i|}  \sum_{j\in\data_i}l_j(x) $ is the local empirical risk at machine\;$i$ ($l_j$ standing for the smooth loss function for example $j$). \SP~algorithm can solve Problem~\eqref{eq:pb_l1} by representing it in the form of a triplet (\emph{workers weights},\emph{workers functions},\emph{probability}) i.e. $((\alpha_i),(f_i),\pi)$ and performing Algorithm~\ref{alg:soda}.
-\begin{algorithm}[t!]
-\caption{\textsc{\SP} on $((\alpha_i),(f_i),\pi)$ with stopping criterion $\mathsf{C}$}
-\label{alg:soda}
+As before, we consider the distributed setup, where $m$ observations are split down over $M$ machines, each machine $i$ having a private subset $\data_i$ of the examples. We also denote by $\alpha_i= |\data_i|/m$ the proportion of observations locally stored in machine\;$i$, hence $\sum_{i=1}^M\alpha_i = 1$. $f_i(x) = \frac{1}{|\data_i|}  \sum_{j\in\data_i}l_j(x) $ is the local empirical risk at machine\;$i$ ($l_j$ standing for the smooth loss function for example $j$). %\spyI~algorithm can solve Problem~\eqref{eq:pb_l1} by representing it in the form of a triplet (\emph{workers weights},\emph{workers functions},\emph{probability}) i.e. $((\alpha_i),(f_i),\pi)$ and performing Algorithm~\ref{alg:soda}.
 
-\tcbset{width=0.58\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
+% At iteration $k$, the randomly drawn subset of entries that worker $i^k$ updates at\;time $k$ is called \emph{mask} and is denoted by $\mask^k$ (in uppercase bold, to emphasize that it is the \emph{only} random variable in the algorithm). We propose to select all the coordinates that are nonzero in the last parameter $\w$ received from the master machine, called $\supp({\w})$, and select some random zero entries of $\w$ with a fixed probability $\pi$.
 
-\begin{tcolorbox}[title=\textsc{Worker } $i$]
-\begin{algorithmic}
-\STATE \textbf{Initialize} $x_i = x_i^+ = \barx^0$\\
-\WHILE{not interrupted}{
-    \STATE {\color{red!80!yellow}Receive  $x$ from master}
-    \STATE Draw sparsity mask $\mask$ as
-    \vspace*{-6pt}
-    \begin{equation*}
-        \mathbb{P}[j\in\mask] = \begin{cases}
-        1,& \text{ if } j\in\supp({x})\\
-        \pi,& \text{ if } j\notin\supp({x})
-        \end{cases}
-    \end{equation*}
-    \vspace*{-12pt}
-    \STATE $x^+_i = [  x - \gamma \nabla f_i(x)]_{\mask} + [x_i]_{\overline{\mask}}$
-    \vspace*{2pt}
-    \STATE  $\Delta = x_i^+ - x_i$%\hspace*{50pt} ($=[\Delta]_{\mask}$)
-    \STATE $x_i = x^+_i $
-    \vspace*{1pt}
-    \STATE {\color{blue!70!black}Send $\Delta$ to master}
-}\ENDWHILE
-
-\end{algorithmic}
-\end{tcolorbox}
-\tcbset{width=0.38\columnwidth,before=,after=\hfill, colframe=black,colback=white, fonttitle=\bfseries, coltitle=white, colbacktitle=black, boxrule=0.2mm,arc=0mm, left = 2pt}
-\begin{tcolorbox}[title=\textsc{Master}
-\vphantom{\texttt{Worker  i}}]
-~\\\begin{algorithmic}
-\STATE \textbf{Initialize} $\barx^0$
-%Send $\overline x$ to each machine\\
-\WHILE{not converged}{
-     \STATE {\color{blue!70!black}Receive\,$\Delta^k$\,from\,agent\,$i^k$}
-     \STATE $\barx^k = \barx^{k-1} + \alpha_{i^k}\Delta^k$
-    \STATE $ x^k = \prox_{\gamma \lambda\|\cdot\|}(\barx^k )$
-    \vspace*{1pt}
-    \STATE {\color{red!80!yellow} Send $x^k$ to agent $i^k$}
-    \vspace*{2pt}
-    %$k\leftarrow k+1$
-}
-\ENDWHILE
-
-\textbf{Output} $x^k$
-\end{algorithmic}
-~\\
-\end{tcolorbox}
-\end{algorithm}
-At iteration $k$, the randomly drawn subset of entries that worker $i^k$ updates at\;time $k$ is called \emph{mask} and is denoted by $\mask^k$ (in uppercase bold, to emphasize that it is the \emph{only} random variable in the algorithm). We propose to select all the coordinates that are nonzero in the last parameter $\w$ received from the master machine, called $\supp({\w})$, and select some random zero entries of $\w$ with a fixed probability $\pi$.
-
-Without sparsification (i.e. $\pi=1$ and \;$\fullmask^{k}= \{1\,\ldots,n\}$ at any time $k$), this iteration corresponds to the asynchronous proximal-gradient algorithm \dave~proposed in \cite{ICML18}.
+% Without sparsification (i.e. $\pi=1$ and \;$\fullmask^{k}= \{1\,\ldots,n\}$ at any time $k$), this iteration corresponds to the asynchronous proximal-gradient algorithm \dave~proposed in \cite{ICML18}.
 
 
-The proposed algorithm \SP{} uses the following notation:
-for a vector of $\w\in\mathbb{R}^n$ and a subset $S$ of $\{1,..,n\}$, $[\w]_{S}$ denotes the sparse vector where $S$ is the set of non-null entries, for which they match those of $\w$, i.e. $([\w]_{S})_{[i]} = \w_{[i]}$ if $i\in S$ and $0$ otherwise. In addition, we denote by $\overline{\mask} = \{i\in\{1,\dots,n\}: i\notin \mask\}$.
+% The proposed algorithm \SP{} uses the following notation:
+% for a vector of $\w\in\mathbb{R}^n$ and a subset $S$ of $\{1,..,n\}$, $[\w]_{S}$ denotes the sparse vector where $S$ is the set of non-null entries, for which they match those of $\w$, i.e. $([\w]_{S})_{[i]} = \w_{[i]}$ if $i\in S$ and $0$ otherwise. In addition, we denote by $\overline{\mask} = \{i\in\{1,\dots,n\}: i\notin \mask\}$.
 
-The communications per iteration are (i) a blocking {\color{blue!70!black}send/receive} from a slave to the master (in {\color{blue!70!black}blue}) of size $|\mask|$, and (ii) a blocking {\color{red!80!yellow}send/receive} from the master to the last updating slave (in {\color{red!80!yellow}red}) of the current iterate.
+% The communications per iteration are (i) a blocking {\color{blue!70!black}send/receive} from a slave to the master (in {\color{blue!70!black}blue}) of size $|\mask|$, and (ii) a blocking {\color{red!80!yellow}send/receive} from the master to the last updating slave (in {\color{red!80!yellow}red}) of the current iterate.
 
-Let us recall the theoretical result (see Theorem \ref{lm:spy_diff}), specified for this selection.
-\begin{corollary}[Expected deviation]\label{cor:spydr_rate}
-Suppose all functions $\{f_i\}_{i=1,..,M}$ are $\mu$-strongly convex and $L$-smooth (i.e. differentiable with Lipschitz continuous gradient). Let $\w^\star$ be the minimizer of the  loss \eqref{eq:pb}, and take  $\gamma~\in~(0,2/(\mu+L)]$, then for all $k\in[k_s, k_{s+1})$
-\begin{equation}
-   \mathbb{E}\|\w^k - \w^\star\|^2 
- \leq  (1-\beta)^s \max_{i=1,..,M} \|\w_i^0 - \w_i^\star\|^2,
-\end{equation}
-where $\w_i^\star = \w^\star - \gamma \nabla f_i(\w^\star); i\in\{1,\ldots,M\}$, and, the sequence of stopping times
-$(k_s)$ defined iteratively as $k_0 = 0$ and
+Let us recall the theoretical result (see Theorem \ref{lm:spy_diff}), specified for this selection of \spyI. Using the same notations as in Theorem \ref{lm:spy_diff}, the iterates of \spyI~satisfies
 \begin{align}
-\label{eq:km1}
-k_{s+1} &= \min\left\{ k : k- D_i^k \geq k_s ~\textnormal{for all $i$} \right\}, 
+\label{eq:dif_prob3}
+   \mathbb{E} \left\| x^k - x^\star \right\|^2 \le\mathbb{E} \left\| \barx^k - \barx^\star \right\|^2 \le\left( (1 - \gamma \mu)^2 + 1 - \pi  \right)^{m} \max_i\left\|x_i^0-x_i^\star\right\|^2,
 \end{align}
-%so that there are at least two updates of each worker between $k_{m+1}$ and $k_m$.
-and 
-$$
-\beta = 2\frac{\gamma \mu L}{\mu+L} - 1 + \pi.
-$$
-\end{corollary}
 This general result deserves several comments:
 \begin{itemize}
-    \item The sequence $(k_s)$ of stopping times
-    % \footnote{To be precise with respect to random stopping time nature of $(k_m)$: since for any $i$ and $k$, $D_i^k$ is $\mathcal{F}^k$-measurable, $k_m$ is an $\mathcal{F}^{k_m}$ stopping time.} 
- is defined such that there are at least two updates of each worker between $k_{s+1}$ and $k_s$. 
- %we say that $m$ is the \emph{number of epochs} of the algorithm.  
- This sequence directly embeds the number of machines and the delays, and thus automatically adapts the various situations. %For instance, we treat the usual case of bounded delays as a corollary (see appendix).
-\item Furthermore, we retrieve the convergence results of \cite{mishchenko2018} in the case where there are no sparsification (i.e. $\pi=1$), and if there is no delay, we recover the rate of vanilla proximal-gradient algorithm.
-\item Assuming that all machines are responsive (i.e. $s\to \infty$ when $k\to\infty$), the inequality \eqref{eq:dif_prob} gives convergence if $\beta > 0$, i.e. ${\pi} > {1 - \alpha}$. 
+%     \item The sequence $(k_s)$ of stopping times
+%     % \footnote{To be precise with respect to random stopping time nature of $(k_m)$: since for any $i$ and $k$, $D_i^k$ is $\mathcal{F}^k$-measurable, $k_m$ is an $\mathcal{F}^{k_m}$ stopping time.} 
+%  is defined such that there are at least two updates of each worker between $k_{s+1}$ and $k_s$. 
+%  %we say that $m$ is the \emph{number of epochs} of the algorithm.  
+%  This sequence directly embeds the number of machines and the delays, and thus automatically adapts the various situations. %For instance, we treat the usual case of bounded delays as a corollary (see appendix).
+\item \dg{W}e retrieve the convergence results of \cite{mishchenko2018} in the case where there is no sparsification (i.e., $\pi=1$), and if there is no delay, we recover the rate of vanilla proximal-gradient algorithm.
+\item Assuming that all machines are responsive (i.e. $s\to \infty$ when $k\to\infty$), the inequality \eqref{eq:dif_prob3} gives convergence if $\beta > 0$, i.e. ${\pi} > {1 - \alpha}$. 
 In other words, when we sample entries non-uniformly, we still have convergence if the probability of selection is big enough.
-\item Finally, when the problem is well-conditioned (i.e.\;$\mu\simeq L$ and thus $\alpha\simeq 1$), the algorithm is guaranteed to converge for any reasonable choice of $\pi$.
+\item Finally, when the problem is well-conditioned (i.e., \;$\mu\simeq L$ and thus $\alpha\simeq 1$), the algorithm is guaranteed to converge for any reasonable choice of $\pi$.
 \end{itemize}
 
-Taking into account that there is no almost sure convergence in our case we could not talk about identification result \cite{fadili2018sensitivity} (see Section \ref{sec:basics_identificationn}) out of the box. Let us introduce the following assumption, that will figure it out.
+% \subsection{Identification}
+Taking into account that there is no almost sure convergence in our case, we could not talk about identification result \cite{fadili2018sensitivity} (see Section \ref{sec:basics_identificationn}) out of the box. Let us introduce the following assumption, that will figure it out.
 
 \begin{assumption}[On convergence]\label{hyp:conv}
 Let us assume that for any $\varepsilon > 0$ there exists iterate number $K$ such that for any $k>K$ the average point $\|\barw^k-\barw^{\star}\|_2^2<\varepsilon$ is $\varepsilon$-close to the final solution.
 \end{assumption}
 
-As we could see from the Theorem \ref{th:identification}, if this assumption holds for any particular run of the Algorithm \ref{alg:soda} then the iterates $(x^k)$ identifies the near-optimal support in finite time. Furthermore, under the additional non-degeneracy assumption the iterates will identify the optimal support. 
+As we could see from the Theorem \ref{th:identification}, if this assumption holds for any particular run of the Algorithm \ref{alg:soda}, then the iterates $(x^k)$ identifies the near-optimal support in finite time. Furthermore, under the additional non-degeneracy assumption, the iterates will identify the optimal support. 
 
 \begin{lemma}[Identification]\label{lm:ident}
-Suppose that Assumption \ref{hyp:conv} hold; furthermore, let us assume that problem \eqref{eq:pb} is non-degenerate. That is~:
-\begin{equation}\label{eq:nondeg}
-\left(\sum_{i=1}^M\pi_i\nabla f_i(\w^\star)\right)_{[j]}<\lambda_1~~~~~\textnormal{for all $j\in\supp(\w^\star)$}.
-\end{equation}
+Suppose that Assumption \ref{hyp:conv} holds; furthermore, let us assume that problem \eqref{eq:pb_l1} is non-degenerate \eqref{eq:non-deg}. 
 Then for any $k>K$, we have~:
 \begin{equation}
     \supp (\w^k) = \supp(\w^\star).
@@ -122,24 +55,27 @@ First, using nonexpansiveness of the proximal operator we could have that for an
 \[
 \|\w^k-\w^\star\|_2^2 = \|\lprox(\barw^k)-\lprox(\barw^\star)\|_2^2\leq\|\barw^k-\barw^\star\|_2^2\leq\varepsilon.
 \] 
-Let us now define $u^k = (\barw^k-\w^k)/\gamma$. By the definition of proximal operator we have $u^k\in\textnormal{ri}~\partial \lambda_1\|\w^k\|_1$ and moreover, $u^k-u^\star \leq 2\varepsilon/\gamma$, where $u^\star = (\barw^\star - \w^\star)/\gamma$.
+% Let us now define $u^k = (\barw^k-\w^k)/\gamma$. By the definition of proximal operator we have $u^k\in\textnormal{ri}~\partial \lambda_1\|\w^k\|_1$ and moreover, $u^k-u^\star \leq 2\varepsilon/\gamma$, where $u^\star = (\barw^\star - \w^\star)/\gamma$.
 
-Now, as we have convergence of $(\w^k)$ and $(u^k)$ almost surely, it comes from the Theorem\;1 of  \cite{fadili2018sensitivity} that  the support of $\w^k$ is contained between two extreme supports (see Theorem \ref{th:identification}), the one of $\w^\star$ and the larger one associated with the dual optimal solution $u^\star$ (see Eq.\;(2.6) of \cite{fadili2018sensitivity}). 
+Now, using the Corollary \ref{lm:exact_identification} with $u^k = \barx^k$ we get the result of Lemma.
+% as we have convergence of $(\w^k)$ and $(u^k)$ almost surely, it comes from the Theorem\;1 of  \cite{fadili2018sensitivity} that  the support of $\w^k$ is contained between two extreme supports (see Theorem \ref{th:identification}), the one of $\w^\star$ and the larger one associated with the dual optimal solution $u^\star$ (see Eq.\;(2.6) of \cite{fadili2018sensitivity}). 
 
-We specify further the larger support associated to $u^\star$. We notice that a coordinate $i$ of the right-hand term of Eq.\;(2.6) of \cite{fadili2018sensitivity} for $\lambda_1 \|\cdot\|_1$ is equal to zero if and only if $u^\star_{[i]} \in ]-\lambda_1 , \lambda_1 [ $. 
+% We specify further the larger support associated to $u^\star$. We notice that a coordinate $i$ of the right-hand term of Eq.\;(2.6) of \cite{fadili2018sensitivity} for $\lambda_1 \|\cdot\|_1$ is equal to zero if and only if $u^\star_{[i]} \in ]-\lambda_1 , \lambda_1 [ $. 
 
-The non-degeneracy condition \eqref{eq:nondeg} gives that, for any coordinate $i$ such that $\w_{[i]} = 0$, we have $|{u^\star}_{[i]}| <\lambda_1 $. This yields that the right- and left-hand side sparsity patterns match
-\[
-\hspace{35mm}\supp(\w^\star) \subseteq \supp(\w^k)\subseteq \supp(\w^\star),
-\]
-This finishes the proof.
+% The non-degeneracy condition \eqref{eq:nondeg} gives that, for any coordinate $i$ such that $\w_{[i]} = 0$, we have $|{u^\star}_{[i]}| <\lambda_1 $. This yields that the right- and left-hand side sparsity patterns match
+% \[
+% \hspace{35mm}\supp(\w^\star) \subseteq \supp(\w^k)\subseteq \supp(\w^\star),
+% \]
+% This finishes the proof.
 \end{proof}
 
-As a result, under these assumptions the together with the ``convegence'' of the algorithm we could even get the same rate as for non-sparsified \dave~\cite{ICML18}.
 
-\begin{theorem}\label{th:rate_after}
+% \subsection{Better rate}
+As a result, under these assumptions the together with the ``convergence'' of the algorithm, we could even get the same rate as for non-sparsified \dave~\cite{ICML18}.
+
+\begin{theorem}[Better rate of \spyI]\label{th:rate_after}
 Suppose that all functions $\{f_i\}_{i=1,..,M}$ in \eqref{eq:pb} are $\mu$-strongly convex and $L$-smooth. Let $\gamma \in (0,2/(\mu+L)]$, then in the case of identification of Lemma~\ref{lm:ident}, $\supp(\w^k) = \supp(\w^\star)$, we have the following inequality~:
-\begin{equation}\label{eq:dif_prob}
+\begin{equation}\label{eq:dif_prob4}
    \|\w^k - \w^\star\|^2 
  \leq  (1-\delta)^s C_i,
 \end{equation}
@@ -147,7 +83,7 @@ where $\delta = 2\frac{\gamma \mu L}{\mu+L}$, $C_i = (1-\delta)^{-s_i}\|\w^{k_{s
 \[
 k_i = \max\{k:\supp(\w^{k-1})\neq\supp(\w^\star)\}.
 \]
-with $(k_s)$ the sequence of iterations defined in \eqref{eq:km1}.
+with $(k_s)$ the sequence of iterations defined in \eqref{eq:km}.
 \end{theorem}
 \begin{proof}
 Following Lemma~\ref{lm:ident}, let us consider $k$ big enough, such that $\supp(\w^k) = \supp(\w^\star)$, and let $\mathcal{C} = \{\w\in\RR^n:\supp(\w)\subseteq\supp(\w^\star)\}$
@@ -183,7 +119,4 @@ Hence the sequence of parameters generated by projected \SP~algorithm with $\pi 
 where, the expectation can be dropped as far as we have a deterministic sequence of points.
 \end{proof}
 
-We can see from this theorem that after identification; the convergence rate does not depend on probability $\pi$. This means that communications become lessen with the same rate. On the other hand, as identification depends on this probability $\pi$, in practice, the selection of $\pi$ should be a trade off between speed of identification and the size of sparsification.
-
-
-
+We can see from this theorem that after identification, the convergence rate does not depend on probability $\pi$. This means that communications become \dg{smaller} with the same rate. On the other hand, as identification depends on this probability $\pi$, in practice, the selection of $\pi$ should be a trade-off between speed of identification and the size of sparsification.

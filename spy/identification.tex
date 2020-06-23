@@ -4,29 +4,34 @@
 % ===========================================================
 % ===========================================================
 
-In the previous sections, we present an adaptive sparsification of upward communications (worker-to-master) and show that the resulting algorithm converges after proximal reconditioning. By construction, the downward communications (master-to-workers) depends on the structure of~$x^k$ (the master point of the inner method), which is the output of a proximal operator on $r$. In the case of $\ell_1$-regularization or other sparsity-promoting regularization\;\cite{bach2012optimization}, we show in Section\;\ref{sec:identif} that the $x^k$ eventually become sparse after some iterations. This automatically makes our algorithm a two-way sparse algorithm. 
+In the previous section, we present an adaptive sparsification of upward communications (worker-to-master) and show that the resulting algorithm converges after proximal reconditioning. By construction, the downward communications (master-to-workers) depends on the structure of~$x^k$ (the master point of the inner method), which is the output of a proximal operator on $r$. In the case of $\ell_1$-regularization or other sparsity-promoting regularization\;\cite{bach2012optimization}, we show in Section\;\ref{sec:identif2} that the $x^k$ eventually become sparse after some iterations. This automatically makes our algorithm a two-way sparse algorithm. 
 Finally, in Section\;\ref{sec:comm}, we take a closer look to the complexity of our algorithm with respect to the communication cost.
 
 For this study, we make an additional assumption that our problem has a strongly sparse solution. This assumption is divided into two parts: i) the regularizer $r$ should induce a \emph{stable} support at the optimum (through its proximity operator); and ii) this optimal support $\supp(x^\star)$ should be small with respect to the ambient dimension.
 \begin{assumption}[Strongly sparse optimal solution] \label{hyp:ident}
 Problem~\eqref{eq:pb} is $\mu$-strongly convex ($\mu>0$) and its solution $x^\star$ verifies
 \begin{itemize}
-   \item[i)] $\exists~ \varepsilon>0$ such that $\supp(x^\star) = \supp \left( \prox_{r} \left( x^\star - \sum_{i=1}^M  \alpha_i  \nabla f_i(x^\star) + \mathbf{e}   \right)   \right)~ \forall \mathbf{e} \in \mathcal{B}(0,\varepsilon) $;
+   \item[i)] $\exists~ \varepsilon>0$ such that 
+   $$
+   \supp(x^\star) = \supp \left( \prox_{r} \left( x^\star - \sum_{i=1}^M  \alpha_i  \nabla f_i(x^\star) + \mathbf{e}   \right)   \right)~ \forall \mathbf{e} \in \mathcal{B}(0,\varepsilon);
+   $$
     \item[ii)] the size $s^\star =|\supp(x^\star)|$ of the optimal support is small compared to $d$: $s^\star\ll d$.
 \end{itemize}
 \end{assumption}
-While part ii) is rather explicit, part i) is quite abstract; let us illustrate it with the $\ell_1$-norm. When $r= \lambda \|\cdot\|_1$, using the explicit form of the proximity operator\;\eqref{eq:soft}, part i) directly translates to
-\begin{align*}
-   \sum_{i=1}^M  \alpha_i  \nabla_{[j]} f_i(x^\star)  \in (-\lambda,\lambda)  ~~~ \text{ for all } j \notin \supp(x^\star). 
-\end{align*}
-This condition matches the nondegeneracy condition for sparse solutions commonly admitted for exact recovery in machine learning; see e.g.~\cite{nutini2019active,pmlr-v89-sun19a}.
+While part ii) is rather explicit, part i) is quite abstract; 
+%let us illustrate it with the $\ell_1$-norm. When $r= \lambda \|\cdot\|_1$, using the explicit form of the proximity operator\;\eqref{eq:soft}, part i) directly translates to
+% \begin{align*}
+%   \sum_{i=1}^M  \alpha_i  \nabla_{[j]} f_i(x^\star)  \in (-\lambda,\lambda)  ~~~ \text{ for all } j \notin \supp(x^\star). 
+% \end{align*}
+this condition matches the nondegeneracy condition \eqref{eq:non-deg} for sparse solutions commonly admitted for exact recovery in machine learning; see e.g.~\cite{nutini2019active,pmlr-v89-sun19a}.
 The interest of the general assumption i) is that it accounts for a variety of sparsity-inducing regularizations, including weighted $\ell_1$-norms, ``group'' $\ell_1/\ell_q$-norms; see \cite[Sec.~3.3]{bach2012optimization}.
 
 % ===========================================================
-\subsection{Identification and consequences} \label{sec:identif}
+\subsection{Identification and consequences} \label{sec:identif2}
 % ===========================================================
 
-The iterates of proximal algorithms usually \emph{identify} the optimal structure; see e.g\;\cite{vaiter2015low} or \cite{iutzeler2020SVAA}. In the case of $\ell_1$-regularization, this means that proximal algorithms produce iterates that eventually have the same support as the optimal solution of \eqref{eq:pb}. Unfortunately, randomness may break this identification property. For instance, it is well-known that for the proximal stochastic gradient descent, the sparse structure may not be identified with probability one; see e.g.\;\cite{lee2012manifold} and a counter-example in\;\cite{poon2018local}. We first establish that our algorithm does identify the optimal support under the non-degeneracy assumption~\ref{hyp:ident}.
+The iterates of proximal algorithms usually \emph{identify} the optimal structure; see Section \ref{sec:basics_identificationn}. %e.g\;\cite{vaiter2015low} or \cite{iutzeler2020SVAA}. In the case of $\ell_1$-regularization, this means that proximal algorithms produce iterates that eventually have the same support as the optimal solution of \eqref{eq:pb}.
+Unfortunately, randomness may break this identification property. For instance, it is well-known that for the proximal stochastic gradient descent, the sparse structure may not be identified with probability one; see e.g.\;\cite{lee2012manifold} and a counter-example in\;\cite{poon2018local}. We first establish that our algorithm does identify the optimal support under the non-degeneracy assumption~\ref{hyp:ident}.
 
 % All existing results (including \cite{lee2012manifold}) use a strong non-degeneracy assumption to establish identification results. The only exception is \cite{fadili2018sensitivity} that presents extended identification results without non-degeneracy for a large class of nonsmooth regularizers. Identification of our distributed algorithm in the $\ell_1$ regularization is based on these general identification results.% of \cite{fadili2018sensitivity}.
 % To the best of our knowledge, this is the first time that such a property is shown for an asynchronous algorithm.
@@ -47,7 +52,54 @@ where $x^k_\ell$ denotes the $k$-th iterate produced by \salgo during the $\ell$
 \end{theorem}
 
 \begin{proof}
-We proved in the previous section that \recoalgo converges almost surely, but it is not enough to guarantee identification in general\footnote{Take $d=1$, $F(x) = |x|$, and $x_{\ell+1} = \prox_{|\cdot|}(x_\ell) + 1/\ell^2$. The minimum of $F$ is $0$ but we have $x_\ell = 1/(\ell-1)^2>0$ for all $\ell>1$.}. Here it is the fact that the inner algorithm \salgo features a proximity operator with a non-vanishing stepsize that yields the following identification property. This proof is detailed in Appendix~\ref{apx:ident}.
+We proved in the previous section that \recoalgo converges almost surely, but it is not enough to guarantee identification in general\footnote{Take $d=1$, $F(x) = |x|$, and $x_{\ell+1} = \prox_{|\cdot|}(x_\ell) + 1/\ell^2$. The minimum of $F$ is $0$ but we have $x_\ell = 1/(\ell-1)^2>0$ for all $\ell>1$.}. Here it is the fact that the inner algorithm \spyI~features a proximity operator with a non-vanishing stepsize that yields the following identification property. 
+
+More precisely, \recoalgo is of the form 
+\begin{align*}
+    x_{\ell+1} &\approx \prox_{F/\rho}(x_\ell)
+\end{align*}
+and verify for all $\ell,k$
+\begin{align*}
+    \mathbb{E} \|x_{\ell} - x^\star \| &\leq C (1-\rho)^\ell
+    \qquad\text{and}\qquad
+    \mathbb{E} \|\overline{x}^k_{\ell} - \overline{x}_\ell^\star \| \leq C'  \|x_{\ell} - x_\ell^\star \| 
+\end{align*}
+for some $C,C'>0$ and $\rho\in(0,1)$, where 
+$$
+\overline{x}_\ell^\star :=  {x}_\ell^\star - \gamma \sum_{i=1}^M \alpha_i \nabla h_{i,\ell}({x}_\ell^\star).
+$$
+As in the proof in Section~\ref{apx:proofsparse}, we also consider $\overline{x}^\star$ given by \eqref{eq:barx}. 
+% define $\overline{x}^\star :=  {x}^\star - \gamma \sum_{i=1}^M \alpha_i \nabla f_i({x}^\star)$ and 
+Then we have
+\begin{align*}
+    \|\overline{x}_\ell^\star - \overline{x}^\star\| &=    \|{x}_\ell^\star - \gamma \sum_{i=1}^M \alpha_i \nabla h_{i,\ell}({x}_\ell^\star) - {x}^\star + \gamma \sum_{i=1}^M \alpha_i \nabla f_i({x}^\star) \| \\ 
+    &=  \|{x}_\ell^\star - \gamma \sum_{i=1}^M \alpha_i \nabla f_{i}({x}_\ell^\star) - \gamma \rho ({x}_\ell^\star - {x}_\ell) - {x}^\star + \gamma \sum_{i=1}^M \alpha_i \nabla f_i({x}^\star) \| \\ 
+    &\leq  \|{x}_\ell^\star - {x}^\star\| + \gamma \sum_{i=1}^M \alpha_i  \|\nabla f_i({x}_\ell^\star) - \nabla f_i({x}^\star)\| + \gamma \rho \|{x}_\ell^\star - {x}_\ell\| \\
+    &\leq  \|{x}_\ell^\star - {x}^\star\| + \gamma \sum_{i=1}^M \alpha_i L \|{x}_\ell^\star - {x}^\star\| + \gamma \rho \|{x}_\ell^\star - {x}_\ell\| \\
+    &\leq  D \|{x}_\ell^\star - {x}^\star\|  + D' \|x_\ell - {x}^\star_\ell\|
+\end{align*}
+For any $\ell,k$, we then have
+\begin{align*}
+    \EE \|\overline x_{ {\ell}}^k &-  \overline {x}^\star\|^2  \\
+    & \leq 2\EE\left[\|\overline x_{ {\ell}}^k -  \overline x^{\star}_{ {\ell}}\|^2 + \|\overline x^{\star}_{ {\ell}} -  \overline{x}^\star\|^2\right] \\
+    &\leq 2C' \EE \|x_{\ell} - x_{ {\ell}}^\star\|^2 + 2D  \EE\|x^{\star}_{ {\ell}} -  {x^\star}\|^2 + 2D'  \EE\|x_\ell - {x}^\star_\ell\|^2\\
+    &\leq 4C' \EE \|x_{\ell} - x^\star\|^2  + (4C'+2D) \EE \|x_{\ell}^\star - x^\star\|^2 + 2D'  \EE\|x_\ell - {x}^\star_\ell\|^2  \\
+    &\leq (8C'+2D+2D') \EE \|x_{\ell} - x^\star\|^2 \\
+    &\leq (8C'+2D+2D') \EE \|(1+ {\beta}_\ell)({ {x_{\ell}}} -  {x^\star}) -  {\beta_\ell}({ {x_{\ell-1}}} -  {x^\star})\|^2 + 2D'  \EE\|x^{\star}_{ {\ell}} -  {x_\ell}\|^2\\
+    &{\leq} 2(8C'+2D+2D')(1+ {\beta}_\ell)^2\EE \|{ {x_{\ell}}} -  {x^\star})\|^2  +2(8C'+2D+2D')(1+ {\beta}_\ell)^2 \EE\|{ {x_{\ell-1}}} -  {x^\star})\|^2\\
+    &{\leq} 2(8C'+2D+2D')(1+ {\beta}_\ell)^2 C (1-\rho)^\ell +2(8C'+2D+2D')(1+ {\beta}_\ell)^2 C (1-\rho)^{\ell-1} \\
+    &\leq 16(8C'+2D+2D') C  (1-\rho)^{\ell-1}.
+    \end{align*}
+Hence, by Markov's inequality and Borel-Cantelli's lemma, $\overline x_{ {\ell}}^k \to  \overline {x}^\star$ almost surely. As a direct result, we get
+$$
+x_\ell^k = \prox_{\gamma r}( \overline x_{ {\ell}}^k ) \to {x}^\star = \prox_{\gamma r}(  \overline {x}^\star ).
+$$
+Together with Assumption~\ref{hyp:ident}, this convergence implies identification of optimal support (see e.g.\;the recent survey\;\cite[Cor.\;1]{iutzeler2020SVAA}): there is a $\Lambda<\infty$ such that for all $\ell\geq \Lambda$,
+$$
+\nullC(x_\ell^k) = \nullC(x^\star) \qquad \text{and} \qquad \supp(x_\ell^k) = \supp(x^\star).
+$$
+%This exactly means $ \supp(x_\ell^k) = \supp(x^\star) $.
+Finally, it suffices to notice that $x_{\ell+1} = x_\ell^k$ for some $k$ to conclude the proof. 
 \end{proof}
 
 This identification has two consequences on communications in our distributed setting. First, identification implies that the variables communicated by the master to the workers will eventually be sparse. Second, this sparsity is also leveraged in the sparsification strategies of \recoalgo where only the coordinates in $\null(x_\ell)$ are randomly zeroed. Thus, for sparsity inducing problems such as $\ell_1$-regularized learning problems, our distributed algorithm has, structurally, \emph{two-way sparse communications}. 
@@ -58,18 +110,35 @@ Even better, once this identification occurs, the rate of the inner algorithm \s
 \begin{theorem}[Improved rate]\label{th:imprate}
 Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth. Let $r$ be convex lsc. Under Assumption~\ref{hyp:ident}, the \emph{inner} iterates of \recoalgo benefit from an improved rate after identification. There is $\Lambda<\infty$ such that for all $\ell>\Lambda$ and  $k\in [k_m, k_{m+1})$
 \begin{align*}
-    \left\| x_\ell^k - x_\ell^\star \right\|^2 \le \Big(1 - \gamma (\mu+\rho)  \Big)^{2m} \left\|x_{\ell}-x_\ell^\star\right\|^2
+    \left\| x_\ell^k - x_\ell^\star \right\|^2_2 \le \Big(1 - \gamma (\mu+\rho)  \Big)^{2m} \left\|x_{\ell}-x_\ell^\star\right\|^2_2
 \end{align*}
-where $x^k_\ell$ denotes the $k$-th iterate produced by \salgo during the $\ell$-th outer loop.
+where $x^k_\ell$ denotes the $k$-th iterate produced by \spyI~during the $\ell$-th outer loop.
 
 Furthermore, using the maximal stepsize $\gamma = \frac{2}{\mu + L + 2\rho}$, we obtain for all $k\in [k_m, k_{m+1})$
 \begin{align*}
-    \left\| x_\ell^k - x_\ell^\star \right\|^2 \le \left( \frac{1-\kappa_{\eqref{eq:reco}}}{1+\kappa_{\eqref{eq:reco}}}  \right)^{2m} \left\|x_{\ell}-x_\ell^\star\right\|^2.
+    \left\| x_\ell^k - x_\ell^\star \right\|^2_2 \le \left( \frac{1-\kappa_{\eqref{eq:reco}}}{1+\kappa_{\eqref{eq:reco}}}  \right)^{2m} \left\|x_{\ell}-x_\ell^\star\right\|^2_2.
 \end{align*}
 \end{theorem}
 
-\begin{proof}
-    The proof is reported to Appendix~\ref{apx:imprate}.
+\begin{proof}[Proof of Theorem \ref{th:imprate}]
+From Theorem~\ref{th:ident} we know that identification takes place i.e.\;that we have $\nullC(x^{k}_{\ell}) = \nullC(x^{\star}) = n^{\star}$ for all $k,\ell$ ($\ell\geq\Lambda$).
+%Let consider the iteration after the moment of 
+In this case, 
+\begin{align*}
+    [x^k_{\ell}]_{n^{\star}} = 0 \qquad\text{ and }\qquad[x^k_{\ell}]_{\overline{n^{\star}}} = x_{\ell}^k
+\end{align*}
+where we denote by $\overline{n^{\star}}$ the complementary of $n^{\star}$. Then, we have
+\begin{align*}
+  \nonumber   [x^k_\ell]_{\overline{n^\star}}  
+  &=\left[\prox_{\gamma r}([\overline{x}^k_\ell]_{\overline{n^\star}})\right]_{\overline{n^\star}}  
+  = \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i [x^{k-D_i^k}]_{\overline{n^\star}} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}} \\
+     &=  \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i x^{k-D_i^k} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}}.
+\end{align*}
+This exactly coincides with a non-sparsified update on the restriction of $f_i$ to the subspace of vectors with null coordinates in ${\overline{n^\star}}$. More specifically, let $S^\star = \{ x\in \mathbb{R}^d : \nullC(x) = n^\star \}$ be the subspace of vectors with null coordinates in ${\overline{n^\star}}$, and
+$f_{i|{\overline{n^\star}}}$ be the restriction of $f_i$ to $S^\star$.
+Then the above iteration coincides with non-sparsified update on
+$((\alpha_i),(f_{i|{\overline{n^\star}}}),r)$. In other words, after identification, \spyI~is no longer random and has the same iterates as \dave~on $S^\star$ (while in $S^{\star\perp}$, the algorithm has converged to $0$). Theorem\;\ref{th:davepg} therefore guarantees that \spyI~benefits from a $(1-\gamma (\mu+\rho))^2$ rate in terms of epochs (since $(\mu+\rho)$ is the modulus of strong convexity).
+
 \end{proof}
 
 Thus our algorithm eventually has the practical interest of having sparse two-way communication, at almost no additional cost.
@@ -83,7 +152,7 @@ We study in this section the asymptotic communication complexity of our method i
 To do so, we combine the controlled number of (inner) iterations with the communication cost by iteration. The convergence rate analysis relies on the epoch sequence through the number of iterations (and thus communications) per epoch, which is unknown since it depends on the computing system. We thus make the assumption that the computing setup is able to perform an epoch within a predefined number of iterations, which is verified in many practical contexts e.g.\;when the delays are bounded (recall Corollary\;\ref{cor:bounded}). Note that this assumptions is only needed for the communication complexity analysis but not by any means for the algorithm nor the previous results.
 
 \begin{assumption}[Tamed epochs]
-\label{hyp:delident}
+\label{hyp:delident2}
 The number of iterations between two epochs is bounded as $k_{m} - k_{m-1} \leq K$.
 \end{assumption}
 
@@ -102,22 +171,39 @@ where
     $$
 \end{itemize}
 
-Focusing on the final regime of the algorithm when identification has taken place (as per Section~\ref{sec:identif}), we get
+Focusing on the final regime of the algorithm when identification has taken place (as per Section~\ref{sec:identif2}), we get
 \begin{align*}
     \mathbf{c^{\mathrm{up}}} = |\supp(x_\ell^k)| = |\supp(x^\star)| = s^\star \quad\text{ and }\quad \mathbf{c^{\mathrm{down}}} = s^\star + c
 \end{align*}
 which leads to the following communication complexity for \recoalgo.
 
 \begin{theorem}[Communication complexity of \recoalgo]\label{th:com}
-Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth ($\mu>0$). Let $r$ be convex lsc. Let assumptions \ref{hyp:ident} and \ref{hyp:delident} hold.
+Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth ($\mu>0$). Let $r$ be convex lsc. Let assumptions \ref{hyp:ident} and \ref{hyp:delident2} hold.
 If the parameter $c$ is of the same order as $s^\star$ compared to $d$ ($c\approx s^\star \ll d$), then the communication complexity \eqref{eq:commcomp} of \recoalgo with criteria $\mathsf{C}_2$ or $\mathsf{C}_3$ is:
 \begin{align*}
      \mathbf{C}(\varepsilon) = \tilde{O}\left( \frac{L-\mu}{\mu} \sqrt{d \, s^\star } ~ \max \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} \log\left( \frac{1}{\varepsilon} \right) \right).
 \end{align*}
 \end{theorem}
 
-\begin{proof}
-The proof consists in evaluating the terms in \eqref{eq:commcomp}, one by one, in the right regime. It is given in Appendix~\ref{apx:com}.
+\begin{proof}[Proof of Theorem \ref{th:imprate}]
+The proof consists in evaluating the terms in \eqref{eq:commcomp}, one by one, in the right regime. 
+From Theorem~\ref{th:ident} we know that identification takes place i.e.\;that we have $\nullC(x^k_\ell) = \nullC(x^\star) := n^\star$ for all $k,\ell$ ($\ell\geq\Lambda$).
+%Let consider the iteration after the moment of 
+In this case, 
+\begin{align*}
+    [x^k_\ell]_{n^\star} = 0 \quad\text{ and }\quad [x^k_\ell]_{\overline{n^\star}} = x_\ell^k
+\end{align*}
+where we denote by $\overline{n^\star}$ the complementary of $n^\star$. Then, we have
+\begin{align*}
+  \nonumber   [x^k_\ell]_{\overline{n^\star}}  
+  &=\left[\prox_{\gamma r}([\overline{x}^k_\ell]_{\overline{n^\star}})\right]_{\overline{n^\star}}  
+  = \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i [x^{k-D_i^k}]_{\overline{n^\star}} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}} \\
+     &=  \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i x^{k-D_i^k} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}}.
+\end{align*}
+This exactly coincides with a non-sparsified update on the restriction of $f_i$ to the subspace of vectors with null coordinates in ${\overline{n^\star}}$. More specifically, let $S^\star = \{ x\in \mathbb{R}^d : \nullC(x) = n^\star \}$ be the subspace of vectors with null coordinates in ${\overline{n^\star}}$, and
+$f_{i|{\overline{n^\star}}}$ be the restriction of $f_i$ to $S^\star$.
+Then the above iteration coincides with non-sparsified update on
+$((\alpha_i),(f_{i|{\overline{n^\star}}}),r)$. In other words, after identification, \salgo is no longer random and has the same iterates as \dave~on $S^\star$ (while in $S^{\star\perp}$, the algorithm has converged to $0$). Theorem\;\ref{th:davepg} therefore guarantees that \salgo benefits from a $(1-\gamma (\mu+\rho))^2$ rate in terms of epochs (since $(\mu+\rho)$ is the modulus of strong convexity).
 \end{proof}
 
 Comparing this result with the communication complexity of our baseline \dave shows the interest of our adaptive sparsification technique. For \dave, the communication complexity writes as 
@@ -140,7 +226,7 @@ we get $\mathbf{c^{\mathrm{up}}} = s^\star$ as previously. However without the s
 % \end{align*}
 % \end{corollary}
 The gain thus shows a product of three terms. 
-The first term depends on the condition number of the problem and indicates that our method dominates \dave for all problems.
+The first term depends on the condition number of the problem and indicates that our method dominates \dave~for all problems.
 %well conditioned problems but even more for poorly conditioned ones. 
 % C'est juste mais je commente car je ne veux pas qu'on nous dise que c'est parce qu'on reconditionne...
-The second term is in $(0,1]$ but should be not too far from $1$, provided that the final sparsity is not poorly estimated. Finally, the last term fully exhibits the merits of adaptive sparsification with a term in $d + s^\star $ for \dave much greater than the $\sqrt{ds^\star}$ for \recoalgo. This last term really shows a nice dependence in the dimension of the problem and optimal solution for the proposed method. The theoretical gain of \recoalgo compared to \dave is confirmed in the next numerical illustrations.
+The second term is in $(0,1]$ but should be not too far from $1$, provided that the final sparsity is not poorly estimated. Finally, the last term fully exhibits the merits of adaptive sparsification with a term in $d + s^\star $ for \dave~much greater than the $\sqrt{ds^\star}$ for \recoalgo. This last term really shows a nice dependence in the dimension of the problem and optimal solution for the proposed method. The theoretical gain of \recoalgo compared to \dave~is confirmed in the next numerical illustrations.

@@ -1,21 +1,25 @@
 \subsection{Convexity and smoothness}\label{sec:basics_conv_and_smoothness}
-In this section, we recall the basic definitions and properties that are used to analyse optimization methods for smooth and convex objective \cite{hiriart2012fundamentals}. 
+In this section, we recall the basic definitions and properties that are used to analy\dg{z}e optimization methods for smooth and convex objective \cite{hiriart2012fundamentals}. 
 \begin{definition}[Convex function]
-A function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is called convex if $\dom f$ is a convex set and for any $x, y\in \dom f$ and $\alpha \in[0,1]$
+A function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is called convex if $\dom f$ is a convex set\dg{\footnote{Set $S$ is called convex if for any $x,y\in S$ and any $\alpha\in[0,1]$ holds
+$\alpha x + (1-\alpha)y \in S.$}} and for any $x, y\in \dom f$ and $\alpha \in[0,1]$
 \begin{equation}\label{eq:conv_def}
 f(\alpha x + (1-\alpha)y)\leq \alpha f(x) + (1-\alpha)f(y),
 \end{equation}
 where the domain of function $f$ is defined as
 $$
-\dom f = \{x:|f(x)|<\infty\}.
+\dom\,f = \{x:|f(x)|<\infty\}.
 $$
 Moreover, function $f$ is called $\mu$-strongly convex if function $g = f - \frac{\mu}{2}\|x\|_2^2$ is convex.
 \end{definition}
 
-From this definition, we could immediately get the following interpretation for smooth functions $f$ that is more practical for further analysis. 
+\dg{In this thesis, we consider that the domain of all functions is the entire space $\RR^n$.}
+
+\dg{For continuously differentiable functions the (strongly) convexity to the following first-order lower-bounds.}
+% From this definition, we immediately get the following interpretation for smooth functions $f$ that is more practical for further analysis. 
 
 \begin{lemma}\label{lm:convex}[Theorem $2.1.2$ \cite{nesterov-book}]
-    A continuously differentiable function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex iff for any $x,y\in\mathbb{R}^n$, we have
+    A continuously differentiable function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex iff for any $x,y\in\RR^n$, we have
     \begin{equation}\label{eq:convex_1}
         f(y) \geq f(x) + \langle \nabla f(x), y-x\rangle.
     \end{equation}
@@ -33,23 +37,22 @@ where the computation of limit for $\alpha \rightarrow 1$ will give \eqref{eq:co
 
 Let us now prove the convexity of $f$ form \eqref{eq:convex_1}.
 Summing the following inequalities with multipliers $\alpha$ and $1-\alpha$ correspondingly
-$$
-f(\alpha x + (1-\alpha)y) \leq f(x) - \langle \nabla f(\alpha x + (1-\alpha)y), (1-\alpha)(x-y)\rangle = f(x) + (1-\alpha) \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle
-$$
-$$
-f(\alpha x + (1-\alpha)y) \leq f(y) - \langle \nabla f(\alpha x + (1-\alpha)y), \alpha(y-x)\rangle = f(x) - \alpha \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle
-$$
+\begin{align*}
+f(\alpha x + (1-\alpha)y) &\leq f(x) - \langle \nabla f(\alpha x + (1-\alpha)y), (1-\alpha)(x-y)\rangle\\
+&= f(x) + (1-\alpha) \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle\\
+f(\alpha x + (1-\alpha)y)&\leq f(y) - \langle \nabla f(\alpha x + (1-\alpha)y), \alpha(y-x)\rangle\\&= f(y) - \alpha \langle \nabla f(\alpha x + (1-\alpha)y), y-x\rangle
+\end{align*}
 we immediately get \eqref{eq:conv_def}. 
 
 The proof of \eqref{eq:convex_2} immediately follows from the definition of the strong convexity.
 \end{proof}
 
-Convexity implies that any stationary point is a global minima of $f$. In addition, the strong convexity implies the existence and uniqueness of $x^\star = \argmin_{x\in\mathbb{R}^n} f(x)$.
+Convexity implies that any stationary point\dg{\footnote{Point $x$ is called stationary or critical if $\nabla f(x) = 0$.} of a continuously differentiable} function $f$ is a global minima of $f$. In addition, strong convexity implies the existence and uniqueness of $x^\star = \argmin_{x\in\mathbb{R}^n} f(x)$.
 
 Now let us recall the definition of the $L$-smoothness. 
 
 \begin{definition}[$L$-smoothness]
-Differentiable function $f$ is called $L$-smooth if its gradient is $L$-Lipschitz
+A continuosly differentiable function $f$ is called $L$-smooth if its gradient is $L$-Lipschitz
 \begin{equation}
     \|\nabla f(x) - \nabla f(y)\|_2\leq L\|x-y\|_2
 \end{equation}
@@ -79,7 +82,7 @@ Now, using  convexity of $f$ and Cauchy–Schwarz inequality we have
     f(y)-f(x) - \langle \nabla f(x), y-x\rangle &= |f(y)-f(x) - \langle \nabla f(x), y-x\rangle|\nonumber\\ &= \left|\int_0^1\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle d\alpha\right|\nonumber\\
  &\leq \int_0^1|\langle\nabla f(x + \alpha(y-x)) - \nabla f(x), y-x\rangle| d\alpha\nonumber\\
 &\leq\int_0^1\|\nabla f(x + \alpha(y-x)) - \nabla f(x)\|_2\|y-x\|_2 d\alpha\nonumber\\
-&\leq \int_0^1\tau L\|x-y\|_2^2 d\tau = \frac{L}{2}\|x-y\|_2^2.
+&\leq \int_0^1\dg{\alpha} L\|x-y\|_2^2 d\dg{\alpha} = \frac{L}{2}\|x-y\|_2^2.
 \end{align}
 
 To prove the second part let us sum \eqref{eq:lipsh} for the pairs of points $(x,y)$ and $(y,x)$ and immediately get the upper bound.
@@ -92,7 +95,7 @@ Since $x^\prime$ is a minimizer of $\varphi(x)$ we have
 \begin{equation}
 \varphi(x^\prime) \leq \varphi(x - \frac{1}{L}\nabla \varphi(x))\leq \varphi(x) - \frac{1}{2L}\|\nabla \varphi(x)\|_2^2. 
 \end{equation}
-Now setting $x^\prime = y$ we have the corresponding result.
+Now setting $x^\prime = y$, we have the corresponding result.
 \end{proof}
 
 \begin{figure}[H]
@@ -102,11 +105,11 @@ Now setting $x^\prime = y$ we have the corresponding result.
 \label{fig:functional_approximations}
 \end{figure}
 
-In Figure \ref{fig:functional_approximations} we present the graphical illustration of lower \eqref{eq:convex_2} and upper \eqref{eq:descent_lemma_1} bounds for the $L$-smooth and $\mu$-strongly convex objective function $f$. {As we could see from this figure, the quadratic lower bound provided by \eqref{eq:convex_2} approximates the functional value much better than first-order approximation, that leads to the intuition that $\mu$-strongly convex functions are easier to analyse.} The quality of these approximations could be characterized by {\textbf{condition number}} of the problem
+In Figure \ref{fig:functional_approximations} we present the graphical illustration of lower \eqref{eq:convex_2} and upper \eqref{eq:descent_lemma_1} bounds for the $L$-smooth and $\mu$-strongly convex objective function $f$. {As we could see from this figure, the quadratic lower bound provided by \eqref{eq:convex_2} approximates the functional value much better than \dg{the} first-order approximation \dg{provided by \eqref{eq:convex_1}}}. The quality of these approximations \dg{can} be characterized by the {\textbf{condition number}} of the problem
 $$
 \kappa =  \frac{L}{\mu}.
 $$
-When this number is close to $1$ ({\textbf{well-conditioned}}) the problem is extremely well approximated and when it is big ({\textbf{ill-conditioned}}) problems have a weak approximation. It impacts on the speed of optimization algorithms: better-conditioned problems are easier to solve.
+When this number is close to $1$ ({\textbf{well-conditioned}}) the problem is extremely well approximated and when it is big ({\textbf{ill-conditioned}}) problems have a weak approximation. It impacts on the speed of optimization algorithms: better-conditioned problems are easier to solve (see e.g., Theorem \ref{th:gd}).
 
 {Finally, let us present the following auxiliary lemma (Lemma $3.11$ \cite{bubeck2015convex}) that is widely used in the convergence analysis of first-order methods for $L$-smooth and $\mu$-strongly convex objectives.
 

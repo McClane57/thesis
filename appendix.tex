@@ -1,0 +1,90 @@
+\appendix
+\chapter{Additional theoretical results}
+\section{Useful tools for stochastic processes analysis}
+In this section, we recall some definitions and results from the probability theory that we will use in our further proofs.
+
+Let us start from the law of total expectation \cite[Chapter V, Section $4$]{kolmogorov1933grundbegriffe}.
+
+\begin{lemma}[Tower property]\label{lm:tower_exp}
+For any random variables $X$ and $Y$, we have $\EE[X] = \EE\left[\EE[X|Y]\right]$.
+\end{lemma}
+\begin{proof}[Proof of Lemma \ref{lm:tower_exp}]
+    Let us provide the proof for discrete random variables only.
+\begin{align}
+\EE[X] &= \sum_x x P(X=x) = \sum_x x\sum_yP(X=x)\&P(Y=y) = \sum_x\sum_y x P(X=x)\&P(Y=y)\nonumber\\
+&= \sum_x\sum_y P(Y=y)x\frac{P(X=x\&Y=y)}{P(Y = y)}  = \sum_y P(Y=y) \sum_x xP(X=x\&Y=y)\nonumber\\
+& = \sum_y P(Y=y) \EE[X|Y=y] = \EE\left[\EE[X|Y]\right],
+\end{align}
+which finishes the proof.
+\end{proof}
+
+Now, let us present the notion of almost surely convergence \cite{stout1974almost}.
+\begin{definition}[Almost sure convergence]
+    We say that the sequence $\left\{X_t\right\}$ of random variables $X_t:\Omega\rightarrow \mathcal{S}$ converges almost surely (a.s.) to $X\in\mathcal{S}$ if 
+    $$
+    \mathbf{P}\left[\omega\in\Omega:\lim_{n\rightarrow\infty}X_n(s) = X\right] = 1.
+    $$
+\end{definition}
+
+The following theorem allows proving almost sure convergence for almost supermartingales \cite[Theorem $1$]{robbins1971convergence}.
+\begin{theorem}\label{th:r-s_theorem}
+Consider probability space $(\Omega, \mathcal{F}, \PP)$ with the sequence of $\sigma$-algebras $\FF_1\subset\FF_2\subset\ldots$. For each $n = 1,2,\ldots$ let $z_n, \beta_n, \xi_n,$ and $\zeta_n$ be non-negative $\FF_n$-measurable random variables such that
+\begin{equation}\label{eq:a-super-martingale}
+\EE[z_{n+1}|\FF_n]\leq z_n(1+\beta_n) + \xi_n - \zeta_n.
+\end{equation}
+Assume that $\sum_{i=1}^\infty \beta_i<\infty$ and $\sum_{i=1}^\infty \xi_i<\infty$ then $\lim_{n\rightarrow\infty}z_n$ exist and is finite and $\sum_{i=1}^\infty \zeta_i<\infty$ a.s.
+\end{theorem}
+
+\section{Basic lemmas for proofs of reconditioned algorithms}
+% ===========================================================
+
+
+We state here two simple lemmas that we have not found as such in the literature and that are required in the proofs of Section~\ref{sec:recoalgo}. They use the fact that the unique minimum $x^\star$ of a strongly convex function $F$ is a fixed point of $\prox_{F/{\rho }}$ for any $\rho>0$; see\;\cite[Prop.~12.28]{bauschke2011convex}).
+
+\begin{lemma}
+    \label{lem:opstrong}
+    Let $F: \mathbb{R}^d \to \mathbb{R}\cup\{+\infty\}$ be $\mu$-strongly convex lsc and $\rho>0$.
+    Then, %$F$ has a unique minimizer $x^\star$ and 
+    for any $x\in\mathbb{R}^d$,
+    \begin{align*}
+        \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 \leq \frac{{\rho}}{2\mu + {\rho}} \| x - x^\star \|^2_2 - \frac{{\rho}}{2\mu + {\rho}} \| \prox_{F/{\rho}}(x) - x \|^2_2.
+    \end{align*}
+\end{lemma}
+\begin{proof}
+    The proof simply consists in developing norms as follows:
+    \begin{align*}
+        \| &\prox_{F/{\rho}}(x) - x \|^2_2 \\
+        &= \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) + x^\star - x \|^2_2 \\
+        &= \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 + \| x-  x^\star  \|^2_2 - 2 \langle   \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) ; x-  x^\star \rangle  \\
+        &\leq  \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 + \| x-  x^\star  \|^2_2 - 2(1+\mu/{\rho}) \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 \\
+        &=  \| x-  x^\star  \|^2_2 - ( 1 + 2\mu/{\rho}) \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2;
+    \end{align*}
+    and a reordering concludes the proof. In words, we formalize the fact that the resolvent of the $\mu/{\rho}$ strongly monotone operator $\partial F/{\rho}$ is $(1+\mu/{\rho})$-cocoercive; see\;\cite{bauschke2011convex} for definitions.
+\end{proof}
+
+\begin{lemma}
+    \label{lem:basereco}
+    Let $F: \mathbb{R}^d \to \mathbb{R}\cup\{+\infty\}$ be $\mu$-strongly convex lsc, $\rho>0$. Then, for any $x,x' \in\mathbb{R}^d$ such that 
+    \begin{align*}
+      \EE \left[  \left\|x' - \prox_{F/{\rho }}(x) \right\|^2_2 | x \right] \leq  \nu  \left\|x - \prox_{F/{\rho }}(x) \right\|^2_2 
+    \end{align*}
+    for some $\nu>0$, we have for any $\varepsilon\in(0,1)$
+    \begin{align}
+       \label{eq:basestrong} 
+        \EE \left[   \left\|x' - x^\star  \right\|^2_2 | x \right] &\leq \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\|x - x^\star \right\|^2_2 \\
+   \nonumber     &\hspace*{0.8cm} -\left[ (1 + \varepsilon) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \right]  \|x -  \prox_{F/{\rho }}(x)   \|^2_2.
+     \end{align}
+\end{lemma}
+
+
+\begin{proof}
+     Using Young's inequality, we get that for any $\varepsilon\in(0,1)$,
+\begin{align*}
+    \EE & \left[ \left\|x' - x^\star  \right\|^2_2  | x \right] \\
+    &\leq \left( 1 + \frac{1}{\varepsilon} \right)  \EE \left[ \left\|x' -  \prox_{F/{\rho }}(x)   \right\|^2_2  | x \right]   +   \left( 1 + \varepsilon \right)\left\| \prox_{F/{\rho }}(x) - \prox_{F/{\rho }}(x^\star ) \right\|^2_2 \\
+    &\leq \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \|x -  \prox_{F/{\rho }}(x)   \|^2_2 +   \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }} \left\|x - x^\star \right\|^2_2 \\
+    &\hspace*{0.8cm} -  \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\| x - \prox_{F/{\rho }}(x)  \right\|^2_2 \\
+     &= \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\|x - x^\star \right\|^2_2  -\left[ (1 + \varepsilon) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \right]  \|x -  \prox_{F/{\rho }}(x)   \|^2_2.
+ \end{align*}
+where we used Lemma~\ref{lem:opstrong}.
+\end{proof}

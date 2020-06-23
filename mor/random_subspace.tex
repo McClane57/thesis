@@ -3,7 +3,7 @@
 
 
 The premise of randomized subspace descent consists in repeating two steps: i) randomly selecting some subspace; and ii) updating the iterate over the chosen subspace. {Such algorithms thus extend usual coordinate descent (see Section \ref{sec:basics_composite}) to general sampling strategies, which requires algorithmic changes and an associated mathematical analysis. }
-This section presents a subspace descent algorithm along these lines for solving \eqref{eq:main_problem}. In Section\;\ref{sec:sub}, we introduce our subspace selection procedure. We build on it to introduce, in Section\;\ref{sec:algo}, our first subspace descent algorithm, the convergence of which is analyzed in Section\;\ref{sec:conv}. Finally, we put this algorithm into perspective in Section\;\ref{sec:comparison} by connecting and comparing it to related work.
+This section presents a subspace descent algorithm along these lines for solving \eqref{eq:main_problem}. In Section\;\ref{sec:sub}, we introduce our subspace selection procedure. We build on it to introduce, in Section\;\ref{sec:mor-algo}, our first subspace descent algorithm, the convergence of which is analyzed in Section\;\ref{sec:conv}. Finally, we put this algorithm into perspective in Section\;\ref{sec:comparison} by connecting and comparing it to related work.
 
 % ===============================================================
 % ===============================================================
@@ -100,7 +100,7 @@ Consider the family of the axes from Example~\ref{ex:axes} and the selection gen
 
 % ===============================================================
 % ===============================================================
-\subsection{Random Subspace Proximal Gradient Algorithm} \label{sec:algo}
+\subsection{Random Subspace Proximal Gradient Algorithm} \label{sec:mor-algo}
 % ===============================================================
 % ===============================================================
 
@@ -310,7 +310,7 @@ which in turn implies that $(x^k)$ converges almost surely to $x^\star$.
 \end{proof}
 
 % ==============================================================================
-\subsection{Examples and Connections with the existing work}\label{sec:comparison}
+\subsection{Examples and connections with the existing work}\label{sec:comparison}
 % ==============================================================================
  
 In this section, we derive specific cases and discuss the relation between our algorithm and the related literature.

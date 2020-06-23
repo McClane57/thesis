@@ -1,5 +1,5 @@
-\subsection{Moreau-Yosida regularization}\label{sec:basics_moreau-yosida}
-Let us define a Moreau envelope, that is also called Moreau-Yosida regularization \cite{moreau1962fonctions, yosida2012functional}.
+\subsubsection{Moreau-Yosida regularization}\label{sec:basics_moreau-yosida}
+Let us define \dg{the} Moreau envelope, that is also called Moreau-Yosida regularization \cite{moreau1962fonctions, yosida2012functional}.
 
 \begin{definition}
 Given $\lambda>0$, the Moreau envelope $M_{\lambda r}$ of the function $r$ with parameter $\lambda$ is defined as 
@@ -12,13 +12,13 @@ Moreau-Yosida regularization of function $r$ is continuously differentiable, eve
 \begin{equation}\label{eq:M-Y_grad}
 \nabla M_{\lambda r} = \frac{1}{\lambda}(x-\prox_{\lambda r}(x)).
 \end{equation}
-Moreover, the sets of minimums of $r$ and $M_f$ are the same. Let us rewrite proximal operator as
+Moreover, the sets of minimums of $r$ and $M_f$ are the same. Let us rewrite \dg{the} proximal operator as
 $$
 \prox_{\lambda r}(x) = x - \lambda\nabla M_{\lambda r}(x),
 $$
-which shows that proximal operator could be viewed as a gradient step and Algorithm \ref{algo:pm} is a gradient descent algorithm with stepsize $\lambda$ for minimizing $M_{\lambda r}$ \cite{rockafellar1976monotone}. Taking into account that Moreau envelope has the same minimizers as $r$ we have the convergence of proximal point method. In Figure \ref{fig:M-Y} we present a geometrical interpretation of Moreau envelope for the non-smooth objective function $r$.
+which shows that proximal operator \dg{can} be viewed as a gradient step and Algorithm \ref{algo:pm} is a gradient descent algorithm with stepsize $\lambda$ for minimizing $M_{\lambda r}$ \cite{rockafellar1976monotone}. Taking into account that \dg{the} Moreau envelope has the same minimizers as $r$ we have the convergence of proximal point method. In Figure \ref{fig:M-Y} we present a geometrical interpretation of Moreau envelope for the non-smooth objective function $r$.
 
-\begin{figure}[H]
+\begin{figure}[h]
     \centering
     \input{basics_2/figure_m-y}
     \caption{Geometrical interpretation of Moreau envelope for $r = \max\left\{-x, 0.5x\right\}$ from $\RR$ to $\RR$.}
@@ -29,7 +29,9 @@ Let us talk a little bit about the properties of Moreau-Yosida regularization. S
 \begin{equation}\label{eq:M-Y_smoothness}
 L_{M_{\lambda r}} = \lambda^{-1}
 \end{equation}
-independent on the smoothness parameter of $r$. However, Moreau-Yosida regularization is strongly convex if the objective function $r$ is strongly convex, moreover, their strongly convexity constants relates as
+independent on the smoothness parameter of $r$.
+%However, Moreau-Yosida regularization is strongly convex if the objective function $r$ is strongly convex, moreover, their strongly convexity constants relates as
+\dg{If function $r$ is strongly convex the Moreau envelope is strongly convex with strongly convexity parameter}
 \begin{equation}\label{eq:M-Y_strongly}
 \mu_{M_{\lambda r}} = \frac{\mu\lambda^{-1}}{\mu + \lambda^{-1}},
 \end{equation}

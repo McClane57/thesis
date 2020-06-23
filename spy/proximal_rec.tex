@@ -5,7 +5,7 @@
 % ===========================================================
 
 
-The learning problem~\eqref{eq:pb} should be well-conditioned to safely apply the random sparsification technique of \salgo with reasonable exploration probability $\pi$. The idea is then not to apply \salgo directly to~\eqref{eq:pb} but rather to a modified problem for which we control the condition number and thus the sparsification potential. 
+The learning problem~\eqref{eq:pb} should be well-conditioned to safely apply the random sparsification technique of \spyI~with reasonable exploration probability $\pi$. The idea is then not to apply \spyI~directly to~\eqref{eq:pb} but rather to a modified problem for which we control the condition number and thus the sparsification potential. 
 
 We thus propose to recondition the learning problem~\eqref{eq:pb} using the standard proximal algorithm (see e.g.\;\cite{rockafellar1976monotone}), as described in Section\;\ref{sec:proxrecon}. We present in Section\;\ref{sec:recoalgo} our algorithmic choices and the resulting algorithm, called \recoalgo.
 
@@ -42,10 +42,10 @@ Thus, for solving~\eqref{eq:pb}, each outer iteration consists in an (inexact) p
 \subsection{\recoalgo}\label{sec:recoalgo}
 % ===========================================================
 
-We present our main algorithm, which consists in applying the inexact proximal scheme\;\eqref{eq:approx} with \salgo as inner algorithm to solve \eqref{eq:pb}. 
+We present our main algorithm, which consists in applying the inexact proximal scheme\;\eqref{eq:approx} with \spyI~as inner algorithm to solve \eqref{eq:pb}. 
 
 
-At the outer iteration $\ell$, we run \salgo for solving \eqref{eq:reco} with i.i.d.\;non-uniform sparsification probabilities given, for a fixed $0<c\leq d$, by
+At the outer iteration $\ell$, we run \spyI~for solving \eqref{eq:reco} with i.i.d.\;non-uniform sparsification probabilities given, for a fixed $0<c\leq d$, by
 \begin{align}
 \label{eq:pvec}
 p_{j,\ell} = \left\{ \begin{array}{cr}
@@ -80,14 +80,14 @@ Then, the contraction factor of \salgo~\eqref{eq:ratebefore} for the recondition
 \label{eq:reco_contra}
      \left( \left(\frac{1-\kappa_{\eqref{eq:reco}}}{1+\kappa_{\eqref{eq:reco}}}\right)^2 + 1 - \pi_\ell  \right) =  \left( \pi - \alpha + 1 - \pi_\ell  \right) = \underbrace{(1 - \alpha - (\pi_\ell - \pi) )}_{=: (1-\alpha_\ell)} \leq 1-\alpha < 1 .
 \end{align}
-This means that \salgo is linearly convergent on the reconditioned problem~\eqref{eq:reco}. Thus, it can safely be used as an inner method in the inexact proximal algorithm \eqref{eq:approx} to solve the original problem~\eqref{eq:pb}. 
+This means that \spyI~is linearly convergent on the reconditioned problem~\eqref{eq:reco}. Thus, it can safely be used as an inner method in the inexact proximal algorithm \eqref{eq:approx} to solve the original problem~\eqref{eq:pb}. 
 
 The remaining part is to the choice of a stopping criterion for the inner loop. We propose to use three different criteria: epoch budget, absolute accuracy, and relative accuracy (called $\mathsf{C}_1, \mathsf{C}_2$, and $\mathsf{C}_3$ respectively). Stopping criteria based on accuracy are usually much more stringent to enforce (see e.g. \cite[Sec.~2.3]{lin2017catalyst} and references therein), however they may bring significant performance improvement when the instantaneous rate is much better than the theoretical one. 
 
 The resulting algorithm, called\;\recoalgo, is presented as Algorithm\;\ref{algo:reco}. Under any of the three stopping criteria, we recover the same convergence result, formalized in the next theorem.
 
 % ===================================
-\begin{algorithm}[h!]
+\begin{algorithm}[]
 \caption{\label{algo:reco}\recoalgo on $((\alpha_i),(f_i),r)$}
 Initialize $x_1$, $d\geq c>0$, and $\delta\in(0,1)$.
 \begin{align}
@@ -109,19 +109,17 @@ Compute an approximate solution of the reconditioned problem
 & x_{\ell+1} \approx \prox_{F/\rho} (x_\ell) =\argmin_{x\in\mathbb{R}^d}  ~ \left\{ %H_\ell(x) =  
 \sum_{i=1}^M  \alpha_i \underbrace{\left( f_i(x) + \frac{\rho}{2} \| x - x_\ell \|_2^2 \right)}_{h_{i,\ell}(x)}  +  r(x) \right\} 
 \end{align}
-with \salgo on $\Big((\alpha_i),(h_{i,\ell}), r  \;;\;  \pvec_\ell\Big)$ with $x_\ell$ as initial point and with the stopping criterion:\\[0.1cm]
+with \spyI~on $\Big((\alpha_i),(h_{i,\ell}), r  \;;\;  \pvec_\ell\Big)$ with $x_\ell$ as initial point and with the stopping criterion:\\[0.1cm]
 \begin{itemize}
-    \item[] $\mathsf{C}_1$ (epoch budget): Run \salgo with the maximal stepsize for
+    \item[] $\mathsf{C}_1$ (epoch budget): Run \spyI~with the maximal stepsize for
     $$  \displaystyle \mathsf{M}_\ell = \left\lceil \frac{ (1+\delta) \log(\ell)}{\log\left( \frac{1}{1-\alpha+\pp - \pp_\ell} \right)} + \frac{\log\left(\frac{2 \mu+\rho}{(1-\delta)\rho}\right)}{\log\left( \frac{1}{1-\alpha+\pp - \pp_\ell} \right)} \right\rceil \text{ epochs.}$$
-    \item[or] $\mathsf{C}_2$ (absolute accuracy):  Run \salgo until it finds $x_{\ell+1}$ such that  
-    $$  \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|^2 \leq \frac{(1-\delta)\rho}{(2\mu+\rho) \ell^{1+\delta}} \|x_{\ell} -  \prox_{F/\rho}(x_\ell)\|^2  .$$ 
-    \item[or] $\mathsf{C}_3$ (relative accuracy):  Run \salgo until it finds $x_{\ell+1}$ such that  
-    $$  \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|^2 \leq \frac{\rho}{4(2\mu+\rho) \ell^{2+2\delta}} \|x_{\ell+1} -  x_\ell \|^2  .$$ 
+    \item[or] $\mathsf{C}_2$ (absolute accuracy):  Run \spyI~until it finds $x_{\ell+1}$ such that  
+    $$  \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|^2_2 \leq \frac{(1-\delta)\rho}{(2\mu+\rho) \ell^{1+\delta}} \|x_{\ell} -  \prox_{F/\rho}(x_\ell)\|^2_2  .$$ 
+    \item[or] $\mathsf{C}_3$ (relative accuracy):  Run \spyI~until it finds $x_{\ell+1}$ such that  
+    $$  \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|^2_2 \leq \frac{\rho}{4(2\mu+\rho) \ell^{2+2\delta}} \|x_{\ell+1} -  x_\ell \|^2_2  .$$ 
 \end{itemize}
 }
 \end{algorithm}
-
-
 
 \begin{theorem} 
 \label{th:reco}
@@ -130,21 +128,167 @@ Let the functions $(f_i)$ be $\mu$-strongly convex ($\mu\geq0$) and $L$-smooth. 
 Then, the sequence generated by \recoalgo on $((\alpha_i),(f_i),r)$ with stopping criterion $\mathsf{C}_1, \mathsf{C}_2$, or $\mathsf{C}_3$ converges almost surely to a minimizer of $F$.
 Furthermore, if $\mu>0$, then we have\footnote{We use the standard notation: $a_\ell = \tilde{\mathcal{O}} ( (1-r)^\ell)$ denotes that there exists $C,p$ such that $ a_\ell \leq C \ell^p (1-r)^\ell $. } 
       \begin{align*}
-        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2 \right] = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2} \right)^\ell \right) \quad\text{ for criterion } \mathsf{C}_1; \\
-      \left\|x_{\ell+1} - x^\star  \right\|^2  = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2}  \right)^\ell \right)  \quad\text{ for criteria } \mathsf{C}_2, \mathsf{C}_3.
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2_2 \right] = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2} \right)^\ell \right) \quad\text{ for criterion } \mathsf{C}_1; \\
+      \left\|x_{\ell+1} - x^\star  \right\|^2_2  = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2}  \right)^\ell \right)  \quad\text{ for criteria } \mathsf{C}_2, \mathsf{C}_3.
         \end{align*}
 \end{theorem}
 
-\begin{proof}
-Even though the final result is similar for the three cases, the proof techniques are rather different. We thus present them separated in Appendix~\ref{apx:reco}.
-\end{proof}
+Even though the final result is similar for the three cases, the proof techniques are rather different. We thus present them separated.
+\subsection{Proof of Theorem \ref{th:reco}}
+\dg{\subsubsection{Two basic lemmas}
+First, let us present two simple lemmas that we have not found as such in the literature and that are required in proofs of the theorem. They use the fact that the unique minimum $x^\star$ of a strongly convex function $F$ is a fixed point of $\prox_{F/{\rho }}$ for any $\rho>0$; see\;\cite[Prop.~12.28]{bauschke2011convex}).
+}
 
-This result thus establishes that \recoalgo converges linearly to a solution of \eqref{eq:pb}. This means that \recoalgo has qualitatively the same behavior as \dave, with the additional feature of having sparse local updates and therefore sparse upward communications. In other words, our algorithm is similar to the baseline in terms of iterations, but it is expected to be faster in terms of communications (more precisely in terms of quantity of information exchanged between master and workers) which would result in a wallclock gain in practice, as shown in Section\;\ref{sec:num}. Before this, we further investigate in the next section the theoretical gain of our sparsification technique in the case of sparse optimal solutions.
+\dg{
+\begin{lemma}
+    \label{lem:opstrong}
+    Let $F: \mathbb{R}^d \to \mathbb{R}\cup\{+\infty\}$ be $\mu$-strongly convex lsc and $\rho>0$.
+    Then, %$F$ has a unique minimizer $x^\star$ and 
+    for any $x\in\mathbb{R}^d$,
+    \begin{align*}
+        \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 \leq \frac{{\rho}}{2\mu + {\rho}} \| x - x^\star \|^2_2 - \frac{{\rho}}{2\mu + {\rho}} \| \prox_{F/{\rho}}(x) - x \|^2_2.
+    \end{align*}
+\end{lemma}
+\begin{proof}
+    The proof simply consists in developing norms as follows:
+    \begin{align*}
+        \| &\prox_{F/{\rho}}(x) - x \|^2_2 \\
+        &= \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) + x^\star - x \|^2_2 \\
+        &= \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 + \| x-  x^\star  \|^2_2 - 2 \langle   \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) ; x-  x^\star \rangle  \\
+        &\leq  \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 + \| x-  x^\star  \|^2_2 - 2(1+\mu/{\rho}) \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2 \\
+        &=  \| x-  x^\star  \|^2_2 - ( 1 + 2\mu/{\rho}) \| \prox_{F/{\rho}}(x) - \prox_{F/{\rho}}(x^\star) \|^2_2;
+    \end{align*}
+    and a reordering concludes the proof. In words, we formalize the fact that the resolvent of the $\mu/{\rho}$ strongly monotone operator $\partial F/{\rho}$ is $(1+\mu/{\rho})$-cocoercive; see\;\cite{bauschke2011convex} for definitions.
+\end{proof}}
+
+\dg{
+\begin{lemma}
+    \label{lem:basereco}
+    Let $F: \mathbb{R}^d \to \mathbb{R}\cup\{+\infty\}$ be $\mu$-strongly convex lsc, $\rho>0$. Then, for any $x,x' \in\mathbb{R}^d$ such that 
+    \begin{align*}
+      \EE \left[  \left\|x' - \prox_{F/{\rho }}(x) \right\|^2_2 | x \right] \leq  \nu  \left\|x - \prox_{F/{\rho }}(x) \right\|^2_2 
+    \end{align*}
+    for some $\nu>0$, we have for any $\varepsilon\in(0,1)$
+    \begin{align}
+       \label{eq:basestrong} 
+        \EE \left[   \left\|x' - x^\star  \right\|^2_2 | x \right] &\leq \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\|x - x^\star \right\|^2_2 \\
+   \nonumber     &\hspace*{0.8cm} -\left[ (1 + \varepsilon) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \right]  \|x -  \prox_{F/{\rho }}(x)   \|^2_2.
+     \end{align}
+\end{lemma}}
+
+\dg{
+\begin{proof}
+     Using Young's inequality, we get that for any $\varepsilon\in(0,1)$,
+\begin{align*}
+    \EE & \left[ \left\|x' - x^\star  \right\|^2_2  | x \right] \\
+    &\leq \left( 1 + \frac{1}{\varepsilon} \right)  \EE \left[ \left\|x' -  \prox_{F/{\rho }}(x)   \right\|^2_2  | x \right]   +   \left( 1 + \varepsilon \right)\left\| \prox_{F/{\rho }}(x) - \prox_{F/{\rho }}(x^\star ) \right\|^2_2 \\
+    &\leq \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \|x -  \prox_{F/{\rho }}(x)   \|^2_2 +   \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }} \left\|x - x^\star \right\|^2_2 \\
+    &\hspace*{0.8cm} -  \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\| x - \prox_{F/{\rho }}(x)  \right\|^2_2 \\
+     &= \left( 1 + \varepsilon \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\|x - x^\star \right\|^2_2  -\left[ (1 + \varepsilon) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \frac{1}{\varepsilon} \right)  \nu  \right]  \|x -  \prox_{F/{\rho }}(x)   \|^2_2.
+ \end{align*}
+where we used Lemma~\ref{lem:opstrong}.
+\end{proof}
+}
+\dg{\subsubsection{Proof of Theorem \ref{th:reco} for criterion  $\mathsf{C}_1$ \emph{(epoch budget)}}}
+We start by noticing that, at outer loop $\ell$, \salgo solves the reconditioned problem \eqref{eq:approxalgo} over which it has a contraction factor of $(1-\alpha_\ell)$ with $1-\alpha_\ell  := 1-\alpha+\pp - \pp_\ell$;
+%with the maximal (theoretical) stepsize; 
+see~\eqref{eq:reco_contra} and~\eqref{eq:ratebefore}.% in Theorem~\ref{lm:spy_diff}). 
+% with the maximal (theoretical) stepsize by the choice of~\eqref{eq:set} (See~\eqref{eq:reco_contra} and~\eqref{eq:ratebefore} in Theorem~\ref{lm:spy_diff}). 
+%Mathematically, at outer loop $\ell$, 
+This means that \salgo initialized with $x_\ell$ verifies after $m$ epochs with the maximal stepsize
+    \begin{align*}
+             \mathbb{E}   \left\| x^{k_m} - x_\ell^\star \right\|^2_2 \le \left( 1-\alpha_\ell  \right)^{m} \max_i\left\|x_i^0-x_{i,\ell}^\star\right\|^2_2 \le \left( 1-\alpha_\ell  \right)^{m} \left\|x_\ell -x_{\ell}^\star\right\|^2_2
+    \end{align*}
+    where $x_\ell^\star$ is the unique solution of \eqref{eq:reco}, and $x_{i,\ell}^\star = x_\ell^\star - \gamma \nabla h_{i,\ell}(x^\star_\ell)$ are its local shifts.
+    
+    We now apply Lemma~\ref{lem:basereco} with the following input: $x' = x_{\ell+1}$; $x = x_\ell$; $F = F$ (which is $\mu$ strongly convex); $x^\star =x^\star$ (minimizer of $F$); and $\nu = \left( 1-\alpha_\ell  \right)^{\mathsf{M}_\ell}$ (noting that this term only depends on $x_\ell$). We get for $\varepsilon = \frac{1}{\ell^{1+\delta}} \in (0,1)$
+        \begin{align*}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2_2 | x_\ell \right] &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\| x_\ell - x^\star \right\|^2_2\\
+   \nonumber     &\hspace*{-1.2cm} - \underbrace{\left[ \left(1 + \frac{1}{\ell^{1+\delta}}\right) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \ell^{1+\delta} \right)  (1-\alpha_\ell)^{\mathsf{M}_\ell}  \right]}_{:= b_\ell}  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2_2.
+     \end{align*}
+     Choosing $\mathsf{M}_\ell$
+    %  \mathsf{M}_\ell = \left\lceil \frac{({1+\delta})\log(\ell)}{\log\left( \frac{1}{1-{\alpha_\ell}} \right)} + \frac{ \log\left(\frac{2 \mu+\rho}{(1-\delta)\rho}\right)}{\log\left( \frac{1}{1-{\alpha_\ell}} \right)} \right\rceil$
+     as per $\mathsf{C}_1$ guarantees that
+     $$
+     b_\ell \geq \delta \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \frac{{\rho }}{2\mu + {\rho }} \geq    \frac{{\delta  \rho }}{2\mu + {\rho }} .
+     $$ 
+     Thus, for any $\mu\geq 0$, %($0$ included), 
+     we have
+     \begin{align}\label{eq:C1base}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2_2 | x_\ell \right] &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right) \frac{{ \rho }}{2\mu + {\rho }}  \left\| x_\ell - x^\star \right\|^2_2 -  \frac{{\delta  \rho }}{2\mu + {\rho }} \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2_2.
+     \end{align}
+     
+     \vspace*{1ex}
+     \noindent\underline{Convergence.} By using $\mu\geq 0$ in \;\eqref{eq:C1base}, we get 
+          \begin{align}
+          \label{eq:RS}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2_2 | x_\ell \right] &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \left\| x_\ell - x^\star \right\|^2_2 -  \delta \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|_2^2 .
+     \end{align}
+     By Robbins-Siegmund theorem \cite[Th.~1]{robbins1971convergence} (and \cite{iutzeler2013asynchronous,bianchi2015coordinate,combettes2015stochastic} for applications to optimization), we have that i) $(\left\|x_{\ell} - x^\star  \right\|^2_2)$ converges almost surely to a random variable with finite support; and ii) $ \sum_{\ell=1}^\infty \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2_2 < \infty$. This means that we can extract a subsequence $(x_{\ell^n})$ that converges almost surely to some $\overline{x}^\star$ which is necessarily a minimizer from ii). Using~\eqref{eq:RS} again with $x^\star = \overline{x}^\star$, we see that $(x_{\ell})$ converges to $\overline{x}^\star$ almost surely.
+     
+     \vspace*{1ex}
+     \noindent\underline{Rate.} Now, if $\mu>0$, we get by dropping the last term in~\eqref{eq:C1base} and successively taking expectations that  
+      \begin{align}
+        \EE \left[   \left\|x_{\ell+1} - x^\star  \right\|^2_2 \right] &\leq \left( {\ell} + 1  \right)^{1+\delta}  \left( \frac{{\rho }}{2\mu + {\rho }} \right)^\ell  \left\| x_1 - x^\star \right\|^2_2 
+        = \tilde{\mathcal{O}} \left( \left( 1 - \frac{{\mu }}{\mu + {\rho }/2} \right)^\ell \right).
+     \end{align}
+
+\subsubsection{Proof of Theorem \ref{th:reco} for criterion  $\mathsf{C}_2$ \emph{(absolute accuracy)}}
+We apply Lemma\;\ref{lem:basereco} with the following input:\;$x'\!= x_{\ell+1}$; $x = x_\ell$; $F = F$ (which is $\mu$ strongly convex); $x^\star =x^\star$ (minimizer of $F$); 
+%\rho = \rho$; 
+and $ \nu = (1-\delta)\rho/((2\mu+\rho)\ell^{1+\delta})$ (noting that the condition on $x_{\ell+1}$ is almost sure). We get for $\varepsilon = \frac{1}{\ell^{1+\delta}} \in (0,1)$
+        \begin{align*}
+  %\label{eq:C2base} 
+  \left\|x_{\ell+1} - x^\star  \right\|^2_2 &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)  \frac{{\rho }}{2\mu + {\rho }}  \left\| x_\ell - x^\star \right\|^2_2 \\
+   \nonumber     &\hspace*{-1.2cm} - \underbrace{\left[ \left(1 + \frac{1}{\ell^{1+\delta}}\right) \frac{{\rho }}{2\mu + {\rho }}  - \left( 1 + \ell^{1+\delta} \right)  \frac{1}{\ell^{1+\delta}}  \frac{{(1-\delta)\rho }}{2\mu + {\rho }} \right]}_{\leq 0}  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2_2 \\
+ \nonumber  &\leq  \left( {\ell} + 1  \right)^{1+\delta}  \left( \frac{{\rho }}{2\mu + {\rho }} \right)^\ell  \left\| x_1 - x^\star \right\|^2_2 .
+     \end{align*}
+     This directly gives the rate of convergence when $\mu>0$. 
+    When $\mu=0$, the inequality can be simplified to
+    \begin{align}
+  \nonumber \left\|x_{\ell+1} - x^\star  \right\|^2_2 &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)    \left\| x_\ell - x^\star \right\|^2_2 \\
+   \nonumber     &\hspace*{-1.2cm} -  \left[ \left(1 + \frac{1}{\ell^{1+\delta}}\right)   - \left( 1 + \ell^{1+\delta} \right)  \frac{1}{\ell^{1+\delta}}  (1-\delta) \right]  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2_2 \\
+\nonumber  &\leq \left( 1 + \frac{1}{\ell^{1+\delta}} \right)    \left\| x_\ell - x^\star \right\|^2_2 - \delta  \|x_\ell -  \prox_{F/{\rho }}(x_\ell)   \|^2_2.
+     \end{align}
+     In this case, the same arguments as for criterion $\mathsf{C}_1$ enable to get almost sure convergence.
+\subsubsection{Proof of Theorem \ref{th:reco} for criterion $\mathsf{C}_3$ (relative accuracy)}
+Denoting $\beta := \sqrt{\rho/(2\mu+\rho)} \in (0,1]$, the stopping criterion $\mathsf{C}_3$ writes
+\begin{align}\label{eq:baseC3}
+    \|x_{\ell+1} -  \prox_{F/\rho}(x_\ell)\|_2 \leq   \varepsilon_\ell \|x_{\ell+1} -  x_\ell \|_2  \qquad\text{ with }    \varepsilon_\ell =  \frac{\beta}{2\ell^{1+\delta}} .
+\end{align}
+% This is the usual inexactness in proximal algorithms \cite{rockafellar1976monotone}.
+%\vspace*{1ex}
+\noindent\underline{Convergence.} The condition\;\eqref{eq:baseC3} matches condition\;(B) of\;\cite[Th.~2]{rockafellar1976monotone}. We also have clearly $\sum_\ell \varepsilon_\ell < +\infty$ and the regularity assumption of the operator is verified, by our extra assumption and   \cite[Prop.~7]{rockafellar1976monotone}. Thus \cite[Th.~2]{rockafellar1976monotone} directly gives us that $(x_\ell)$ converges to a minimizer of $F$, that we denote by $x^\star$.
+
+\vspace*{1ex}
+\noindent\underline{Rate.} When $F$ is $\mu$-strongly convex, we can furthermore develop:
+\begin{align*}
+    \left\| x_{\ell+1} - x^\star \right\|_2 &\leq \left\| x_{\ell+1} - \prox_{F/\rho}(x_\ell) \right\|_2 + \left\|\prox_{F/\rho}(x_\ell) - x^\star \right\|_2 \\
+    &\leq \varepsilon_\ell \left\| x_{\ell+1} - x_\ell \right\|_2 + \beta \left\|x_\ell - x^\star \right\|_2 \\
+    &\leq  \varepsilon_\ell \left\| x_{\ell+1} - x^\star \right\|_2  + \varepsilon_\ell \left\| x_{\ell} - x^\star \right\|_2 + \beta \left\|x_\ell - x^\star \right\|_2
+\end{align*}
+where the first inequality used both condition $\mathsf{C}_3$ and Lemma~\ref{lem:opstrong}. This implies that 
+\begin{align*}
+    \left\| x_{\ell+1} - x^\star \right\|^2_2 &\leq \left( \frac{\varepsilon_\ell + \beta}{1 - \varepsilon_\ell} \right)^2  \left\|x_\ell - x^\star \right\|^2_2.
+\end{align*}
+Finally, denoting $d_\ell := \ell^{1+\delta}/(\ell^{1+\delta}-1) > 1 $, we have\footnote{Note that $
+   \varepsilon_\ell^2 = \frac{\rho}{4(2\mu+\rho) \ell^{2+2\delta}} \leq \left( \frac{\beta}{2} \right)^2 \frac{(d_\ell-1)^2}{d_\ell^2} \leq \beta^2 \frac{(d_\ell-1)^2}{(1+\beta d_\ell)^2} $.}
+\begin{align*}
+    \varepsilon_\ell \leq \beta \frac{(d_\ell-1)}{(1+\beta d_\ell)} ~~\Longrightarrow~~ \frac{\varepsilon_\ell + \beta}{1 - \varepsilon_\ell} \leq d_\ell \beta \leq \ell^{1+\delta}/((\ell-1)^{1+\delta}) \beta.
+\end{align*}
+This yields
+\begin{align*}
+    \left\| x_{\ell+1} - x^\star \right\|^2_2 &\leq \left( \frac{\ell}{\ell-1} \right)^{2+2\delta} \frac{{\rho }}{2\mu + {\rho }} \left\|x_\ell - x^\star \right\|^2_2 
+\end{align*}
+which gives the result.
+\dg{\subsubsection{General comments on the result}}
+This result thus establishes that \recoalgo converges linearly to a solution of \eqref{eq:pb}. This means that \recoalgo has qualitatively the same behavior as \dave, with the additional feature of having sparse local updates and therefore sparse upward communications. In other words, our algorithm is similar to the baseline in terms of iterations, but it is expected to be faster in terms of communications (more precisely in terms of quantity of information exchanged between master and workers) which would result in a wallclock gain in practice, as shown in Section\;\ref{sec:spy_exps}. Before this, we further investigate in the next section the theoretical gain of our sparsification technique in the case of sparse optimal solutions.
 
 
 \begin{remark}[Acceleration (with respect to iterations)]\label{rem:cata}
-In this paper, we are interested in sparsifying communications and we primarily consider the reconditioning aspect of proximal methods, leaving aside other aspects including acceleration. As proposed in\;\cite{guler1992new}, the iterations of the inexact proximal algorithm can indeed be accelerated using Nesterov's method\;\cite{nesterov1983method}.
+In this chapter, we are interested in sparsifying communications and we primarily consider the reconditioning aspect of proximal methods, leaving aside other aspects including acceleration. As proposed in\;\cite{guler1992new}, the iterations of the inexact proximal algorithm can indeed be accelerated using Nesterov's method\;\cite{nesterov1983method}.
 The recent works\;\cite{lin2017catalyst,lin2019inexact} also propose accelerated and quasi-Newton variants of the inexact proximal point algorithm as a meta-algorithm to improve the convergence of optimization methods (driven by machine learning applications \cite{lin2015universal}). 
-In this paper, we investigate the complexity in terms of communications rather than iterations, so we do not insist much on these accelerated variants. However the developments of this section could be extended with accelerated proximal algorithm, following the meta-algorithm of \cite{lin2017catalyst}. We briefly study this direction in Appendix\;\ref{apx:cata}.  
-In particular, Theorem~\ref{thm:cata} shows a gain of the square root on the rate for the accelerated version compared to Theorem~\ref{th:reco}, as usually observed with accelerated methods. 
+In this chapter, we investigate the complexity in terms of communications rather than iterations, so we do not insist much on these accelerated variants. However the developments of this section could be extended with accelerated proximal algorithm, following the meta-algorithm of \cite{lin2017catalyst}.
+% We briefly study this direction in Appendix\;\ref{apx:cata}.  
+% In particular, Theorem~\ref{thm:cata} shows a gain of the square root on the rate for the accelerated version compared to Theorem~\ref{th:reco}, as usually observed with accelerated methods. 
 \end{remark}

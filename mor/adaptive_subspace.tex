@@ -32,7 +32,7 @@ Second, in Section~\ref{sec:identif}, we provide a simple general identification
 
 
 % ==============================================================================
-\subsection{Random Subspace Descent with Time-Varying Selection}
+\subsection{Random Subspace Descent with time-varying selection}
 \label{sec:ada_algo}
 
 {For any randomized algorithm,  
@@ -138,9 +138,10 @@ Using now \eqref{eq:corr-rate}, we get
 Finally, the non-expansiveness of the prox-operator propagates this inequality to $x_k$, since we have 
 % $k\in(k_\ell,k_{\ell+1}]$ we have
 \begin{align*}
-\|x^k &- x^\star\|_2^2 = \|\prox_{\gamma g}(\bQ_\ell^{-1}(z^{k-1})) - \prox_{\gamma g}(\bQ_\ell^{-1}(z_\ell^\star))\|_2^2\\
-&\leq
-\|\bQ_\ell^{-1}(z^{k-1} - z_\ell^\star)\|_2^2 \leq \lambda_{\max}(\bQ_\ell^{-1})^2  \|z^{k-1}-z^\star_\ell\|_2^2 =  %\lambda_{\min}(\bP_\ell)  \|z^{k-1}-z^\star\|_2^2
+\|x^k - x^\star\|_2^2 &= \|\prox_{\gamma g}(\bQ_\ell^{-1}(z^{k-1})) - \prox_{\gamma g}(\bQ_\ell^{-1}(z_\ell^\star))\|_2^2
+\leq
+\|\bQ_\ell^{-1}(z^{k-1} - z_\ell^\star)\|_2^2 \\
+&\leq \lambda_{\max}(\bQ_\ell^{-1})^2  \|z^{k-1}-z^\star_\ell\|_2^2 =  %\lambda_{\min}(\bP_\ell)  \|z^{k-1}-z^\star\|_2^2
 \lambda_{\max}(\bP_\ell)  \|z^{k-1}-z^\star_\ell\|_2^2 \leq \|z^{k-1}-z^\star_\ell\|_2^2.
 \end{align*}
 This concludes the proof.
@@ -207,8 +208,14 @@ This drawback can be circumvented to the price of losing the rate \emph{per iter
     Let Assumptions \ref{hyp:f} and  \ref{hyp:main_identif} hold. Take $\gamma\in(0,2/(\mu+L)]$, choose $\lambda>0$, and set $\beta = \gamma\mu L\lambda/(\mu+L)$. Consider the following adaptation strategy:
     %at each  time $k_{\ell-1}$, 
     \begin{itemize}
-        \item[1)] From the observation of $x^{k_{\ell-1}}$\!,\;choose a new sampling with $\bP_{\ell}$ and $\bQ_\ell$,\,such\;that\;$\lambda_{ \min}(\bP_{\ell}) \geq \lambda$;
-        \item[2)] Compute $\mathbf{c}_\ell$ so that $\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 (1-\alpha_{\ell-1})^{\mathbf{c}_\ell} \leq 1 - \beta$ where $\alpha_{\ell-1} = 2\gamma \mu L \lambda_{ \min}(\bP_{\ell-1})/(\mu + L)$;
+        \item[1)] From the observation of $x^{k_{\ell-1}}$\!,\;choose a new sampling with $\bP_{\ell}$ and $\bQ_\ell$,\,such\;that\;
+        $$
+        \lambda_{ \min}(\bP_{\ell}) \geq\lambda;
+        $$
+        \item[2)] Compute $\mathbf{c}_\ell$ so that $\|  \bQ_\ell   \bQ_{\ell-1}^{-1} \|_2^2 (1-\alpha_{\ell-1})^{\mathbf{c}_\ell} \leq 1 - \beta$ where 
+        $$
+        \alpha_{\ell-1} = 2\gamma \mu L \lambda_{ \min}(\bP_{\ell-1})/(\mu + L);
+        $$
         \item[3)] Apply the new sampling %(i.e. perform an adaptation step with this new sampling) 
         after $\mathbf{c}_\ell$ iterations ($k_{\ell} = k_{\ell-1}+\mathbf{c}_\ell$).
     \end{itemize}
@@ -368,15 +375,11 @@ This identification can be exploited within our adaptive algorithm \adaalgo~for 
 
 
 \begin{theorem}[Improved asymptotic rate]\label{th:rate_identif}
-Under the same assumptions as in Theorems~\ref{th:conv_nondis_arbitrary} and~\ref{th:aggressive}, if the solution $x^\star$ of~\eqref{eq:main_problem} verifies the qualification constraint\footnote{The qualifying constraint \eqref{eq:qualif} may seem hard to verify at first glance but for most structure-enhancing regularizers, it simplifies greatly and {reduces} to usual nondegeneracy {assumptions}. Broadly speaking, this condition simply means that the point $u^\star = x^\star - \gamma\nabla f(x^\star)$ is not \emph{borderline} to be put to an identified value by the proximity operator of the regularizer $\prox_{\gamma r}$. 
-For example, {when} $g(x) = \lambda_1 \|x\|_1$, the qualifying constraint \eqref{eq:qualif} simply rewrites $x_i^\star = 0 \Leftrightarrow \nabla_{[i]} f(x^\star) \in ]-\lambda_1,\lambda_1[$; 
-for $r$ is the TV-regularization \eqref{eq:TV}, the qualifying constraint means that there is no point $u$ (in any ball) around $x^\star - \gamma \nabla f(x^\star)$ such that $\prox_{\gamma r}(u)$ has a jump that $x^\star$ does not have. 
-In general, this corresponds to the relative interior assumption of \cite{lewis2002active}; see the extensive discussion 
-of \cite{vaiter2015model}.}
-\begin{align}
-    \label{eq:qualif}\tag{QC}
-     \S(x^\star) ~=\!\! \bigcup_{u\in\mathcal{B}(x^\star-\gamma \nabla f(x^\star),\varepsilon)} \!\S(\prox_{\gamma g}(u))
-\end{align}
+Under the same assumptions as in Theorems~\ref{th:conv_nondis_arbitrary} and~\ref{th:aggressive}, if the solution $x^\star$ of~\eqref{eq:main_problem} verifies the qualification constraint \eqref{eq:qc}
+% \begin{align}
+%     \label{eq:qualif}\tag{QC}
+%      \S(x^\star) ~=\!\! \bigcup_{u\in\mathcal{B}(x^\star-\gamma \nabla f(x^\star),\varepsilon)} \!\S(\prox_{\gamma g}(u))
+% \end{align}
 for any $\varepsilon>0$ small enough, then, using an adaptation deterministically computed from $(\S(x^k))$, we have \begin{align*}
      \EE[\|x^k-x^\star\|_2^2] = \mathcal{O}\left( \left( 1- \lambda_{\min} (\bP^\star) \frac{2\gamma \mu L}{\mu + L}  \right)^k \right)
  \end{align*}
@@ -386,7 +389,7 @@ for any $\varepsilon>0$ small enough, then, using an adaptation deterministicall
 
 % cette preuve doit pouvoir s'etendre au cas de f convexe, ie x^star non unique. [en considerant le x^* limite des X^k] On oublie ce detail ici.
 \begin{proof}[Proof of Theorem \ref{th:rate_identif}]
-Let $u^\star = x^\star-\gamma \nabla f(x^\star)$ and observe from the optimality conditions of \eqref{eq:main_problem} that $x^\star =  \prox_{\gamma g}(u^\star)$. We apply Theorem~\ref{th:identification} and the qualification condition \eqref{eq:qualif} yields that $\S(x^k)$ will exactly reach $\S(x^\star)$ in finite time. Now we go back to the proof of Theorem~\ref{th:aggressive} to see that the random variable defined by
+Let $u^\star = x^\star-\gamma \nabla f(x^\star)$ and observe from the optimality conditions of \eqref{eq:main_problem} that $x^\star =  \prox_{\gamma g}(u^\star)$. We apply Theorem~\ref{th:identification} and the qualification condition \eqref{eq:qc} yields that $\S(x^k)$ will exactly reach $\S(x^\star)$ in finite time. Now we go back to the proof of Theorem~\ref{th:aggressive} to see that the random variable defined by
 \begin{align*}
     X^k = \left\{ \begin{array}{cl}
             x^{k_{\ell}} & \textrm{if } k\in(k_{\ell},k_{\ell}+\mathbf{c}_\ell]   \\
@@ -405,7 +408,7 @@ This theorem means that if $r$, $\M$, and $\C$ are chosen in agreement, the adap
 
 
 % =============================================================================
-\subsection{Identification-based Subspace Descent}\label{sec:adapt}
+\subsection{Identification-based subspace descent}\label{sec:adapt}
 % =============================================================================
 
 {
@@ -521,7 +524,7 @@ Notice that, contrary to the importance-like adaptive algorithms of \cite{stich2
 
 {
 % =============================================================================
-\subsubsection{Practical Examples and Discussion}\label{sec:ex_ada}
+\subsubsection{Practical examples and discussion}\label{sec:ex_ada}
 % =============================================================================
 % ==========================================================================================
 

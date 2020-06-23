@@ -1,5 +1,5 @@
-\section{Introduction}\label{sec:mor-intro}
-
+\section*{Introduction}\label{sec:mor-intro}
+\addcontentsline{toc}{section}{Introduction}
 % ========== Problem ==============
 In this chapter, we consider composite optimization problems of the form
 \begin{equation}\label{eq:main_problem}
@@ -44,5 +44,7 @@ are usually expensive to compute \cite{dhillon2011nearest,nutini2015coordinate,n
 The methods proposed in the present chapter, even when specialized in the coordinate descent case, are the first ones where the \emph{iterate structure enforced by a non-smooth regularizer} is used to adapt the selection probabilities.
 
 % ======= outline =========
-{Outline of the chapter. In Section~\ref{sec:mor-randomized-subspace}, we introduce the formalism for subspace descent methods. First, we formalize how to sample subspaces and introduce a first random subspace proximal gradient algorithm. Then, we show its convergence and derive its linear rate in the strongly convex case. Along the way, we make connections and comparisons with the literature on coordinate descent and sketching methods, notably in the special cases of $\ell_1$ and total variation regularization. In Section~\ref{sec:mor-adaptive-subspace}, we present our identification-based adaptive algorithm. We begin by showing the convergence of an adaptive generalization of our former algorithm; next, we show that this algorithm enjoys some identification property and give practical methods to adapt the sampling, based on generated iterates, leading to refined rates. Finally, in Section~\ref{sec:mor-numerical}, we report numerical experiments on popular learning problems to illustrate the merits and reach of the proposed methods.
+{\paragraph{Outline.} In Section~\ref{sec:mor-randomized-subspace}, we introduce the formalism for subspace descent methods. First, we formalize how to sample subspaces and introduce a first random subspace proximal gradient algorithm. Then, we show its convergence and derive its linear rate in the strongly convex case. Along the way, we make connections and comparisons with the literature on coordinate descent and sketching methods, notably in the special cases of $\ell_1$ and total variation regularization. In Section~\ref{sec:mor-adaptive-subspace}, we present our identification-based adaptive algorithm. We begin by showing the convergence of an adaptive generalization of our former algorithm; next, we show that this algorithm enjoys some identification property and give practical methods to adapt the sampling, based on generated iterates, leading to refined rates. Finally, in Section~\ref{sec:mor-numerical}, we report numerical experiments on popular learning problems to illustrate the merits and reach of the proposed methods.
 }
+
+\dg{This chapter corresponds to \cite{grishchenko2020proximal}}

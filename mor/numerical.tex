@@ -99,7 +99,7 @@ For the produced iterates, we measure the sparsity of a point $x$ by $\|\S(x_k)\
 \]
 We then compare the performance of the algorithms on three criteria:
 \begin{itemize}
-    \item functional suboptimality vs iterations (standard comparison);
+    \item functional suboptimality vs iterations;
     \item size of the sparsity pattern vs iterations (showing the identification properties);
     \item functional suboptimality vs number of subspaces explored (showing the gain of adaptivity).
 \end{itemize}
@@ -181,3 +181,12 @@ Finally, Figure~\ref{fig:tvcomp} displays 20 runs of 1 and 20\% \adaalgo~as well
 }
 \label{fig:tvcomp}
 \end{figure}
+
+
+
+\section{Conclusion}
+\dg{In this chapter, we presented a sketch-and-project algorithm with automatic dimension reduction.
+%The key component of our approach - identification property of proximal methods that takes place for a wide variety of common regularizers. Our method is a 
+The key feature of our approach is an identification-based way to select projections using the geometric structure of the regularizer in contrast with the common approaches that propose taking into account only properties of the smooth term.
+We shown both in theory and in practice, that after some moment of time the iteration complexity of our method is the same as for vanilla proximal gradient descent; however, the dimension of the problem solved on every iteration is sufficiently smaller. This leads to acceleration in terms of the ``number of subspaces explored''.
+}
