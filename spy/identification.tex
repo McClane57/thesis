@@ -15,7 +15,7 @@ Problem~\eqref{eq:pb} is $\mu$-strongly convex ($\mu>0$) and its solution $x^\st
    $$
    \supp(x^\star) = \supp \left( \prox_{r} \left( x^\star - \sum_{i=1}^M  \alpha_i  \nabla f_i(x^\star) + \mathbf{e}   \right)   \right)~ \forall \mathbf{e} \in \mathcal{B}(0,\varepsilon);
    $$
-    \item[ii)] the size $s^\star =|\supp(x^\star)|$ of the optimal support is small compared to $d$: $s^\star\ll d$.
+    \item[ii)] the size $s^\star =|\supp(x^\star)|$ of the optimal support is small compared to $n$: $s^\star\ll n$.
 \end{itemize}
 \end{assumption}
 While part ii) is rather explicit, part i) is quite abstract; 
@@ -134,7 +134,7 @@ where we denote by $\overline{n^{\star}}$ the complementary of $n^{\star}$. Then
   = \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i [x^{k-D_i^k}]_{\overline{n^\star}} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}} \\
      &=  \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i x^{k-D_i^k} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}}.
 \end{align*}
-This exactly coincides with a non-sparsified update on the restriction of $f_i$ to the subspace of vectors with null coordinates in ${\overline{n^\star}}$. More specifically, let $S^\star = \{ x\in \mathbb{R}^d : \nullC(x) = n^\star \}$ be the subspace of vectors with null coordinates in ${\overline{n^\star}}$, and
+This exactly coincides with a non-sparsified update on the restriction of $f_i$ to the subspace of vectors with null coordinates in ${\overline{n^\star}}$. More specifically, let $S^\star = \{ x\in \mathbb{R}^n : \nullC(x) = n^\star \}$ be the subspace of vectors with null coordinates in ${\overline{n^\star}}$, and
 $f_{i|{\overline{n^\star}}}$ be the restriction of $f_i$ to $S^\star$.
 Then the above iteration coincides with non-sparsified update on
 $((\alpha_i),(f_{i|{\overline{n^\star}}}),r)$. In other words, after identification, \spyI~is no longer random and has the same iterates as \dave~on $S^\star$ (while in $S^{\star\perp}$, the algorithm has converged to $0$). Theorem\;\ref{th:davepg} therefore guarantees that \spyI~benefits from a $(1-\gamma (\mu+\rho))^2$ rate in terms of epochs (since $(\mu+\rho)$ is the modulus of strong convexity).
@@ -179,9 +179,9 @@ which leads to the following communication complexity for \recoalgo.
 
 \begin{theorem}[Communication complexity of \recoalgo]\label{th:com}
 Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth ($\mu>0$). Let $r$ be convex lsc. Let assumptions \ref{hyp:ident} and \ref{hyp:delident2} hold.
-If the parameter $c$ is of the same order as $s^\star$ compared to $d$ ($c\approx s^\star \ll d$), then the communication complexity \eqref{eq:commcomp} of \recoalgo with criteria $\mathsf{C}_2$ or $\mathsf{C}_3$ is:
+If the parameter $c$ is of the same order as $s^\star$ compared to $n$ ($c\approx s^\star \ll n$), then the communication complexity \eqref{eq:commcomp} of \recoalgo with criteria $\mathsf{C}_2$ or $\mathsf{C}_3$ is:
 \begin{align*}
-     \mathbf{C}(\varepsilon) = \tilde{O}\left( \frac{L-\mu}{\mu} \sqrt{d \, s^\star } ~ \max \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} \log\left( \frac{1}{\varepsilon} \right) \right).
+     \mathbf{C}(\varepsilon) = \tilde{O}\left( \frac{L-\mu}{\mu} \sqrt{n \, s^\star } ~ \max \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} \log\left( \frac{1}{\varepsilon} \right) \right).
 \end{align*}
 \end{theorem}
 
@@ -200,23 +200,23 @@ where we denote by $\overline{n^\star}$ the complementary of $n^\star$. Then, we
   = \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i [x^{k-D_i^k}]_{\overline{n^\star}} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}} \\
      &=  \left[\prox_{\gamma r}\left(\sum_{i=1}^M \alpha_i x^{k-D_i^k} - \gamma \sum_{i=1}^M \alpha_i [\nabla f_i(x^{k-D_i^k})]_{\overline{n^\star}} \right)\right]_{\overline{n^\star}}.
 \end{align*}
-This exactly coincides with a non-sparsified update on the restriction of $f_i$ to the subspace of vectors with null coordinates in ${\overline{n^\star}}$. More specifically, let $S^\star = \{ x\in \mathbb{R}^d : \nullC(x) = n^\star \}$ be the subspace of vectors with null coordinates in ${\overline{n^\star}}$, and
+This exactly coincides with a non-sparsified update on the restriction of $f_i$ to the subspace of vectors with null coordinates in ${\overline{n^\star}}$. More specifically, let $S^\star = \{ x\in \mathbb{R}^n : \nullC(x) = n^\star \}$ be the subspace of vectors with null coordinates in ${\overline{n^\star}}$, and
 $f_{i|{\overline{n^\star}}}$ be the restriction of $f_i$ to $S^\star$.
 Then the above iteration coincides with non-sparsified update on
 $((\alpha_i),(f_{i|{\overline{n^\star}}}),r)$. In other words, after identification, \salgo is no longer random and has the same iterates as \dave~on $S^\star$ (while in $S^{\star\perp}$, the algorithm has converged to $0$). Theorem\;\ref{th:davepg} therefore guarantees that \salgo benefits from a $(1-\gamma (\mu+\rho))^2$ rate in terms of epochs (since $(\mu+\rho)$ is the modulus of strong convexity).
 \end{proof}
 
-Comparing this result with the communication complexity of our baseline \dave shows the interest of our adaptive sparsification technique. For \dave, the communication complexity writes as 
+Comparing this result with the communication complexity of our baseline \dave~shows the interest of our adaptive sparsification technique. For \dave, the communication complexity writes as 
 \begin{align*}%\label{eq:commcomp2}
     \mathbf{C}(\varepsilon) = K( \mathbf{c}^{\mathrm{up}} + \mathbf{c}^{\mathrm{down}} ) \mathbf{M}(\varepsilon) 
 \end{align*}
 where $\mathbf{M}(\varepsilon)$ is the number of epochs to reach accuracy $\varepsilon$. Theorem~\ref{th:davepg} gives us  $\mathbf{M}(\varepsilon) = \mathcal{O}((\mu+L)/\mu\log(1/\varepsilon))$. 
-Noticing that \dave also identifies the optimal support (apply e.g.\;\cite[Cor.\;1]{iutzeler2020SVAA}),
+Noticing that \dave~also identifies the optimal support (apply e.g.\;\cite[Cor.\;1]{iutzeler2020SVAA}),
 %but does not leverage it, 
-we get $\mathbf{c^{\mathrm{up}}} = s^\star$ as previously. However without the sparsification of \salgo, the cost of an upward communication is $\mathbf{c^{\mathrm{down}}} = d$. This yields the following gain in communication complexity of our algorithm %\recoalgo over \dave 
+we get $\mathbf{c^{\mathrm{up}}} = s^\star$ as previously. However without the sparsification of \salgo, the cost of an upward communication is $\mathbf{c^{\mathrm{down}}} = n$. This yields the following gain in communication complexity of our algorithm %\recoalgo over \dave 
 (the greater, the more performing \recoalgo compared to \dave):
 \begin{align*}
-      \tilde{O}\left( \frac{1+\kappa_{\eqref{eq:pb}}}{1-\kappa_{\eqref{eq:pb}}}   ~ \min \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} ~ \frac{d+s^\star}{\sqrt{ds^\star}}  \right).
+      \tilde{O}\left( \frac{1+\kappa_{\eqref{eq:pb}}}{1-\kappa_{\eqref{eq:pb}}}   ~ \min \left\{\sqrt{\frac{c}{s^\star}};\sqrt{\frac{s^\star}{c}} \right\} ~ \frac{n+s^\star}{\sqrt{ns^\star}}  \right).
 \end{align*}
 % \begin{corollary}[Communication complexity speedup of \recoalgo vs \dave]\label{cor:comcomp}
 % Let the functions $(f_i)$ be $\mu$-strongly convex and $L$-smooth ($\mu>0$). Let $r$ be convex lsc. Let assumptions \ref{hyp:ident} and \ref{hyp:delident} hold.
@@ -229,4 +229,4 @@ The gain thus shows a product of three terms.
 The first term depends on the condition number of the problem and indicates that our method dominates \dave~for all problems.
 %well conditioned problems but even more for poorly conditioned ones. 
 % C'est juste mais je commente car je ne veux pas qu'on nous dise que c'est parce qu'on reconditionne...
-The second term is in $(0,1]$ but should be not too far from $1$, provided that the final sparsity is not poorly estimated. Finally, the last term fully exhibits the merits of adaptive sparsification with a term in $d + s^\star $ for \dave~much greater than the $\sqrt{ds^\star}$ for \recoalgo. This last term really shows a nice dependence in the dimension of the problem and optimal solution for the proposed method. The theoretical gain of \recoalgo compared to \dave~is confirmed in the next numerical illustrations.
+The second term is in $(0,1]$ but should be not too far from $1$, provided that the final sparsity is not poorly estimated. Finally, the last term fully exhibits the merits of adaptive sparsification with a term in $n r + s^\star $ for \dave~much greater than the $\sqrt{ns^\star}$ for \recoalgo. This last term really shows a nice dependence in the dimension of the problem and optimal solution for the proposed method. The theoretical gain of \recoalgo compared to \dave~is confirmed in the next numerical illustrations.

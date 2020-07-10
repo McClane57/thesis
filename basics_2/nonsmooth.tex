@@ -56,7 +56,7 @@ As we could see from the definition, the norm of subgradient could be different;
 The subgradient descent method is not the only method to solve non-smooth problems. Let us present the class of methods called proximal methods and, first, let us recall the definition of \dg{the} proximal operator.
 
 \begin{definition}[Proximal operator]\label{def:proximal_operator}
-Given a convex function $r:\RR^n\rightarrow \RR\dg{\cup+\infty}$, the proximal operator of $r$ is the \dg{mapping}
+Given a convex function $r:\RR^n\rightarrow \RR\dg{\cup\{+\infty\}}$, the proximal operator of $r$ is the \dg{mapping}
 \begin{equation}\label{eq:prox}
 \prox_r(x) = \argmin_{y\in\RR^n}\left\{r(y) + \frac{1}{2}\|x-y\|_2^2\right\}.
 \end{equation}

@@ -1,7 +1,7 @@
 \subsection{Convexity and smoothness}\label{sec:basics_conv_and_smoothness}
 In this section, we recall the basic definitions and properties that are used to analy\dg{z}e optimization methods for smooth and convex objective \cite{hiriart2012fundamentals}. 
 \begin{definition}[Convex function]
-A function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is called convex if $\dom f$ is a convex set\dg{\footnote{Set $S$ is called convex if for any $x,y\in S$ and any $\alpha\in[0,1]$ holds
+A function $f:\RR^n\rightarrow \RR\cup\{+\infty\}$ is called convex if $\dom f$ is a convex set\dg{\footnote{Set $S$ is called convex if for any $x,y\in S$ and any $\alpha\in[0,1]$ holds
 $\alpha x + (1-\alpha)y \in S.$}} and for any $x, y\in \dom f$ and $\alpha \in[0,1]$
 \begin{equation}\label{eq:conv_def}
 f(\alpha x + (1-\alpha)y)\leq \alpha f(x) + (1-\alpha)f(y),
@@ -19,11 +19,11 @@ Moreover, function $f$ is called $\mu$-strongly convex if function $g = f - \fra
 % From this definition, we immediately get the following interpretation for smooth functions $f$ that is more practical for further analysis. 
 
 \begin{lemma}\label{lm:convex}[Theorem $2.1.2$ \cite{nesterov-book}]
-    A continuously differentiable function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex iff for any $x,y\in\RR^n$, we have
+    A continuously differentiable function $f:\RR^n\rightarrow \RR\cup\{+\infty\}$ is convex iff for any $x,y\in\RR^n$, we have
     \begin{equation}\label{eq:convex_1}
         f(y) \geq f(x) + \langle \nabla f(x), y-x\rangle.
     \end{equation}
-    Moreover, function $f:\RR^n\rightarrow \RR\cup{+\infty}$ is $\mu$-strongly convex iff for any $x,y$ in $\mathbb{R}^n$, we have
+    Moreover, function $f:\RR^n\rightarrow \RR\cup\{+\infty\}$ is $\mu$-strongly convex iff for any $x,y$ in $\mathbb{R}^n$, we have
     \begin{equation}\label{eq:convex_2}
         f(y) \geq f(x) + \langle \nabla f(x), y-x\rangle + \frac{\mu}{2}\|y-x\|_2^2.
     \end{equation}
@@ -62,7 +62,7 @@ for any $x,y\in\mathbb{R}^n$.
 If function $f$ is $L$-smooth, then the following upper bound takes place.
 
 \begin{lemma}\label{lm:descent}[Theorem $2.1.5$ \cite{nesterov-book}]
-    Let us assume that $f:\RR^n\rightarrow \RR\cup{+\infty}$ is convex and $L$-smooth, then for any $x,y\in\mathbb{R}^n$
+    Let us assume that $f:\RR^n\rightarrow \RR\cup\{+\infty\}$ is convex and $L$-smooth, then for any $x,y\in\mathbb{R}^n$
     \begin{equation}\label{eq:descent_lemma_1}
         f(y) - f(x) - \langle \nabla f(x), y-x\rangle\leq \frac{L}{2}\|x-y\|_2^2
     \end{equation}
