@@ -1,44 +1,109 @@
-\contentsline {chapter}{\numberline {1}From Gradient to Identification}{1}{chapter.1}% 
-\contentsline {section}{\numberline {1.1}Introduction}{1}{section.1.1}% 
-\contentsline {section}{\numberline {1.2}Convexity and smoothness}{3}{section.1.2}% 
-\contentsline {section}{\numberline {1.3}Gradient descent}{6}{section.1.3}% 
-\contentsline {section}{\numberline {1.4}Non-smooth optimization}{8}{section.1.4}% 
-\contentsline {subsubsection}{Proximal methods}{9}{section*.6}% 
-\contentsline {subsection}{\numberline {1.4.1}Moreau-Yosida regularization}{11}{subsection.1.4.1}% 
-\contentsline {subsection}{\numberline {1.4.2}Composite optimization}{13}{subsection.1.4.2}% 
-\contentsline {subsubsection}{Proximal gradient descent}{13}{section*.9}% 
-\contentsline {subsubsection}{Coordinate descent methods}{14}{section*.10}% 
-\contentsline {subsubsection}{Incremental methods}{15}{section*.11}% 
-\contentsline {section}{\numberline {1.5}Useful tools for stochastic processes analysis.}{17}{section.1.5}% 
-\contentsline {section}{\numberline {1.6}Identification}{18}{section.1.6}% 
-\contentsline {chapter}{\numberline {2}Automatic dimension reduction}{23}{chapter.2}% 
-\contentsline {section}{\numberline {2.1}Introduction}{23}{section.2.1}% 
-\contentsline {section}{\numberline {2.2}Randomized subspace descent}{24}{section.2.2}% 
-\contentsline {subsection}{\numberline {2.2.1}Subspace selection}{24}{subsection.2.2.1}% 
-\contentsline {subsection}{\numberline {2.2.2}Random Subspace Proximal Gradient Algorithm}{26}{subsection.2.2.2}% 
-\contentsline {subsection}{\numberline {2.2.3}Analysis and convergence rate}{27}{subsection.2.2.3}% 
-\contentsline {subsection}{\numberline {2.2.4}Examples and Connections with the existing work}{30}{subsection.2.2.4}% 
-\contentsline {subsubsection}{Projections onto coordinates}{30}{section*.14}% 
-\contentsline {subsubsection}{Projections onto vectors of fixed variations}{30}{section*.15}% 
-\contentsline {subsubsection}{Comparison with sketching}{31}{section*.16}% 
-\contentsline {section}{\numberline {2.3}Adaptive subspace descent}{32}{section.2.3}% 
-\contentsline {subsection}{\numberline {2.3.1}Random Subspace Descent with Time-Varying Selection}{32}{subsection.2.3.1}% 
-\contentsline {subsection}{\numberline {2.3.2}Identification of proximal algorithms}{37}{subsection.2.3.2}% 
-\contentsline {subsection}{\numberline {2.3.3}Identification-based Subspace Descent}{38}{subsection.2.3.3}% 
-\contentsline {subsubsection}{How to update the selection}{38}{section*.19}% 
-\contentsline {subsubsection}{Practical Examples and Discussion}{39}{section*.21}% 
-\contentsline {paragraph}{Coordinate-wise projections}{39}{section*.22}% 
-\contentsline {paragraph}{Vectors of fixed variations}{40}{section*.23}% 
-\contentsline {subsubsection}{Practical consideration for TV}{41}{section*.24}% 
-\contentsline {section}{\numberline {2.4}Numerical illustrations}{41}{section.2.4}% 
-\contentsline {subsection}{\numberline {2.4.1}Experimental setup}{41}{subsection.2.4.1}% 
-\contentsline {subsection}{\numberline {2.4.2}Illustrations for coordinate-structured problems}{42}{subsection.2.4.2}% 
-\contentsline {subsubsection}{Comparison with standard methods}{42}{section*.25}% 
-\contentsline {subsubsection}{Comparison with \texttt {SEGA}}{43}{section*.27}% 
-\contentsline {subsection}{\numberline {2.4.3}Illustrations for total variation regularization}{44}{subsection.2.4.3}% 
-\contentsline {chapter}{\numberline {3}Distributed learning}{47}{chapter.3}% 
-\contentsline {section}{\numberline {3.1}Introduction}{47}{section.3.1}% 
-\contentsline {section}{\numberline {3.2}Notations and Preliminaries}{48}{section.3.2}% 
-\contentsline {paragraph}{Convergence and rate for strongly convex objectives}{50}{section*.32}% 
-\contentsline {paragraph}{Discussion on communication.}{50}{section*.33}% 
-\contentsline {paragraph}{Outline.}{51}{section*.34}% 
+\@ifundefined {etoctocstyle}{\let \etoc@startlocaltoc \@gobble \let \etoc@settocdepth \@gobble \let \etoc@depthtag \@gobble \let \etoc@setlocaltop \@gobble }{}
+\contentsline {chapter}{Introduction}{1}{chapter*.4}%
+\contentsline {paragraph}{Corresponding articles}{2}{section*.5}%
+\contentsline {chapter}{\numberline {1}Background material}{4}{chapter.1}%
+\etoc@startlocaltoc {2}
+\contentsline {section}{Introduction}{5}{section*.7}%
+\contentsline {paragraph}{Outline.}{5}{section*.8}%
+\contentsline {section}{\numberline {1.1}Convex optimization}{6}{section.1.1}%
+\contentsline {subsection}{\numberline {1.1.1}Convexity and smoothness}{6}{subsection.1.1.1}%
+\contentsline {subsection}{\numberline {1.1.2}Gradient descent}{11}{subsection.1.1.2}%
+\contentsline {subsection}{\numberline {1.1.3}Non-smooth optimization}{14}{subsection.1.1.3}%
+\contentsline {subsubsection}{Subgradient descent}{14}{section*.10}%
+\contentsline {subsubsection}{Proximal methods}{16}{section*.12}%
+\contentsline {subsubsection}{Moreau-Yosida regularization}{19}{section*.14}%
+\contentsline {subsection}{\numberline {1.1.4}Composite optimization}{21}{subsection.1.1.4}%
+\contentsline {subsubsection}{Proximal gradient descent}{22}{section*.16}%
+\contentsline {subsubsection}{Coordinate descent methods}{23}{section*.17}%
+\contentsline {subsubsection}{Incremental methods}{25}{section*.18}%
+\contentsline {section}{\numberline {1.2}Introduction to machine learning}{29}{section.1.2}%
+\contentsline {section}{\numberline {1.3}Distributed learning}{32}{section.1.3}%
+\contentsline {subsection}{\numberline {1.3.1}Computing setups}{32}{subsection.1.3.1}%
+\contentsline {subsubsection}{Synchronous algorithms}{33}{section*.20}%
+\contentsline {subsubsection}{Asynchronous algorithms}{34}{section*.21}%
+\contentsline {subsection}{\numberline {1.3.2}Notations and preliminaries}{35}{subsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.3.3}\texttt {DAve-PG}}{36}{subsection.1.3.3}%
+\contentsline {paragraph}{Convergence and rate for strongly convex objectives}{37}{section*.23}%
+\contentsline {paragraph}{Discussion on communication.}{39}{section*.24}%
+\contentsline {section}{\numberline {1.4}Identification}{39}{section.1.4}%
+\contentsline {subsubsection}{Related literature}{40}{section*.25}%
+\contentsline {subsection}{\numberline {1.4.1}Active-set identification}{40}{subsection.1.4.1}%
+\contentsline {subsubsection}{Two examples}{41}{section*.26}%
+\contentsline {subsection}{\numberline {1.4.2}Identification of \texttt {DAve-PG}}{46}{subsection.1.4.2}%
+\contentsline {chapter}{\numberline {2}Automatic dimension reduction}{48}{chapter.2}%
+\etoc@startlocaltoc {3}
+\contentsline {section}{Introduction}{49}{section*.29}%
+\contentsline {paragraph}{Outline.}{50}{section*.30}%
+\contentsline {section}{\numberline {2.1}Randomized subspace descent}{50}{section.2.1}%
+\contentsline {subsection}{\numberline {2.1.1}Subspace selection}{50}{subsection.2.1.1}%
+\contentsline {subsection}{\numberline {2.1.2}Random Subspace Proximal Gradient Algorithm}{53}{subsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.1.3}Analysis and convergence rate}{55}{subsection.2.1.3}%
+\contentsline {subsection}{\numberline {2.1.4}Examples and connections with the existing work}{59}{subsection.2.1.4}%
+\contentsline {subsubsection}{Projections onto coordinates}{59}{section*.31}%
+\contentsline {subsubsection}{Projections onto vectors of fixed variations}{60}{section*.32}%
+\contentsline {subsubsection}{Comparison with sketching}{61}{section*.33}%
+\contentsline {section}{\numberline {2.2}Adaptive subspace descent}{62}{section.2.2}%
+\contentsline {subsection}{\numberline {2.2.1}Random Subspace Descent with time-varying selection}{62}{subsection.2.2.1}%
+\contentsline {subsection}{\numberline {2.2.2}Identification of proximal algorithms}{69}{subsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.2.3}Identification-based subspace descent}{71}{subsection.2.2.3}%
+\contentsline {subsubsection}{How to update the selection}{71}{section*.36}%
+\contentsline {subsubsection}{Practical examples and discussion}{73}{section*.38}%
+\contentsline {paragraph}{Coordinate-wise projections}{73}{section*.39}%
+\contentsline {paragraph}{Vectors of fixed variations}{75}{section*.40}%
+\contentsline {subsubsection}{Practical consideration for TV}{75}{section*.41}%
+\contentsline {section}{\numberline {2.3}Numerical illustrations}{76}{section.2.3}%
+\contentsline {subsection}{\numberline {2.3.1}Experimental setup}{77}{subsection.2.3.1}%
+\contentsline {subsection}{\numberline {2.3.2}Illustrations for coordinate-structured problems}{78}{subsection.2.3.2}%
+\contentsline {subsubsection}{Comparison with standard methods}{78}{section*.42}%
+\contentsline {subsubsection}{Comparison with \texttt {SEGA}}{79}{section*.44}%
+\contentsline {subsection}{\numberline {2.3.3}Illustrations for total variation regularization}{80}{subsection.2.3.3}%
+\contentsline {section}{\numberline {2.4}Conclusion}{82}{section.2.4}%
+\contentsline {chapter}{\numberline {3}Adaptive sparsification of distributed methods}{83}{chapter.3}%
+\etoc@startlocaltoc {4}
+\contentsline {section}{Introduction}{84}{section*.49}%
+\contentsline {paragraph}{Outline.}{85}{section*.50}%
+\contentsline {section}{\numberline {3.1}General sparsification framework}{85}{section.3.1}%
+\contentsline {subsection}{\numberline {3.1.1}Sparsification of local updates}{85}{subsection.3.1.1}%
+\contentsline {subsection}{\numberline {3.1.2}Distributed implementation}{86}{subsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.1.3}Convergence analysis}{88}{subsection.3.1.3}%
+\contentsline {section}{\numberline {3.2}On the sparsification choice for $\ell _1$ regularized problems}{91}{section.3.2}%
+\contentsline {subsection}{\numberline {3.2.1}Inefficiency of uniform sparsification}{91}{subsection.3.2.1}%
+\contentsline {subsection}{\numberline {3.2.2}Efficiency of adaptive sparsification}{93}{subsection.3.2.2}%
+\contentsline {subsection}{\numberline {3.2.3}Scaled adaptive sparsification}{96}{subsection.3.2.3}%
+\contentsline {section}{\numberline {3.3}Better analysis for \texttt {I-SPY}\nobreakspace {}in case of $\ell _1$ regularized problems}{100}{section.3.3}%
+\contentsline {subsection}{\numberline {3.3.1}Identification and better rate}{100}{subsection.3.3.1}%
+\contentsline {subsection}{\numberline {3.3.2}Numerical experiments}{103}{subsection.3.3.2}%
+\contentsline {subsubsection}{Experimental setup}{103}{section*.54}%
+\contentsline {subsubsection}{Speed of convergence.}{104}{section*.56}%
+\contentsline {subsubsection}{Cost of communication.}{106}{section*.58}%
+\contentsline {subsubsection}{Evolution of sparsity.}{108}{section*.63}%
+\contentsline {section}{\numberline {3.4}Conclusion}{109}{section.3.4}%
+\contentsline {chapter}{\numberline {4}Reconditioned sparsification}{111}{chapter.4}%
+\etoc@startlocaltoc {5}
+\contentsline {section}{Introduction}{112}{section*.65}%
+\contentsline {paragraph}{Outline}{113}{section*.66}%
+\contentsline {section}{\numberline {4.1}Proximal reconditioning for adaptive sparsification}{113}{section.4.1}%
+\contentsline {subsection}{\numberline {4.1.1}Proximal reconditioning}{113}{subsection.4.1.1}%
+\contentsline {subsection}{\numberline {4.1.2}Reconditioned--\texttt {I-SPY}\xspace }{114}{subsection.4.1.2}%
+\contentsline {subsection}{\numberline {4.1.3}Proof of Theorem \ref {th:reco}}{116}{subsection.4.1.3}%
+\contentsline {subsubsection}{Two basic lemmas}{116}{section*.67}%
+\contentsline {subsubsection}{Proof of Theorem \ref {th:reco} for criterion $\mathsf {C}_1$ \emph {(epoch budget)}}{119}{section*.68}%
+\contentsline {subsubsection}{Proof of Theorem \ref {th:reco} for criterion $\mathsf {C}_2$ \emph {(absolute accuracy)}}{120}{section*.69}%
+\contentsline {subsubsection}{Proof of Theorem \ref {th:reco} for criterion $\mathsf {C}_3$ (relative accuracy)}{121}{section*.70}%
+\contentsline {subsubsection}{General comments on the result}{122}{section*.71}%
+\contentsline {section}{\numberline {4.2}Identification for two-way sparse communications}{123}{section.4.2}%
+\contentsline {subsection}{\numberline {4.2.1}Identification and consequences}{124}{subsection.4.2.1}%
+\contentsline {subsection}{\numberline {4.2.2}Communication complexity}{128}{subsection.4.2.2}%
+\contentsline {section}{\numberline {4.3}Numerical illustrations}{131}{section.4.3}%
+\contentsline {subsection}{\numberline {4.3.1}Experimental setup}{131}{subsection.4.3.1}%
+\contentsline {subsubsection}{Problem}{131}{section*.72}%
+\contentsline {subsubsection}{Setup details}{131}{section*.73}%
+\contentsline {paragraph}{Restart technique}{132}{section*.74}%
+\contentsline {subsubsection}{Algorithms}{132}{section*.75}%
+\contentsline {subsubsection}{Performance of fixed budget criterion}{132}{section*.76}%
+\contentsline {subsubsection}{Comparing with relative accuracy criterion}{133}{section*.79}%
+\contentsline {paragraph}{Criterion $\mathsf {C}_3$ for LASSO}{134}{section*.80}%
+\contentsline {paragraph}{Criterion $\mathsf {C}_3$ for logistic regression}{134}{section*.82}%
+\contentsline {subsection}{\numberline {4.3.2}Warm start}{136}{subsection.4.3.2}%
+\contentsline {section}{\numberline {4.4}Conclusion}{137}{section.4.4}%
+\contentsline {chapter}{Conclusion and perspectives}{138}{chapter*.85}%

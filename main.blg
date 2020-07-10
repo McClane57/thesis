@@ -1,55 +1,57 @@
 This is BibTeX, Version 0.99d (TeX Live 2019/Debian)
-Capacity: max_strings=100000, hash_size=100000, hash_prime=85009
+Capacity: max_strings=200000, hash_size=200000, hash_prime=170003
 The top-level auxiliary file: main.aux
+A level-1 auxiliary file: cover_simple.aux
 A level-1 auxiliary file: contents.aux
+A level-1 auxiliary file: introduction.aux
 A level-1 auxiliary file: basics_2.aux
 A level-1 auxiliary file: mor.aux
-A level-1 auxiliary file: distributed.aux
+A level-1 auxiliary file: soda.aux
+A level-1 auxiliary file: spy.aux
+A level-1 auxiliary file: conclusion.aux
 A level-1 auxiliary file: biblio.aux
 The style file: alpha.bst
 Database file #1: references.bib
-Warning--I didn't find a database entry for "bertsekas1989parallel"
 Warning--empty journal in moreau1962fonctions
-Warning--empty journal in stout1974almost
-You've used 143 entries,
+You've used 167 entries,
             2543 wiz_defined-function locations,
-            1284 strings with 28340 characters,
-and the built_in function-call counts, 63532 in all, are:
-= -- 6483
-> -- 3072
-< -- 77
-+ -- 1087
-- -- 1070
-* -- 4565
-:= -- 10187
-add.period$ -- 442
-call.type$ -- 143
-change.case$ -- 941
-chr.to.int$ -- 140
-cite$ -- 145
-duplicate$ -- 2533
-empty$ -- 4536
-format.name$ -- 1230
-if$ -- 13115
-int.to.chr$ -- 4
+            1407 strings with 32565 characters,
+and the built_in function-call counts, 74819 in all, are:
+= -- 7635
+> -- 3641
+< -- 87
++ -- 1293
+- -- 1268
+* -- 5423
+:= -- 11996
+add.period$ -- 517
+call.type$ -- 167
+change.case$ -- 1103
+chr.to.int$ -- 161
+cite$ -- 168
+duplicate$ -- 2954
+empty$ -- 5339
+format.name$ -- 1451
+if$ -- 15450
+int.to.chr$ -- 7
 int.to.str$ -- 0
-missing$ -- 148
-newline$ -- 719
-num.names$ -- 429
-pop$ -- 877
+missing$ -- 173
+newline$ -- 839
+num.names$ -- 503
+pop$ -- 1012
 preamble$ -- 1
-purify$ -- 1089
+purify$ -- 1276
 quote$ -- 0
-skip$ -- 2222
+skip$ -- 2593
 stack$ -- 0
-substring$ -- 3865
-swap$ -- 560
-text.length$ -- 77
-text.prefix$ -- 33
+substring$ -- 4608
+swap$ -- 653
+text.length$ -- 87
+text.prefix$ -- 34
 top$ -- 0
-type$ -- 1120
-warning$ -- 2
-while$ -- 635
-width$ -- 149
-write$ -- 1836
-(There were 3 warnings)
+type$ -- 1304
+warning$ -- 1
+while$ -- 748
+width$ -- 173
+write$ -- 2154
+(There was 1 warning)

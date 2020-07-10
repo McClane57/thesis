@@ -1,27 +1,60 @@
-\BOOKMARK [0][-]{chapter.1}{From Gradient to Identification}{}% 1
-\BOOKMARK [1][-]{section.1.1}{Introduction}{chapter.1}% 2
-\BOOKMARK [1][-]{section.1.2}{Convexity and smoothness}{chapter.1}% 3
-\BOOKMARK [1][-]{section.1.3}{Gradient descent}{chapter.1}% 4
-\BOOKMARK [1][-]{section.1.4}{Non-smooth optimization}{chapter.1}% 5
-\BOOKMARK [2][-]{subsection.1.4.1}{Moreau-Yosida regularization}{section.1.4}% 6
-\BOOKMARK [2][-]{subsection.1.4.2}{Composite optimization}{section.1.4}% 7
-\BOOKMARK [1][-]{section.1.5}{Useful tools for stochastic processes analysis.}{chapter.1}% 8
-\BOOKMARK [1][-]{section.1.6}{Identification}{chapter.1}% 9
-\BOOKMARK [0][-]{chapter.2}{Automatic dimension reduction}{}% 10
-\BOOKMARK [1][-]{section.2.1}{Introduction}{chapter.2}% 11
-\BOOKMARK [1][-]{section.2.2}{Randomized subspace descent}{chapter.2}% 12
-\BOOKMARK [2][-]{subsection.2.2.1}{Subspace selection}{section.2.2}% 13
-\BOOKMARK [2][-]{subsection.2.2.2}{Random Subspace Proximal Gradient Algorithm}{section.2.2}% 14
-\BOOKMARK [2][-]{subsection.2.2.3}{Analysis and convergence rate}{section.2.2}% 15
-\BOOKMARK [2][-]{subsection.2.2.4}{Examples and Connections with the existing work}{section.2.2}% 16
-\BOOKMARK [1][-]{section.2.3}{Adaptive subspace descent}{chapter.2}% 17
-\BOOKMARK [2][-]{subsection.2.3.1}{Random Subspace Descent with Time-Varying Selection}{section.2.3}% 18
-\BOOKMARK [2][-]{subsection.2.3.2}{Identification of proximal algorithms}{section.2.3}% 19
-\BOOKMARK [2][-]{subsection.2.3.3}{Identification-based Subspace Descent}{section.2.3}% 20
-\BOOKMARK [1][-]{section.2.4}{Numerical illustrations}{chapter.2}% 21
-\BOOKMARK [2][-]{subsection.2.4.1}{Experimental setup}{section.2.4}% 22
-\BOOKMARK [2][-]{subsection.2.4.2}{Illustrations for coordinate-structured problems}{section.2.4}% 23
-\BOOKMARK [2][-]{subsection.2.4.3}{Illustrations for total variation regularization}{section.2.4}% 24
-\BOOKMARK [0][-]{chapter.3}{Distributed learning}{}% 25
-\BOOKMARK [1][-]{section.3.1}{Introduction}{chapter.3}% 26
-\BOOKMARK [1][-]{section.3.2}{Notations and Preliminaries}{chapter.3}% 27
+\BOOKMARK [0][-]{chapter*.4}{Introduction}{}% 1
+\BOOKMARK [0][-]{chapter.1}{Background material}{}% 2
+\BOOKMARK [1][-]{section*.7}{Introduction}{chapter.1}% 3
+\BOOKMARK [1][-]{section.1.1}{Convex optimization}{chapter.1}% 4
+\BOOKMARK [2][-]{subsection.1.1.1}{Convexity and smoothness}{section.1.1}% 5
+\BOOKMARK [2][-]{subsection.1.1.2}{Gradient descent}{section.1.1}% 6
+\BOOKMARK [2][-]{subsection.1.1.3}{Non-smooth optimization}{section.1.1}% 7
+\BOOKMARK [2][-]{subsection.1.1.4}{Composite optimization}{section.1.1}% 8
+\BOOKMARK [1][-]{section.1.2}{Introduction to machine learning}{chapter.1}% 9
+\BOOKMARK [1][-]{section.1.3}{Distributed learning}{chapter.1}% 10
+\BOOKMARK [2][-]{subsection.1.3.1}{Computing setups}{section.1.3}% 11
+\BOOKMARK [2][-]{subsection.1.3.2}{Notations and preliminaries}{section.1.3}% 12
+\BOOKMARK [2][-]{subsection.1.3.3}{DAve-PG}{section.1.3}% 13
+\BOOKMARK [1][-]{section.1.4}{Identification}{chapter.1}% 14
+\BOOKMARK [2][-]{subsection.1.4.1}{Active-set identification}{section.1.4}% 15
+\BOOKMARK [2][-]{subsection.1.4.2}{Identification of DAve-PG}{section.1.4}% 16
+\BOOKMARK [0][-]{chapter.2}{Automatic dimension reduction}{}% 17
+\BOOKMARK [1][-]{section*.29}{Introduction}{chapter.2}% 18
+\BOOKMARK [1][-]{section.2.1}{Randomized subspace descent}{chapter.2}% 19
+\BOOKMARK [2][-]{subsection.2.1.1}{Subspace selection}{section.2.1}% 20
+\BOOKMARK [2][-]{subsection.2.1.2}{Random Subspace Proximal Gradient Algorithm}{section.2.1}% 21
+\BOOKMARK [2][-]{subsection.2.1.3}{Analysis and convergence rate}{section.2.1}% 22
+\BOOKMARK [2][-]{subsection.2.1.4}{Examples and connections with the existing work}{section.2.1}% 23
+\BOOKMARK [1][-]{section.2.2}{Adaptive subspace descent}{chapter.2}% 24
+\BOOKMARK [2][-]{subsection.2.2.1}{Random Subspace Descent with time-varying selection}{section.2.2}% 25
+\BOOKMARK [2][-]{subsection.2.2.2}{Identification of proximal algorithms}{section.2.2}% 26
+\BOOKMARK [2][-]{subsection.2.2.3}{Identification-based subspace descent}{section.2.2}% 27
+\BOOKMARK [1][-]{section.2.3}{Numerical illustrations}{chapter.2}% 28
+\BOOKMARK [2][-]{subsection.2.3.1}{Experimental setup}{section.2.3}% 29
+\BOOKMARK [2][-]{subsection.2.3.2}{Illustrations for coordinate-structured problems}{section.2.3}% 30
+\BOOKMARK [2][-]{subsection.2.3.3}{Illustrations for total variation regularization}{section.2.3}% 31
+\BOOKMARK [1][-]{section.2.4}{Conclusion}{chapter.2}% 32
+\BOOKMARK [0][-]{chapter.3}{Adaptive sparsification of distributed methods}{}% 33
+\BOOKMARK [1][-]{section*.49}{Introduction}{chapter.3}% 34
+\BOOKMARK [1][-]{section.3.1}{General sparsification framework}{chapter.3}% 35
+\BOOKMARK [2][-]{subsection.3.1.1}{Sparsification of local updates}{section.3.1}% 36
+\BOOKMARK [2][-]{subsection.3.1.2}{Distributed implementation}{section.3.1}% 37
+\BOOKMARK [2][-]{subsection.3.1.3}{Convergence analysis}{section.3.1}% 38
+\BOOKMARK [1][-]{section.3.2}{On the sparsification choice for 1 regularized problems}{chapter.3}% 39
+\BOOKMARK [2][-]{subsection.3.2.1}{Inefficiency of uniform sparsification}{section.3.2}% 40
+\BOOKMARK [2][-]{subsection.3.2.2}{Efficiency of adaptive sparsification}{section.3.2}% 41
+\BOOKMARK [2][-]{subsection.3.2.3}{Scaled adaptive sparsification}{section.3.2}% 42
+\BOOKMARK [1][-]{section.3.3}{Better analysis for I-SPY in case of 1 regularized problems}{chapter.3}% 43
+\BOOKMARK [2][-]{subsection.3.3.1}{Identification and better rate}{section.3.3}% 44
+\BOOKMARK [2][-]{subsection.3.3.2}{Numerical experiments}{section.3.3}% 45
+\BOOKMARK [1][-]{section.3.4}{Conclusion}{chapter.3}% 46
+\BOOKMARK [0][-]{chapter.4}{Reconditioned sparsification}{}% 47
+\BOOKMARK [1][-]{section*.65}{Introduction}{chapter.4}% 48
+\BOOKMARK [1][-]{section.4.1}{Proximal reconditioning for adaptive sparsification}{chapter.4}% 49
+\BOOKMARK [2][-]{subsection.4.1.1}{Proximal reconditioning}{section.4.1}% 50
+\BOOKMARK [2][-]{subsection.4.1.2}{Reconditioned\205I-SPY}{section.4.1}% 51
+\BOOKMARK [2][-]{subsection.4.1.3}{Proof of Theorem 4.1}{section.4.1}% 52
+\BOOKMARK [1][-]{section.4.2}{Identification for two-way sparse communications}{chapter.4}% 53
+\BOOKMARK [2][-]{subsection.4.2.1}{Identification and consequences}{section.4.2}% 54
+\BOOKMARK [2][-]{subsection.4.2.2}{Communication complexity}{section.4.2}% 55
+\BOOKMARK [1][-]{section.4.3}{Numerical illustrations}{chapter.4}% 56
+\BOOKMARK [2][-]{subsection.4.3.1}{Experimental setup}{section.4.3}% 57
+\BOOKMARK [2][-]{subsection.4.3.2}{Warm start}{section.4.3}% 58
+\BOOKMARK [1][-]{section.4.4}{Conclusion}{chapter.4}% 59
+\BOOKMARK [0][-]{chapter*.85}{Conclusion and perspectives}{}% 60

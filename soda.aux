@@ -1,0 +1,161 @@
+\relax 
+\providecommand\hyper@newdestlabel[2]{}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Adaptive sparsification of distributed methods}{83}{chapter.3}\protected@file@percent }
+\@writefile{lof}{\addvspace {10\p@ }}
+\@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{loa}{\addvspace {10\p@ }}
+\newlabel{ch:soda}{{3}{83}{Adaptive sparsification of distributed methods}{chapter.3}{}}
+\@writefile{toc}{\etoc@startlocaltoc{4}}
+\citation{ICML18}
+\newlabel{sec:soda-intro}{{3}{84}{Introduction}{section*.49}{}}
+\@writefile{toc}{\contentsline {section}{Introduction}{84}{section*.49}\protected@file@percent }
+\@writefile{toc}{\contentsline {paragraph}{Outline.}{85}{section*.50}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.1}General sparsification framework}{85}{section.3.1}\protected@file@percent }
+\newlabel{sec:distributed-sparse}{{3.1}{85}{General sparsification framework}{section.3.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.1}Sparsification of local updates}{85}{subsection.3.1.1}\protected@file@percent }
+\newlabel{sec:algo}{{3.1.1}{85}{Sparsification of local updates}{subsection.3.1.1}{}}
+\citation{liu2015asynchronous}
+\citation{sun2017asynchronous}
+\citation{peng2016arock}
+\citation{richtarik2016distributed}
+\newlabel{hyp:algo}{{3.1}{86}{On the random sparsification}{theorem.3.1}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.2}Distributed implementation}{86}{subsection.3.1.2}\protected@file@percent }
+\newlabel{sec:distributed-sparse-impl}{{3.1.2}{86}{Distributed implementation}{subsection.3.1.2}{}}
+\citation{ICML18}
+\citation{mishchenko2018}
+\citation{ICML18}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {11}{\ignorespaces \textsc  {\texttt  {SPY}\xspace  } on $((\alpha _i),(f_i), r \nobreakspace  {} ; \nobreakspace  {} p)$ with stopping criterion $\mathsf  {C}$\relax }}{87}{algorithm.11}\protected@file@percent }
+\newlabel{alg:spy}{{11}{87}{\textsc {\salgo } on $((\alpha _i),(f_i), r ~ ; ~ p)$ with stopping criterion $\mathsf {C}$\relax }{algorithm.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.1.3}Convergence analysis}{88}{subsection.3.1.3}\protected@file@percent }
+\newlabel{sec:distributed-sparse-analyze}{{3.1.3}{88}{Convergence analysis}{subsection.3.1.3}{}}
+\newlabel{lm:spy_diff}{{3.2}{88}{Reach and Limits of Sparsification}{theorem.3.2}{}}
+\newlabel{eq:dif_prob}{{3.2}{88}{Reach and Limits of Sparsification}{equation.3.1.2}{}}
+\newlabel{eq:ratebefore}{{3.3}{88}{Reach and Limits of Sparsification}{equation.3.1.3}{}}
+\newlabel{apx:proofsparse}{{3.1.3}{88}{Convergence analysis}{equation.3.1.3}{}}
+\newlabel{eq:spy_rate}{{3.4}{90}{Convergence analysis}{equation.3.1.4}{}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.2}On the sparsification choice for $\ell _1$ regularized problems}{91}{section.3.2}\protected@file@percent }
+\newlabel{sec:distributed-adaptive}{{3.2}{91}{On the sparsification choice for $\ell _1$ regularized problems}{section.3.2}{}}
+\newlabel{eq:prob_gap}{{3.5}{91}{On the sparsification choice for $\ell _1$ regularized problems}{equation.3.2.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.1}Inefficiency of uniform sparsification}{91}{subsection.3.2.1}\protected@file@percent }
+\newlabel{hyp:delident}{{3.3}{91}{Additional assumption for identification}{theorem.3.3}{}}
+\newlabel{lm:spydr_identification}{{3.4}{91}{Almost-sure convergence of \spy }{theorem.3.4}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {12}{\ignorespaces \textsc  {\texttt  {U-SPY}} on $((\alpha _i),(f_i), r \nobreakspace  {} ; \nobreakspace  {} \pi )$\relax }}{92}{algorithm.12}\protected@file@percent }
+\newlabel{alg:uspy}{{12}{92}{\textsc {\spyU } on $((\alpha _i),(f_i), r ~ ; ~ \pi )$\relax }{algorithm.12}{}}
+\newlabel{eq:recall}{{3.6}{92}{Inefficiency of uniform sparsification}{equation.3.2.6}{}}
+\citation{chang2011libsvm}
+\citation{chang2011libsvm}
+\citation{grishchenko2020proximal}
+\@writefile{lof}{\contentsline {figure}{\numberline {3-1}{\ignorespaces Evolution of \texttt  {U-SPY}\nobreakspace  {}iterates comparing to \texttt  {DAve-PG}. We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite  {chang2011libsvm}. We denote by ``SPY\nobreakspace  {}+ $\pi $'' the \texttt  {U-SPY}\nobreakspace  {}with probability $\pi $.\relax }}{93}{figure.caption.51}\protected@file@percent }
+\newlabel{fig:uniform}{{3-1}{93}{Evolution of \spyU ~iterates comparing to \dave . We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite {chang2011libsvm}. We denote by ``SPY~+ $\pi $'' the \spyU ~with probability $\pi $.\relax }{figure.caption.51}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.2}Efficiency of adaptive sparsification}{93}{subsection.3.2.2}\protected@file@percent }
+\newlabel{sec:adapt_eff}{{3.2.2}{93}{Efficiency of adaptive sparsification}{subsection.3.2.2}{}}
+\citation{chang2011libsvm}
+\citation{chang2011libsvm}
+\newlabel{hyp:algoident}{{3.5}{94}{Sparsification with support identification}{theorem.3.5}{}}
+\newlabel{eq:kappamin}{{3.7}{94}{Efficiency of adaptive sparsification}{equation.3.2.7}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {13}{\ignorespaces \textsc  {\texttt  {I-SPY}} on $((\alpha _i),(f_i),\pi )$\relax }}{95}{algorithm.13}\protected@file@percent }
+\newlabel{alg:soda}{{13}{95}{\textsc {\spyI } on $((\alpha _i),(f_i),\pi )$\relax }{algorithm.13}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3-2}{\ignorespaces Evolution of \texttt  {I-SPY}\nobreakspace  {}iterates comparing to \texttt  {DAve-PG}. We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite  {chang2011libsvm}. We present $3$ different runs of \texttt  {I-SPY}\nobreakspace  {}with adaptive selection as in Option I of Assumption \ref  {hyp:algoident} with probability $\pi = 0.1$ showing both convergence and divergence of \texttt  {I-SPY}.\relax }}{95}{figure.caption.52}\protected@file@percent }
+\newlabel{fig:soda}{{3-2}{95}{Evolution of \spyI ~iterates comparing to \dave . We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite {chang2011libsvm}. We present $3$ different runs of \spyI ~with adaptive selection as in Option I of Assumption \ref {hyp:algoident} with probability $\pi = 0.1$ showing both convergence and divergence of \spyI .\relax }{figure.caption.52}{}}
+\citation{wang2017efficient}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {14}{\ignorespaces \textsc  {\texttt  {S-SPY}} on $((\alpha _i),(f_i), r \nobreakspace  {} ; \nobreakspace  {} {p})$\relax }}{96}{algorithm.14}\protected@file@percent }
+\newlabel{alg:sspy}{{14}{96}{\textsc {\spyS } on $((\alpha _i),(f_i), r ~ ; ~ \pvec )$\relax }{algorithm.14}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.2.3}Scaled adaptive sparsification}{96}{subsection.3.2.3}\protected@file@percent }
+\newlabel{alg:spyS}{{3.8}{97}{Scaled adaptive sparsification}{equation.3.2.8}{}}
+\newlabel{th:spydr_conv}{{3.6}{97}{Convergence of \spyS }{theorem.3.6}{}}
+\newlabel{eq:dif_prob2}{{3.9}{97}{Convergence of \spyS }{equation.3.2.9}{}}
+\citation{chang2011libsvm}
+\citation{chang2011libsvm}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {15}{\ignorespaces \textsc  {\texttt  {IS-SPY}} on $((\alpha _i),(f_i), r \nobreakspace  {} ; \nobreakspace  {} \pi )$\relax }}{99}{algorithm.15}\protected@file@percent }
+\newlabel{alg:spydr}{{15}{99}{\textsc {\spyIS } on $((\alpha _i),(f_i), r ~ ; ~ \pi )$\relax }{algorithm.15}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3-3}{\ignorespaces Evolution of \texttt  {IS-SPY}\nobreakspace  {}iterates comparing to \texttt  {DAve-PG}. We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite  {chang2011libsvm}. We denote by ``IS-SPY\nobreakspace  {}+ {$\pi $}'' the \texttt  {IS-SPY}\nobreakspace  {}with selected as in Option I of Assumption \ref  {hyp:algoident} with probability $\pi $.\relax }}{99}{figure.caption.53}\protected@file@percent }
+\newlabel{fig:spydr}{{3-3}{99}{Evolution of \spyIS ~iterates comparing to \dave . We consider logistic regression objective function with elastic net regularizer on madelon dataset from LibSVM library \cite {chang2011libsvm}. We denote by ``IS-SPY~+ \dg {$\pi $}'' the \spyIS ~with selected as in Option I of Assumption \ref {hyp:algoident} with probability $\pi $.\relax }{figure.caption.53}{}}
+\citation{mishchenko2018}
+\citation{fadili2018sensitivity}
+\@writefile{toc}{\contentsline {section}{\numberline {3.3}Better analysis for \texttt  {I-SPY}\nobreakspace  {}in case of $\ell _1$ regularized problems}{100}{section.3.3}\protected@file@percent }
+\newlabel{sec:i-spy}{{3.3}{100}{Better analysis for \spyI ~in case of $\ell _1$ regularized problems}{section.3.3}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.1}Identification and better rate}{100}{subsection.3.3.1}\protected@file@percent }
+\newlabel{sec:soda-identiification}{{3.3.1}{100}{Identification and better rate}{subsection.3.3.1}{}}
+\newlabel{eq:pb_l1}{{{$\mathsf  {P}_{\ell _1}$}}{100}{Identification and better rate}{subsection.3.3.1}{}}
+\newlabel{eq:dif_prob3}{{3.10}{100}{Identification and better rate}{equation.3.3.10}{}}
+\citation{ICML18}
+\newlabel{hyp:conv}{{3.7}{101}{On convergence}{theorem.3.7}{}}
+\newlabel{lm:ident}{{3.8}{101}{Identification}{theorem.3.8}{}}
+\newlabel{th:rate_after}{{3.9}{101}{Better rate of \spyI }{theorem.3.9}{}}
+\newlabel{eq:dif_prob4}{{3.12}{101}{Better rate of \spyI }{equation.3.3.12}{}}
+\citation{ICML18}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.3.2}Numerical experiments}{103}{subsection.3.3.2}\protected@file@percent }
+\newlabel{sec:exps}{{3.3.2}{103}{Numerical experiments}{subsection.3.3.2}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Experimental setup}{103}{section*.54}\protected@file@percent }
+\newlabel{eq:log_reg}{{3.13}{103}{Experimental setup}{equation.3.3.13}{}}
+\citation{ICML18}
+\@writefile{toc}{\contentsline {subsubsection}{Speed of convergence.}{104}{section*.56}\protected@file@percent }
+\@writefile{lot}{\contentsline {table}{\numberline {3.1}{\ignorespaces Statistics of datasets used in our experiments; $m$, $n$, $\lambda _1$, $\lambda _2$ and support are respectively the size of the training set, the number of parameters, the hyperparmeters corresponding to $\ell _1$ and $\ell _2$ regularization terms and the percentage of non-zero entries of the final solution; $\mathrm  {supp}(x^\star )$.\relax }}{104}{table.caption.55}\protected@file@percent }
+\newlabel{tab:datasets}{{3.1}{104}{Statistics of datasets used in our experiments; $m$, $n$, $\lambda _1$, $\lambda _2$ and support are respectively the size of the training set, the number of parameters, the hyperparmeters corresponding to $\ell _1$ and $\ell _2$ regularization terms and the percentage of non-zero entries of the final solution; $\supp (\w ^\star )$.\relax }{table.caption.55}{}}
+\citation{ICML18}
+\citation{ICML18}
+\@writefile{lof}{\contentsline {figure}{\numberline {3-4}{\ignorespaces Objective loss \textup  {\hbox {\mathsurround \z@ \normalfont  (\ignorespaces \ref  {eq:pb_l1}\unskip \@@italiccorr )}} suboptimality versus time in second (top) and epochs with respect to time (down), for $M=20$ workers and $\lambda _1 = 10^{-4}$ on Real\_sim and RCV1 datasets.\relax }}{105}{figure.caption.57}\protected@file@percent }
+\newlabel{fig:speed_conv}{{3-4}{105}{Objective loss \eqref {eq:pb_l1} suboptimality versus time in second (top) and epochs with respect to time (down), for $M=20$ workers and $\lambda _1 = 10^{-4}$ on Real\_sim and RCV1 datasets.\relax }{figure.caption.57}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Cost of communication.}{106}{section*.58}\protected@file@percent }
+\@writefile{lof}{\contentsline {figure}{\numberline {3-5}{\ignorespaces madelon dataset, $M=10$ workers, $\lambda _1 = 0.02$.\relax }}{106}{figure.caption.59}\protected@file@percent }
+\newlabel{fig:madelon_robust}{{3-5}{106}{madelon dataset, $M=10$ workers, $\lambda _1 = 0.02$.\relax }{figure.caption.59}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3-6}{\ignorespaces Objective loss \textup  {\hbox {\mathsurround \z@ \normalfont  (\ignorespaces \ref  {eq:pb_l1}\unskip \@@italiccorr )}} suboptimality versus number of exchanges, for $M=20$ workers and $\lambda _1 = 10^{-4}$ on real-sim and rcv1\_train datasets.\relax }}{107}{figure.caption.60}\protected@file@percent }
+\newlabel{fig:communication}{{3-6}{107}{Objective loss \eqref {eq:pb_l1} suboptimality versus number of exchanges, for $M=20$ workers and $\lambda _1 = 10^{-4}$ on real-sim and rcv1\_train datasets.\relax }{figure.caption.60}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3-7}{\ignorespaces Evolution of sparsity versus iterations on real-sim and rcv1\_train collections with, $M=20$ workers and $\lambda _1= 10^{-4}.$\relax }}{108}{figure.caption.61}\protected@file@percent }
+\newlabel{fig:real_diff_sp}{{3-7}{108}{Evolution of sparsity versus iterations on real-sim and rcv1\_train collections with, $M=20$ workers and $\lambda _1= 10^{-4}.$\relax }{figure.caption.61}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Evolution of sparsity.}{108}{section*.63}\protected@file@percent }
+\@writefile{toc}{\contentsline {section}{\numberline {3.4}Conclusion}{109}{section.3.4}\protected@file@percent }
+\newlabel{sec:conclusion}{{3.4}{109}{Conclusion}{section.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3-8}{\ignorespaces Dependence of gain on the sparsity of the final solution\relax }}{109}{figure.caption.62}\protected@file@percent }
+\newlabel{fig:different_final_sparsity}{{3-8}{109}{Dependence of gain on the sparsity of the final solution\relax }{figure.caption.62}{}}
+\@setckpt{soda}{
+\setcounter{page}{111}
+\setcounter{equation}{13}
+\setcounter{enumi}{0}
+\setcounter{enumii}{0}
+\setcounter{enumiii}{0}
+\setcounter{enumiv}{0}
+\setcounter{footnote}{3}
+\setcounter{mpfootnote}{0}
+\setcounter{part}{0}
+\setcounter{chapter}{3}
+\setcounter{section}{4}
+\setcounter{subsection}{0}
+\setcounter{subsubsection}{0}
+\setcounter{paragraph}{0}
+\setcounter{subparagraph}{0}
+\setcounter{figure}{8}
+\setcounter{table}{1}
+\setcounter{savepage}{0}
+\setcounter{AM@survey}{0}
+\setcounter{Item}{0}
+\setcounter{Hfootnote}{12}
+\setcounter{bookmark@seq@number}{46}
+\setcounter{parentequation}{1}
+\setcounter{etoc@tocid}{4}
+\setcounter{etoc@tocdepth}{2}
+\setcounter{caption@flags}{0}
+\setcounter{continuedfloat}{0}
+\setcounter{float@type}{16}
+\setcounter{pp@next@reset}{0}
+\setcounter{algorithm}{15}
+\setcounter{ALC@unique}{62}
+\setcounter{ALC@line}{9}
+\setcounter{ALC@rem}{9}
+\setcounter{ALC@depth}{0}
+\setcounter{subfigure}{0}
+\setcounter{subtable}{0}
+\setcounter{AlgoLine}{0}
+\setcounter{algocfline}{0}
+\setcounter{algocfproc}{0}
+\setcounter{algocf}{0}
+\setcounter{tcbbreakpart}{1}
+\setcounter{tcblayer}{0}
+\setcounter{lofdepth}{1}
+\setcounter{lotdepth}{1}
+\setcounter{theorem}{9}
+\setcounter{@pps}{0}
+\setcounter{@ppsavesec}{0}
+\setcounter{@ppsaveapp}{0}
+\setcounter{section@level}{1}
+}

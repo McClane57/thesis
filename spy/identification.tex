@@ -52,7 +52,7 @@ where $x^k_\ell$ denotes the $k$-th iterate produced by \salgo during the $\ell$
 \end{theorem}
 
 \begin{proof}
-We proved in the previous section that \recoalgo converges almost surely, but it is not enough to guarantee identification in general\footnote{Take $d=1$, $F(x) = |x|$, and $x_{\ell+1} = \prox_{|\cdot|}(x_\ell) + 1/\ell^2$. The minimum of $F$ is $0$ but we have $x_\ell = 1/(\ell-1)^2>0$ for all $\ell>1$.}. Here it is the fact that the inner algorithm \spyI~features a proximity operator with a non-vanishing stepsize that yields the following identification property. 
+We proved in the previous section that \recoalgo converges almost surely, but it is not enough to guarantee identification in general\footnote{Take $n=1$, $F(x) = |x|$, and $x_{\ell+1} = \prox_{|\cdot|}(x_\ell) + 1/\ell^2$. The minimum of $F$ is $0$ but we have $x_\ell = 1/(\ell-1)^2>0$ for all $\ell>1$.}. Here it is the fact that the inner algorithm \spyI~features a proximity operator with a non-vanishing stepsize that yields the following identification property. 
 
 More precisely, \recoalgo is of the form 
 \begin{align*}

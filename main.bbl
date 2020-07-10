@@ -47,16 +47,41 @@ Dimitri~P Bertsekas.
 \newblock Incremental proximal methods for large scale convex optimization.
 \newblock {\em Mathematical programming}, 129(2):163, 2011.
 
+\bibitem[BGI{\etalchar{+}}20]{bareilles2020solving}
+Gilles Bareilles, Dmitry Grishchenko, Franck Iutzeler, Yassine Laguel, and
+  J{\'e}r{\^o}me Malick.
+\newblock Solving stochastic programming problems with randomized scenario
+  sampling.
+\newblock Technical report, EasyChair, 2020.
+
 \bibitem[BHG07]{blatt2007convergent}
 Doron Blatt, Alfred~O Hero, and Hillel Gauchman.
 \newblock A convergent incremental gradient method with a constant step size.
 \newblock {\em SIAM Journal on Optimization}, 18(1):29--51, 2007.
+
+\bibitem[BHI15]{bianchi2015coordinate}
+Pascal Bianchi, Walid Hachem, and Franck Iutzeler.
+\newblock A coordinate descent primal-dual algorithm and application to
+  distributed asynchronous optimization.
+\newblock {\em IEEE Transactions on Automatic Control}, 61(10):2947--2957,
+  2015.
+
+\bibitem[BI19]{bareilles2019interplay}
+Gilles Bareilles and Franck Iutzeler.
+\newblock On the interplay between acceleration and identification for the
+  proximal gradient algorithm.
+\newblock {\em arXiv preprint arXiv:1909.08944}, 2019.
 
 \bibitem[BJM{\etalchar{+}}12]{bach2012optimization}
 Francis Bach, Rodolphe Jenatton, Julien Mairal, Guillaume Obozinski, et~al.
 \newblock Optimization with sparsity-inducing penalties.
 \newblock {\em Foundations and Trends{\textregistered} in Machine Learning},
   4(1):1--106, 2012.
+
+\bibitem[BKL66]{bkl}
+R.E. Bellman, R.E. Kalaba, and J.~Lockett.
+\newblock {\em Numerical Inversion of the Laplace Transform}, pages 143--144.
+\newblock Elsevier, New York, 1966.
 
 \bibitem[BM88]{burke1988identification}
 James~V Burke and Jorge~J Mor{\'e}.
@@ -88,6 +113,12 @@ Stephen~P. Boyd, Neal Parikh, Eric Chu, Borja Peleato, and Jonathan Eckstein.
   direction method of multipliers.
 \newblock {\em Foundations and Trends in Machine Learning}, 3(1):1--122, 2011.
 
+\bibitem[BT89]{bertsekas1989parallel}
+Dimitri~P Bertsekas and John~N Tsitsiklis.
+\newblock {\em Parallel and distributed computation: numerical methods},
+  volume~23.
+\newblock Prentice hall Englewood Cliffs, NJ, 1989.
+
 \bibitem[BT97]{bertsekas1997parallel}
 Dimitri~P Bertsekas and John~N Tsitsiklis.
 \newblock Parallel and distributed computation: numerical methods. 1989.
@@ -110,28 +141,35 @@ Augustin Cauchy.
   d’{\'e}quations simultan{\'e}es.
 \newblock {\em Comp. Rend. Sci. Paris}, 25(1847):536--538, 1847.
 
+\bibitem[CL11]{chang2011libsvm}
+Chih-Chung Chang and Chih-Jen Lin.
+\newblock Libsvm: a library for support vector machines.
+\newblock {\em ACM Transactions on Intelligent Systems and Technology (TIST)},
+  2(3):27, 2011.
+
+\bibitem[CM09]{cappe2009line}
+Olivier Capp{\'e} and Eric Moulines.
+\newblock On-line expectation--maximization algorithm for latent data models.
+\newblock {\em Journal of the Royal Statistical Society: Series B (Statistical
+  Methodology)}, 71(3):593--613, 2009.
+
 \bibitem[CMBJ16]{Chen2016}
 Jianmin Chen, Rajat Monga, Samy Bengio, and Rafal Jozefowicz.
 \newblock Revisiting distributed synchronous sgd.
 \newblock In {\em International Conference on Learning Representations Workshop
   Track}, 2016.
 
-\bibitem[Con13]{condat2013direct}
-Laurent Condat.
-\newblock A direct algorithm for 1-d total variation denoising.
-\newblock {\em IEEE Signal Processing Letters}, 20(11):1054--1057, 2013.
-
-\bibitem[CP08]{combettes2008proximal}
-Patrick~L Combettes and Jean-Christophe Pesquet.
-\newblock Proximal thresholding algorithm for minimization over orthonormal
-  bases.
-\newblock {\em SIAM Journal on Optimization}, 18(4):1351--1376, 2008.
-
 \bibitem[CP11]{combettes2011proximal}
 Patrick~L Combettes and Jean-Christophe Pesquet.
 \newblock Proximal splitting methods in signal processing.
 \newblock In {\em Fixed-point algorithms for inverse problems in science and
   engineering}, pages 185--212. Springer, 2011.
+
+\bibitem[CP15]{combettes2015stochastic}
+Patrick~L Combettes and Jean-Christophe Pesquet.
+\newblock Stochastic quasi-fej{\'e}r block-coordinate fixed point iterations
+  with random sweeping.
+\newblock {\em SIAM Journal on Optimization}, 25(2):1221--1248, 2015.
 
 \bibitem[CR17]{calauzenes2017distributed}
 Cl{\'e}ment Calauz{\`e}nes and Nicolas~Le Roux.
@@ -192,15 +230,24 @@ Inderjit~S Dhillon, Pradeep~K Ravikumar, and Ambuj Tewari.
 \newblock Nearest neighbor based greedy coordinate descent.
 \newblock In {\em Advances in Neural Information Processing Systems}, 2011.
 
-\bibitem[FGMP18]{fadili2018model}
-Jalal Fadili, Guillaume Garrigos, J{\'e}rome Malick, and Gabriel Peyr{\'e}.
+\bibitem[FGMP19]{fadili2018model}
+Jalal~M Fadili, Guillaume Garrigos, J{\'e}r{\^o}me Malick, and Gabriel
+  Peyr{\'e}.
 \newblock Model consistency for learning with mirror-stratifiable regularizers.
-\newblock {\em arXiv preprint arXiv:1803.08381}, 2018.
+\newblock In {\em International Conference on Artificial Intelligence and
+  Statistics (AISTATS)}, 2019.
 
 \bibitem[FGS15]{fercoq2015mind}
 Olivier Fercoq, Alexandre Gramfort, and Joseph Salmon.
 \newblock Mind the duality gap: safer rules for the lasso.
-\newblock {\em arXiv preprint arXiv:1505.03410}, 2015.
+\newblock In {\em International Conference on Machine Learning}, pages
+  333--342, 2015.
+
+\bibitem[FML12]{fuentes}
+Marc Fuentes, J{\'e}r{\^o}me Malick, and Claude Lemar{\'e}chal.
+\newblock Descentwise inexact proximal algorithms for smooth optimization.
+\newblock {\em Computational Optimization and Applications}, 53(3):755--769,
+  2012.
 
 \bibitem[FMP18]{fadili2018sensitivity}
 Jalal Fadili, Jerome Malick, and Gabriel Peyr{\'e}.
@@ -226,12 +273,29 @@ Tobias Glasmachers and Urun Dogan.
 \newblock Accelerated coordinate descent with adaptive coordinate frequencies.
 \newblock In {\em Asian Conference on Machine Learning}, pages 72--86, 2013.
 
+\bibitem[GIM20]{grishchenko2020proximal}
+Dmitry Grishchenko, Franck Iutzeler, and J{\'e}r{\^o}me Malick.
+\newblock Proximal gradient methods with adaptive subspace sampling.
+\newblock {\em Mathematics of Operations Research}, 2020.
+
 \bibitem[GIMA18]{grishchenko2018asynchronous}
 Dmitry Grishchenko, Franck Iutzeler, J{\'e}r{\^o}me Malick, and Massih-Reza
   Amini.
 \newblock Asynchronous distributed learning with sparse communications and
   identification.
 \newblock {\em arXiv preprint arXiv:1812.03871}, 2018.
+
+\bibitem[GRC09]{gasso2009recovering}
+Gilles Gasso, Alain Rakotomamonjy, and St{\'e}phane Canu.
+\newblock Recovering sparse signals with a certain family of nonconvex
+  penalties and dc programming.
+\newblock {\em IEEE Transactions on Signal Processing}, 57(12):4686--4698,
+  2009.
+
+\bibitem[G{\"u}l92]{guler1992new}
+Osman G{\"u}ler.
+\newblock New proximal point algorithms for convex minimization.
+\newblock {\em SIAM Journal on Optimization}, 2(4):649--664, 1992.
 
 \bibitem[HCS{\etalchar{+}}17]{hubara2017quantized}
 Itay Hubara, Matthieu Courbariaux, Daniel Soudry, Ran El-Yaniv, and Yoshua
@@ -275,6 +339,24 @@ Jean-Baptiste Hiriart-Urruty and Claude Lemar{\'e}chal.
 Robert Hannah and Wotao Yin.
 \newblock On unbounded delays in asynchronous parallel fixed-point algorithms.
 \newblock {\em Journal of Scientific Computing}, pages 1--28, 2016.
+
+\bibitem[IBCH13]{iutzeler2013asynchronous}
+Franck Iutzeler, Pascal Bianchi, Philippe Ciblat, and Walid Hachem.
+\newblock Asynchronous distributed optimization using a randomized alternating
+  direction method of multipliers.
+\newblock In {\em Decision and Control (CDC), 2013 IEEE 52nd Annual Conference
+  on}, pages 3671--3676. IEEE, 2013.
+
+\bibitem[IGGS19]{ivanova2019adaptive}
+Anastasiya Ivanova, Dmitry Grishchenko, Alexander Gasnikov, and Egor Shulgin.
+\newblock Adaptive catalyst for smooth convex optimization.
+\newblock {\em arXiv preprint arXiv:1911.11271}, 2019.
+
+\bibitem[IM20]{iutzeler2020SVAA}
+Franck Iutzeler and Jerome Malick.
+\newblock Nonsmoothness in machine learning: specific structure, proximal
+  identification, and applications.
+\newblock {\em Submitted to Set-Valued and Variational Analysis}, 2020.
 
 \bibitem[JAB11]{jenatton2011structured}
 Rodolphe Jenatton, Jean-Yves Audibert, and Francis Bach.
@@ -325,10 +407,11 @@ AN~KOLMOGOROV.
 \newblock {\em Ergebnisse der Mathematik}, 1933.
 
 \bibitem[KSJ19]{koloskova2019decentralized}
-Anastasia Koloskova, Sebastian~U Stich, and Martin Jaggi.
+Anastasia Koloskova, Sebastian Stich, and Martin Jaggi.
 \newblock Decentralized stochastic optimization and gossip algorithms with
   compressed communication.
-\newblock {\em arXiv preprint arXiv:1902.00340}, 2019.
+\newblock In {\em International Conference on Machine Learning}, pages
+  3478--3487, 2019.
 
 \bibitem[Kum02]{Kumar02}
 Vipin Kumar.
@@ -357,6 +440,12 @@ Yujun Lin, Song Han, Huizi Mao, Yu~Wang, and William~J Dally.
   distributed training.
 \newblock {\em arXiv preprint arXiv:1712.01887}, 2017.
 
+\bibitem[LHY00]{lange2000optimization}
+Kenneth Lange, David~R Hunter, and Ilsoon Yang.
+\newblock Optimization transfer using surrogate objective functions.
+\newblock {\em Journal of computational and graphical statistics}, 9(1):1--20,
+  2000.
+
 \bibitem[LL18]{lewis2018partial}
 Adrian~S Lewis and Jingwei Liang.
 \newblock Partial smoothness and constant rank.
@@ -368,12 +457,31 @@ Hongzhou Lin, Julien Mairal, and Zaid Harchaoui.
 \newblock In {\em Advances in neural information processing systems}, pages
   3384--3392, 2015.
 
+\bibitem[LMH17]{lin2017catalyst}
+Hongzhou Lin, Julien Mairal, and Zaid Harchaoui.
+\newblock Catalyst acceleration for first-order convex optimization: from
+  theory to practice.
+\newblock {\em The Journal of Machine Learning Research}, 18(1):7854--7907,
+  2017.
+
+\bibitem[LMH19]{lin2019inexact}
+Hongzhou Lin, Julien Mairal, and Zaid Harchaoui.
+\newblock An inexact variable metric proximal point algorithm for generic
+  quasi-newton acceleration.
+\newblock {\em SIAM Journal on Optimization}, 29(2):1408--1443, 2019.
+
 \bibitem[LPLJ17]{leblond2016asaga}
 R{\'e}mi Leblond, Fabian Pedregosa, and Simon Lacoste-Julien.
 \newblock Asaga: Asynchronous parallel saga.
 \newblock In {\em Artificial Intelligence and Statistics}, pages 46--54, 2017.
 
-\bibitem[LS97]{lemarechal1997practical}
+\bibitem[LS97a]{lemarechal-sagastizabal-1997}
+C.~{Lemar\'echal} and C.~Sagastiz\'abal.
+\newblock Variable metric bundle methods: from conceptual to implementable
+  forms.
+\newblock {\em Mathematical Programming}, 76(3):393--410, 1997.
+
+\bibitem[LS97b]{lemarechal1997practical}
 Claude Lemar{\'e}chal and Claudia Sagastiz{\'a}bal.
 \newblock Practical aspects of the moreau--yosida regularization: Theoretical
   preliminaries.
@@ -390,22 +498,40 @@ Tian Li, Anit~Kumar Sahu, Ameet Talwalkar, and Virginia Smith.
 \newblock Federated learning: Challenges, methods, and future directions.
 \newblock {\em arXiv preprint arXiv:1908.07873}, 2019.
 
+\bibitem[LW12]{lee2012manifold}
+Sangkyun Lee and Stephen~J Wright.
+\newblock Manifold identification in dual averaging for regularized stochastic
+  online learning.
+\newblock {\em Journal of Machine Learning Research}, 13, 2012.
+
+\bibitem[LWR{\etalchar{+}}15]{liu2015asynchronous}
+Ji~Liu, Stephen~J Wright, Christopher R{\'e}, Victor Bittorf, and Srikrishna
+  Sridhar.
+\newblock An asynchronous parallel stochastic coordinate descent algorithm.
+\newblock {\em The Journal of Machine Learning Research}, 16(1):285--322, 2015.
+
 \bibitem[Mai15]{mairal2015incremental}
 Julien Mairal.
 \newblock Incremental majorization-minimization optimization with application
   to large-scale machine learning.
 \newblock {\em SIAM Journal on Optimization}, 25(2):829--855, 2015.
 
-\bibitem[MGTR19]{mishchenko2019distributed}
-Konstantin Mishchenko, Eduard Gorbunov, Martin Tak{\'a}{\v{c}}, and Peter
-  Richt{\'a}rik.
-\newblock Distributed learning with compressed gradient differences.
-\newblock {\em arXiv preprint arXiv:1901.09269}, 2019.
+\bibitem[Mar70]{martinet-1970}
+B.~Martinet.
+\newblock {R\'egularisation d'in\'equations variationelles par approximation
+  successives}.
+\newblock {\em {Revue Fran\c{c}aise d'Informatique et de Recherche
+  Op\'erationelle}}, R3:154--158, 1970.
 
-\bibitem[MIM18]{mishchenko2018}
+\bibitem[MHR19]{mishchenko201999}
+Konstantin Mishchenko, Filip Hanzely, and Peter Richt{\'a}rik.
+\newblock 99\% of parallel optimization is inevitably a waste of time.
+\newblock {\em arXiv preprint arXiv:1901.09437}, 2019.
+
+\bibitem[MIM20]{mishchenko2018}
 Konstantin Mishchenko, Franck Iutzeler, and J{\'e}r{\^o}me Malick.
 \newblock A distributed flexible delay-tolerant proximal gradient algorithm.
-\newblock {\em arXiv preprint arXiv:1806.09429}, 2018.
+\newblock {\em SIAM Journal on Optimization}, 30(1):933--959, 2020.
 
 \bibitem[MIMA18]{ICML18}
 Konstantin Mishchenko, Franck Iutzeler, J{\'e}r{\^o}me Malick, and Massih-Reza
@@ -440,6 +566,12 @@ Angelia Nedi{\'c} and Dimitri Bertsekas.
 \newblock In {\em Stochastic optimization: algorithms and applications}, pages
   223--264. Springer, 2001.
 
+\bibitem[Nes83]{nesterov1983method}
+Yurii~E Nesterov.
+\newblock A method for solving the convex programming problem with convergence
+  rate $o(1/k^2)$.
+\newblock In {\em Dokl. akad. nauk Sssr}, volume 269, pages 543--547, 1983.
+
 \bibitem[Nes05]{nesterov2005smooth}
 Yu~Nesterov.
 \newblock Smooth minimization of non-smooth functions.
@@ -456,6 +588,13 @@ Y.~Nesterov.
 \newblock {\em Introductory lectures on convex optimization: A basic course},
   volume~87.
 \newblock Springer Science \& Business Media, 2013.
+
+\bibitem[NH98]{neal1998view}
+Radford~M Neal and Geoffrey~E Hinton.
+\newblock A view of the em algorithm that justifies incremental, sparse, and
+  other variants.
+\newblock In {\em Learning in graphical models}, pages 355--368. Springer,
+  1998.
 
 \bibitem[NLS17]{nutini2017let}
 Julie Nutini, Issam Laradji, and Mark Schmidt.
@@ -500,17 +639,6 @@ Kohei Ogawa, Yoshiki Suzuki, and Ichiro Takeuchi.
 \newblock In {\em International Conference on Machine Learning}, pages
   1382--1390, 2013.
 
-\bibitem[OT06]{olshevsky2006convergence}
-Alex Olshevsky and John~N Tsitsiklis.
-\newblock Convergence rates in distributed consensus and averaging.
-\newblock In {\em Proceedings of the 45th IEEE Conference on Decision and
-  Control}, pages 3387--3392. IEEE, 2006.
-
-\bibitem[OT09]{olshevsky2009convergence}
-Alex Olshevsky and John~N Tsitsiklis.
-\newblock Convergence speed in distributed consensus and averaging.
-\newblock {\em SIAM Journal on Control and Optimization}, 48(1):33--55, 2009.
-
 \bibitem[PB{\etalchar{+}}14]{parikh2014proximal}
 Neal Parikh, Stephen Boyd, et~al.
 \newblock Proximal algorithms.
@@ -530,9 +658,10 @@ Fabian Pedregosa, R{\'e}mi Leblond, and Simon Lacoste-Julien.
   55--64, 2017.
 
 \bibitem[PLS18]{poon2018local}
-Clarice Poon, Jingwei Liang, and Carola-Bibiane Sch{\"o}nlieb.
+Clarice Poon, Jingwei Liang, and Carola Schoenlieb.
 \newblock Local convergence properties of saga/prox-svrg and acceleration.
-\newblock {\em arXiv preprint arXiv:1802.02554}, 2018.
+\newblock In {\em International Conference on Machine Learning}, pages
+  4124--4132, 2018.
 
 \bibitem[Pol63]{polyak1963gradient}
 Boris~T Polyak.
@@ -604,7 +733,13 @@ Peter Richt{\'a}rik and Martin Tak{\'a}{\v{c}}.
   for minimizing a composite function.
 \newblock {\em Mathematical Programming}, 144(1-2):1--38, 2014.
 
-\bibitem[RT16]{richtarik2016optimal}
+\bibitem[RT16a]{richtarik2016distributed}
+Peter Richt{\'a}rik and Martin Tak{\'a}{\v{c}}.
+\newblock Distributed coordinate descent method for learning with big data.
+\newblock {\em The Journal of Machine Learning Research}, 17(1):2657--2681,
+  2016.
+
+\bibitem[RT16b]{richtarik2016optimal}
 Peter Richt{\'a}rik and Martin Tak{\'a}{\v{c}}.
 \newblock On optimal probabilities in stochastic coordinate descent methods.
 \newblock {\em Optimization Letters}, 10(6):1233--1243, 2016.
@@ -622,17 +757,31 @@ Virginia Smith, Simone Forte, Michael~I Jordan, and Martin Jaggi.
 \newblock {\em arXiv preprint arXiv:1512.04011, presented at the ML Systems
   Workshop of ICML}, 2016.
 
+\bibitem[Sho64]{shor1964structure}
+Naum~Z Shor.
+\newblock On the structure of algorithms for the numerical solution of optimal
+  planning and design problems.
+\newblock In {\em Diss. kand. fiz.-matem. n.} IK Akad. Nauk UkSSR Kiev, 1964.
+
 \bibitem[SHY17]{sun2017asynchronous}
 Tao Sun, Robert Hannah, and Wotao Yin.
 \newblock Asynchronous coordinate descent under more realistic assumptions.
 \newblock In {\em Advances in Neural Information Processing Systems}, 2017.
 
-\bibitem[SJNS19]{sun2019we}
+\bibitem[SJNS19a]{sun2019we}
 Yifan Sun, Halyun Jeong, Julie Nutini, and Mark Schmidt.
 \newblock Are we there yet? manifold identification of gradient-related
   proximal methods.
 \newblock In {\em The 22nd International Conference on Artificial Intelligence
   and Statistics}, pages 1110--1119, 2019.
+
+\bibitem[SJNS19b]{pmlr-v89-sun19a}
+Yifan Sun, Halyun Jeong, Julie Nutini, and Mark Schmidt.
+\newblock Are we there yet? manifold identification of gradient-related
+  proximal methods.
+\newblock In Kamalika Chaudhuri and Masashi Sugiyama, editors, {\em Proceedings
+  of Machine Learning Research}, volume~89 of {\em Proceedings of Machine
+  Learning Research}, pages 1110--1119. PMLR, 16--18 Apr 2019.
 
 \bibitem[SLRB17]{schmidt2017minimizing}
 Mark Schmidt, Nicolas Le~Roux, and Francis Bach.
@@ -657,6 +806,18 @@ Sebastian~U Stich, Anant Raj, and Martin Jaggi.
 \newblock Safe adaptive importance sampling.
 \newblock In {\em Advances in Neural Information Processing Systems}, pages
   4381--4391, 2017.
+
+\bibitem[SS00]{solodov2000error}
+Mikhail~V Solodov and Benar~Fux Svaiter.
+\newblock Error bounds for proximal point subproblems and associated inexact
+  proximal point algorithms.
+\newblock {\em Mathematical programming}, 88(2):371--389, 2000.
+
+\bibitem[SS01]{solodov-svaiter-2001}
+M.~V. Solodov and B.~F. Svaiter.
+\newblock A unified framework for some inexact proximal point algorithms.
+\newblock {\em Numerical functional analysis and optimization}, 22:1013--1035,
+  2001.
 
 \bibitem[SS14]{shamir2014distributed}
 Ohad Shamir and Nathan Srebro.
@@ -687,11 +848,6 @@ Sebastian~U Stich.
 \newblock Local sgd converges fast and communicates little.
 \newblock {\em arXiv preprint arXiv:1805.09767}, 2018.
 
-\bibitem[Sto74]{stout1974almost}
-William~F Stout.
-\newblock Almost sure convergence.
-\newblock 1974.
-
 \bibitem[SV99]{suykens1999least}
 Johan~AK Suykens and Joos Vandewalle.
 \newblock Least squares support vector machine classifiers.
@@ -702,11 +858,6 @@ John Tsitsiklis, Dimitri Bertsekas, and Michael Athans.
 \newblock Distributed asynchronous deterministic and stochastic gradient
   optimization algorithms.
 \newblock {\em IEEE transactions on automatic control}, 31(9):803--812, 1986.
-
-\bibitem[Teb18]{teboulle2018simplified}
-Marc Teboulle.
-\newblock A simplified view of first order methods for optimization.
-\newblock {\em Mathematical Programming}, 170(1):67--96, 2018.
 
 \bibitem[TJSZ04]{tang2004granular}
 Yuchun Tang, Bo~Jin, Yi~Sun, and Yan-Qing Zhang.
@@ -760,11 +911,22 @@ Samuel Vaiter, Mohammad Golbabaee, Jalal Fadili, and Gabriel Peyr{\'e}.
 \newblock {\em Information and Inference: A Journal of the IMA}, 4(3):230--287,
   2015.
 
+\bibitem[VGO16]{vanli2016stronger}
+Nuri~Denizcan Vanli, Mert Gurbuzbalaban, and Asu Ozdaglar.
+\newblock A stronger convergence result on the proximal incremental aggregated
+  gradient method.
+\newblock {\em arXiv preprint arXiv:1611.08022}, 2016.
+
 \bibitem[WKSZ17]{wang2017efficient}
 Jialei Wang, Mladen Kolar, Nathan Srebro, and Tong Zhang.
 \newblock Efficient distributed learning with sparsity.
 \newblock In {\em Proceedings of the 34th International Conference on Machine
   Learning-Volume 70}, pages 3636--3645. JMLR. org, 2017.
+
+\bibitem[WNF09]{wright2009sparse}
+Stephen~J Wright, Robert~D Nowak, and M{\'a}rio~AT Figueiredo.
+\newblock Sparse reconstruction by separable approximation.
+\newblock {\em IEEE Transactions on Signal Processing}, 57(7):2479--2493, 2009.
 
 \bibitem[Wri93]{wright1993identifiable}
 Stephen~J Wright.
@@ -802,12 +964,6 @@ Tianbao Yang.
   coordinate ascent.
 \newblock In {\em Advances in Neural Information Processing Systems}, pages
   629--637, 2013.
-
-\bibitem[YLY11]{yuan2011efficient}
-Lei Yuan, Jun Liu, and Jieping Ye.
-\newblock Efficient methods for overlapping group lasso.
-\newblock In {\em Advances in neural information processing systems}, pages
-  352--360, 2011.
 
 \bibitem[Yos12]{yosida2012functional}
 K{\"o}saku Yosida.
